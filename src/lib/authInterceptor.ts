@@ -1,6 +1,6 @@
 import { useAuthStore } from '@/store/useAuthStore'
 import { refreshTokenRequest } from '@/utils/refreshTokenRequest'
-import { getTokenExpiry } from '@/utils/jwtUtils'
+import { getTokenPayload } from '@/utils/jwtUtils'
 import { TokenError } from '@/types/authTypes'
 
 let isRefreshing = false
@@ -50,22 +50,52 @@ export function shouldRefreshToken(): boolean {
 
 export { isRefreshing } 
 
-// 토큰 설정을 한 곳에서 관리하는 유틸리티 함수 추가
+/**
+ * 토큰 설정을 한 곳에서 관리하는 유틸리티 함수 추가
+ * 
+ * interface DecodedToken {
+  email: string;
+  sub: string;
+  role: string;
+  preferences: {
+    theme: string;
+    language: string;
+    timezone: string;
+  };
+  tokenVersion: number;
+  keepLoggedIn: boolean;
+  iat: number;
+  exp: number;
+  // [key: string]: any;
+}
+ */
+
+
 export function setAuthToken(token: string | null) {
   if (!token) {
-    useAuthStore.getState().setAccessToken(null);
-    useAuthStore.getState().setTokenExpiry(null);
+    useAuthStore.getState().resetAuthState();
     return;
   }
 
   try {
-    const expiry = getTokenExpiry(token);
-    useAuthStore.getState().setTokenExpiry(expiry);
-    useAuthStore.getState().setAccessToken(token);
+    const payload = getTokenPayload(token);
+    useAuthStore.getState().updateAuthState({
+      accessToken: token,
+      tokenExpiry: payload.exp * 1000,
+      role: payload.role,
+      email: payload.email,
+      sub: payload.sub
+    });
+    // useAuthStore에서 Partial을 사용했기 때문에 아래와 같이 개별 필드를 업데이트할 수 있다.
+    // useAuthStore.getState().updateAuthState({
+    //   email: "new@email.com",
+    //   role: "ADMIN"
+    // });
+
+    console.log('토큰 설정 완료:', useAuthStore.getState());
   } catch (error) {
     console.error('토큰 처리 실패:', error);
-    useAuthStore.getState().setAccessToken(null);
-    useAuthStore.getState().setTokenExpiry(null);
+    useAuthStore.getState().resetAuthState();
     throw new TokenError('유효하지 않은 토큰 형식입니다.');
   }
 } 

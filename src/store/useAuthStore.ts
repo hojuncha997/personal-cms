@@ -10,20 +10,63 @@ import { create } from 'zustand'
 // 2. tokenExpiry: 토큰 만료 시간
 // 3. loading: 인증 처리 중 상태
 
+
+/*
+interface DecodedToken {
+  email: string;
+  sub: string;
+  role: string;
+  preferences: {
+    theme: string;
+    language: string;
+    timezone: string;
+  };
+  tokenVersion: number;
+  keepLoggedIn: boolean;
+  iat: number;
+  exp: number;
+  // [key: string]: any;
+}
+*/
+
 interface AuthStore {
   accessToken: string | null;
   tokenExpiry: number | null;
   loading: boolean;
-  setAccessToken: (token: string | null) => void;
-  setTokenExpiry: (expiry: number | null) => void;
+  role: string | null;
+  email: string | null;
+  sub: string | null;
+  // preferences: {
+  //   theme: string;
+  //   language: string;
+  //   timezone: string;
+  // };
+  updateAuthState: (payload: Partial<{ // 부분적 업데이트가 가능하도록 partial사용
+    accessToken: string | null;
+    tokenExpiry: number | null;
+    role: string | null;
+    email: string | null;
+    sub: string | null;
+  }>) => void;
+  resetAuthState: () => void;
   setLoading: (isLoading: boolean) => void;
 }
 
-export const useAuthStore = create<AuthStore>((set) => ({
+const initialState = {
   accessToken: null,
   tokenExpiry: null,
   loading: false,
-  setAccessToken: (token) => set({ accessToken: token }),
-  setTokenExpiry: (expiry) => set({ tokenExpiry: expiry }),
-  setLoading: (isLoading) => set({ loading: isLoading })
+  role: null,
+  email: null,
+  sub: null,
+} as const;
+
+export const useAuthStore = create<AuthStore>((set) => ({
+  ...initialState,
+  
+  updateAuthState: (payload) => set(payload),
+  
+  resetAuthState: () => set(initialState),
+  
+  setLoading: (isLoading) => set({ loading: isLoading }),
 })); 
