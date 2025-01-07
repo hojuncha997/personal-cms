@@ -12,22 +12,27 @@
 'use client'
 
 import { useEffect } from 'react'
-import { useAuthStore } from '@/store/useAuthStore'
+import { useAuthStore } from '@/stores/useAuthStore'
 import { shouldRefreshToken, handleTokenRefresh } from '@/lib/authInterceptor'
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const setLoading = useAuthStore(state => state.setLoading)
 
   useEffect(() => {
-    // 초기 인증 시도
+    let mounted = true;
+
     const initializeAuth = async () => {
       try {
         setLoading(true)
         await handleTokenRefresh()
+        // 약간의 지연을 주어 깜빡임 방지
+        await new Promise(resolve => setTimeout(resolve, 100))
       } catch (error) {
         console.error('초기 인증 실패:', error)
       } finally {
-        setLoading(false)
+        if (mounted) {
+          setLoading(false)
+        }
       }
     }
 
@@ -55,6 +60,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange)
       window.removeEventListener('online', handleOnline)
+      mounted = false
     }
   }, [])
 

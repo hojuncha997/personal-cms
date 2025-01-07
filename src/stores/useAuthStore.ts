@@ -55,7 +55,7 @@ interface AuthStore {
 const initialState = {
   accessToken: null,
   tokenExpiry: null,
-  loading: false,
+  loading: true,
   role: null,
   email: null,
   sub: null,

@@ -1,4 +1,4 @@
-import { useAuthStore } from '@/store/useAuthStore'
+import { useAuthStore } from '@/stores/useAuthStore'
 import { refreshTokenRequest } from '@/utils/refreshTokenRequest'
 import { getTokenPayload } from '@/utils/jwtUtils'
 import { TokenError } from '@/types/authTypes'
