@@ -1,6 +1,8 @@
 'use client'
 
-import { useAuthStore } from '@stores/useAuthStore'
+import { useAuthStore } from '@/store/useAuthStore'
+
+
 interface NavigationProps {
   onOpenDrawer: () => void;
   onOpenLogin: () => void;

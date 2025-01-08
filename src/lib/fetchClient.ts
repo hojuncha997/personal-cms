@@ -12,7 +12,7 @@
 // 4. 요청 실행
 // 5. 401 응답시 토큰 갱신 후 재시도
 
-import { useAuthStore } from '@/stores/useAuthStore'
+import { useAuthStore } from '@/store/useAuthStore'
 import { 
   isRefreshing, 
   handleTokenRefresh, 

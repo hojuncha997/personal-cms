@@ -12,7 +12,7 @@
 'use client'
 
 import { useEffect } from 'react'
-import { useAuthStore } from '@/stores/useAuthStore'
+import { useAuthStore } from '@/store/useAuthStore'
 import { shouldRefreshToken, handleTokenRefresh } from '@/lib/authInterceptor'
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {

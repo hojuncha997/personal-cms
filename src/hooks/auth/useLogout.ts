@@ -3,7 +3,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { fetchClient } from '@/lib/fetchClient';
 import { setAuthToken } from '@/lib/authInterceptor';
-import { useAuthStore } from '@/stores/useAuthStore';
+import { useAuthStore } from '@/store/useAuthStore';
 
 export const useLogout = () => {
   const setLoading = useAuthStore(state => state.setLoading)

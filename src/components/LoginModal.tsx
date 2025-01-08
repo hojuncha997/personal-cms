@@ -1,8 +1,8 @@
 // LoginModal.tsx
 import { useState } from 'react'
-import { useLogin, LoginError } from '../auth/useLogin'
-import { useAuthStore } from "@/stores/useAuthStore";
-import { useLogout } from "@/auth/useLogout";
+import { useLogin, LoginError } from '@hooks/auth/useLogin'
+import { useAuthStore } from "@/store/useAuthStore";
+import { useLogout } from "@hooks/auth/useLogout";
 
 interface LoginModalProps {
  isOpen: boolean
