@@ -36,6 +36,7 @@ interface AuthStore {
   role: string | null;
   email: string | null;
   sub: string | null;
+  isAuthenticated: boolean;
   // preferences: {
   //   theme: string;
   //   language: string;
@@ -47,6 +48,7 @@ interface AuthStore {
     role: string | null;
     email: string | null;
     sub: string | null;
+    isAuthenticated: boolean;
   }>) => void;
   resetAuthState: () => void;
   setLoading: (isLoading: boolean) => void;
@@ -59,6 +61,7 @@ const initialState = {
   role: null,
   email: null,
   sub: null,
+  isAuthenticated: false,
 } as const;
 
 export const useAuthStore = create<AuthStore>((set) => ({

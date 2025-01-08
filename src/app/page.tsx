@@ -1,7 +1,7 @@
 'use client'
 
-import Navigation from '@/components/Navigation'
-import Drawer from '@/components/Drawer'
+  import { NavContainer } from '@/components/navigation'
+  import Drawer from '@/components/Drawer'
 import LoginModal from '@/components/LoginModal'
 import { useState } from 'react'
 import Carousel from '@/components/Carousel'
@@ -14,7 +14,8 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-[#f1f5f9] to-[#ffffff]">
-      <Navigation 
+    
+      <NavContainer 
         onOpenDrawer={() => setIsDrawerOpen(true)}
         onOpenLogin={() => setIsLoginModalOpen(true)}
       />

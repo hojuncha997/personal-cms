@@ -84,13 +84,39 @@ export function setAuthToken(token: string | null) {
       tokenExpiry: payload.exp * 1000,
       role: payload.role,
       email: payload.email,
-      sub: payload.sub
+      sub: payload.sub,
+      isAuthenticated: true,
     });
+
     // useAuthStore에서 Partial을 사용했기 때문에 아래와 같이 개별 필드를 업데이트할 수 있다.
     // useAuthStore.getState().updateAuthState({
     //   email: "new@email.com",
     //   role: "ADMIN"
     // });
+
+    /* 추후 이렇게 처리하자.
+try {
+  const decodedToken = getTokenPayload(token);
+  
+  if (isTokenExpired(decodedToken.exp)) {
+    throw new TokenError('Token has expired', 'EXPIRED');
+  }
+
+  const remainingTime = getRemainingTime(decodedToken.exp);
+  console.log(`Token will expire in ${remainingTime}ms`);
+
+  useAuthStore.getState().updateAuthState({
+    accessToken: token,
+    tokenExpiry: getTokenExpiryTime(decodedToken.exp),
+    ...decodedToken
+  });
+} catch (error) {
+  if (error instanceof TokenError) {
+    // 특정 에러 타입에 따른 처리
+  }
+  useAuthStore.getState().resetAuthState();
+}
+    */
 
     console.log('토큰 설정 완료:', useAuthStore.getState());
   } catch (error) {
