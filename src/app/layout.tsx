@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import Providers from '@/providers'
-
+import ClientLayout from '@/components/layouts/ClientLayout'
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
   variable: "--font-geist-sans",
@@ -25,12 +25,20 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    /*
+    scrollbar-gutter-stable :
+    스크롤이 필요할 때만 스크롤바가 출현
+    다만, 스크롤바가 나타날 수 있는 공간을 미리 확보해
+    이를 통해 스크롤바가 갑자기 나타날 때 레이아웃이 밀리는 현상을 방지
+    */
+    <html lang="en" className="scrollbar-gutter-stable">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <Providers>
-          {children}
+          <ClientLayout>
+            {children}
+          </ClientLayout>
         </Providers>
       </body>
     </html>

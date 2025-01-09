@@ -25,7 +25,7 @@ export default function PostCard({ title, description, date, category, imageUrl 
         </div>
       </div>
       <div className="p-6">
-        <h3 className="text-xl font-bold mb-2 line-clamp-2">{title}</h3>
+        <h3 className="text-xl font-bold mb-2 line-clamp-2 text-gray-600">{title}</h3>
         <p className="text-gray-600 mb-4 line-clamp-3">{description}</p>
         <div className="text-gray-400 text-sm">{date}</div>
       </div>

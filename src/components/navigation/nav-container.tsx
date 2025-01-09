@@ -2,6 +2,7 @@
 
 import { useAuthStore } from '@/store/useAuthStore'
 import { NavProfile } from './nav-profile'
+import Link from 'next/link'
 
 
 interface NavContainerProps {
@@ -29,10 +30,10 @@ export function NavContainer({ onOpenDrawer, onOpenLogin }: NavContainerProps) {
 
           {/* 데스크탑 메뉴 */}
           <div className="hidden lg:flex lg:items-center lg:space-x-8">
-            <a href="#" className="text-gray-600 hover:text-gray-900">홈</a>
-            <a href="#" className="text-gray-600 hover:text-gray-900">소개</a>
-            <a href="#" className="text-gray-600 hover:text-gray-900">서비스</a>
-            <a href="#" className="text-gray-600 hover:text-gray-900">문의하기</a>
+            <Link href="/" className="text-gray-600 hover:text-gray-900">홈</Link>
+            <Link href="/about" className="text-gray-600 hover:text-gray-900">소개</Link>
+            <Link href="#" className="text-gray-600 hover:text-gray-900">서비스</Link>
+            <Link href="#" className="text-gray-600 hover:text-gray-900">문의하기</Link>
 
             {/* 만약 로그인 되어 있다면 프로필 버튼을 보여주고, 아니면 로그인 버튼을 보여준다. 그리고 
             로그인 되어 있는 경우 클릭하면 팝오버를 보여주고, 로그인 돼 있지 않다면 로그인 모달을 보여줘야 한다
