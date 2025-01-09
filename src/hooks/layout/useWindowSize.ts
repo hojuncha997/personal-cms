@@ -1,5 +1,10 @@
 import { useState, useEffect } from 'react';
 
+const BREAKPOINTS = {
+  mobile: 768,  // md
+  tablet: 1024, // lg
+} as const;
+
 export const useWindowSize = () => {
   const [windowSize, setWindowSize] = useState({
     width: typeof window !== 'undefined' ? window.innerWidth : 0,
@@ -18,5 +23,15 @@ export const useWindowSize = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  return windowSize;
+  const isMobile = () => windowSize.width < BREAKPOINTS.mobile;
+  const isTablet = () => windowSize.width >= BREAKPOINTS.mobile && windowSize.width < BREAKPOINTS.tablet;
+  const isDesktop = () => windowSize.width >= BREAKPOINTS.tablet;
+
+  return {
+    width: windowSize.width,
+    height: windowSize.height,
+    isMobile,
+    isTablet,
+    isDesktop,
+  };
 }; 
