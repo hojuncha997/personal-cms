@@ -19,7 +19,7 @@ export function NavContainer({ onOpenDrawer, onOpenLogin }: NavContainerProps) {
   const loading = useAuthStore(state => state.loading)
 
   return (
-    <nav className={`fixed w-full bg-white shadow-md z-10 transition-transform duration-300 ${
+    <nav className={`fixed w-full bg-white shadow-md z-10 transition-transform duration-200 ${
       isScrollingDown ? '-translate-y-full' : 'translate-y-0'
     }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

@@ -8,6 +8,11 @@ export function useScrollDirection() {
     const handleScroll = () => {
       const currentScrollY = window.scrollY
 
+      if (currentScrollY === 0) {
+        setIsScrollingDown(false)
+        return
+      }
+
       setIsScrollingDown(currentScrollY > lastScrollY && currentScrollY > 64)
       setLastScrollY(currentScrollY)
     }
