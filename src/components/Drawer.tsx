@@ -1,8 +1,15 @@
 'use client'
 
 import { NavContainer } from '@/components/navigation'
+// import Link from 'next/link'
+import { useRouter, usePathname } from 'next/navigation'
 
-'use client'
+const menuList = [
+  {id:"home", name: '홈', path: '/' },
+  {id:"about", name: '소개', path: '/about' },
+  {id:"services", name: '서비스', path: '/services' },
+  {id:"contact", name: '문의하기', path: '/contact' },
+]
 
 interface DrawerProps {
   isOpen: boolean;
@@ -10,6 +17,14 @@ interface DrawerProps {
 }
 
 export default function Drawer({ isOpen, onClose }: DrawerProps) {
+  const router = useRouter()
+  const pathname = usePathname()
+
+  const handleLinkClick = (path: string) => {
+    router.push(path)
+    onClose()
+  }
+
   return (
     <>
       {/* 오버레이 */}
@@ -34,7 +49,7 @@ export default function Drawer({ isOpen, onClose }: DrawerProps) {
             <h2 className="text-lg text-gray-700 font-semibold">메뉴</h2>
             <button 
               onClick={onClose}
-              className="p-1 hover:bg-gray-100 rounded-full"
+              className="p-1 hover:bg-gray-100 rounded-full text-gray-600"
             >
               <svg 
                 className="w-6 h-6" 
@@ -56,26 +71,13 @@ export default function Drawer({ isOpen, onClose }: DrawerProps) {
         {/* 드로어 메뉴 */}
         <nav className="p-4">
           <ul className="space-y-3">
-            <li>
-              <a href="#" className="block py-2 text-gray-700 hover:text-blue-600">
-                홈
-              </a>
-            </li>
-            <li>
-              <a href="#" className="block py-2 text-gray-700 hover:text-blue-600">
-                소개
-              </a>
-            </li>
-            <li>
-              <a href="#" className="block py-2 text-gray-700 hover:text-blue-600">
-                서비스
-              </a>
-            </li>
-            <li>
-              <a href="#" className="block py-2 text-gray-700 hover:text-blue-600">
-                문의하기
-              </a>
-            </li>
+            {menuList.map((menu) => (
+              <li key={menu.id}>
+                  <p className="block py-2 text-gray-700 hover:text-blue-600" onClick={() => handleLinkClick(menu.path)}>
+                  {menu.name}
+                </p>
+              </li>
+            ))} 
           </ul>
         </nav>
       </div>
