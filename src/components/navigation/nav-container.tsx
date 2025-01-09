@@ -3,6 +3,7 @@
 import { useAuthStore } from '@/store/useAuthStore'
 import { NavProfile } from './nav-profile'
 import Link from 'next/link'
+import { useScrollDirection } from '@/hooks/useScrollDirection'
 
 
 interface NavContainerProps {
@@ -11,13 +12,16 @@ interface NavContainerProps {
 }
 
 export function NavContainer({ onOpenDrawer, onOpenLogin }: NavContainerProps) {
+  const isScrollingDown = useScrollDirection()
 
   const isAuthenticated = useAuthStore(state => state.isAuthenticated)
   const email = useAuthStore(state => state.email)
   const loading = useAuthStore(state => state.loading)
 
   return (
-    <nav className="fixed w-full bg-white shadow-md z-10">
+    <nav className={`fixed w-full bg-white shadow-md z-10 transition-transform duration-300 ${
+      isScrollingDown ? '-translate-y-full' : 'translate-y-0'
+    }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center">
           {/* 로고 */}
