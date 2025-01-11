@@ -156,6 +156,19 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
                '로그인'
              )}
            </button>
+
+           <div className="text-center mt-4">
+             <span className="text-gray-600">계정이 없으신가요?</span>
+             <a
+               href="/auth/signup"
+               className="ml-2 text-blue-600 hover:text-blue-800 font-medium"
+               onClick={() => {
+                 handleCloseModal();
+               }}
+             >
+               회원가입
+             </a>
+           </div>
          </form>
        </div>
      </div>
