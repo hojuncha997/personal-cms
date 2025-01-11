@@ -3,9 +3,8 @@
 import { NavContainer } from '@/components/navigation'
 import Footer from '@/components/Footer'
 import { useState } from 'react'
-import Drawer from '@/components/Drawer'
+// import Drawer from '@/components/Drawer'
 import LoginModal from '@/components/LoginModal'
-
 interface ClientLayoutProps {
   children: React.ReactNode;
 }
@@ -16,7 +15,7 @@ export default function ClientLayout({ children }: ClientLayoutProps) {
 
   return (
     <div className="flex flex-col min-h-screen">
-        {/* 네비게이션바 높이는 h-16(64px)로 컴포넌트 내부에 설정돼 있음 */}
+      {/* 네비게이션바 높이는 h-16(64px)로 컴포넌트 내부에 설정돼 있음 */}
       <NavContainer 
         onOpenDrawer={() => setIsDrawerOpen(true)}
         onOpenLogin={() => setIsLoginModalOpen(true)}
@@ -24,8 +23,11 @@ export default function ClientLayout({ children }: ClientLayoutProps) {
       <div className="pt-16 flex-grow">
         {children}
       </div>
-      <Drawer isOpen={isDrawerOpen} onClose={() => setIsDrawerOpen(false)} />
+      {/* 모든 모달류는 여기에 배치 */}
+      {/* <Drawer isOpen={isDrawerOpen} onClose={() => setIsDrawerOpen(false)} /> */}
       <LoginModal isOpen={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)} />
+      {/* CommonDrawer는 각 컴포넌트에서 사용하되, 렌더링은 여기서 되도록 함. 포탈 방식으로 구현 */}
+      <div id="drawer-root" />
       <Footer />
     </div>
   )
