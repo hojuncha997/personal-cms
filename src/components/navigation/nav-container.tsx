@@ -114,7 +114,10 @@ export function NavContainer({ onOpenDrawer, onOpenLogin }: NavContainerProps) {
               isOpen={isDrawerOpen} 
               onClose={() => setIsDrawerOpen(false)}
               portalTo="drawer-root"
-              drawerWidth="30"
+              drawerWidth={10}
+              hasBlur={false}
+              position='right'
+              title={`메뉴`}
             >
               <div className="flex flex-col">
                 {NavMenuContent.map((item) => {

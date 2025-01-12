@@ -3,107 +3,12 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Eye, EyeOff, ChevronDown, ChevronUp } from 'lucide-react';
+import { TERMS } from '@/constants/auth/terms';
+import { SOCIAL_CONFIG } from '@/constants/auth/social-config';
 
 type SocialProvider = 'google' | 'kakao' | 'naver';
 
-interface TermsType {
-  id: 'service' | 'privacy' | 'age' | 'marketing';
-  title: string;
-  required: boolean;
-  content: string;
-}
 
-const TERMS: TermsType[] = [
-  {
-    id: 'service',
-    title: '서비스 이용약관',
-    required: true,
-    content: `제1조(목적) 이 약관은 회사가 제공하는 서비스의 이용과 관련하여 회사와 회원과의 권리, 의무 및 책임사항, 기타 필요한 사항을 규정함을 목적으로 합니다.
-
-제2조(정의)
-1. "서비스"라 함은 회사가 제공하는 모든 서비스를 의미합니다.
-2. "회원"이라 함은 회사와 서비스 이용계약을 체결하고 회사가 제공하는 서비스를 이용하는 고객을 말합니다.
-
-제3조(약관의 효력 및 변경)
-1. 이 약관은 서비스를 이용하고자 하는 모든 회원에 대하여 그 효력을 발생합니다.
-2. 회사는 약관의 규제에 관한 법률 등 관련법을 위배하지 않는 범위에서 이 약관을 개정할 수 있습니다.`
-  },
-  {
-    id: 'privacy',
-    title: '개인정보 수집 및 이용',
-    required: true,
-    content: `1. 수집하는 개인정보의 항목
-- 필수항목: 이메일 주소, 비밀번호, 이름
-- 선택항목: 프로필 이미지, 마케팅 수신 동의 여부
-
-2. 수집 및 이용목적
-- 서비스 제공 및 회원관리
-- 신규 서비스 개발 및 마케팅에 활용
-- 고객 상담 및 불만처리
-
-3. 보유 및 이용기간
-회원탈퇴 시까지 (단, 관계법령에 따라 보존할 필요가 있는 경우 해당 기간까지 보존)`
-  },
-  {
-    id: 'age',
-    title: '만 14세 이상 확인',
-    required: true,
-    content: '회원가입을 위해서는 만 14세 이상이어야 합니다.'
-  },
-  {
-    id: 'marketing',
-    title: '마케팅 정보 수신',
-    required: false,
-    content: `마케팅 정보 수신에 동의하시면 다음과 같은 정보를 받으실 수 있습니다.
-
-1. 혜택 알림
-- 이벤트 및 프로모션 정보
-- 신규 서비스 소식
-- 할인 쿠폰 지급
-
-2. 수신 방법
-- 이메일
-- 앱 푸시 알림
-
-언제든지 마케팅 수신 동의를 취소하실 수 있습니다.`
-  }
-];
-
-const SOCIAL_CONFIG = {
-  google: {
-    color: 'bg-white hover:bg-gray-50',
-    textColor: 'text-gray-700',
-    border: 'border-gray-300',
-    icon: (
-      <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-        <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
-        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-      </svg>
-    )
-  },
-  kakao: {
-    color: 'bg-[#FEE500] hover:bg-[#FDD800]',
-    textColor: 'text-[#000000]',
-    border: 'border-transparent',
-    icon: (
-      <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M12 3C6.48 3 2 6.48 2 12c0 5.52 4.48 10 10 10s10-4.48 10-10c0-5.52-4.48-10-10-10zm4.01 14.23l-1.79-2.44c-.19-.26-.55-.3-.84-.14l-2.12 1.17c-.23.13-.52.07-.67-.14L8.6 13.46c-.15-.21-.44-.27-.67-.14l-2.12 1.17c-.29.16-.65.12-.84-.14l-1.79-2.44c-.19-.26-.1-.62.19-.76l8.47-4.15c.29-.14.63-.14.92 0l8.47 4.15c.29.14.38.5.19.76z"/>
-      </svg>
-    )
-  },
-  naver: {
-    color: 'bg-[#03C75A] hover:bg-[#02b351]',
-    textColor: 'text-white',
-    border: 'border-transparent',
-    icon: (
-      <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M16.273 12.845L7.376 0H0v24h7.726V11.155L16.624 24H24V0h-7.727z"/>
-      </svg>
-    )
-  }
-};
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -115,8 +20,8 @@ export default function SignUpPage() {
     email: '',
     password: '',
     confirmPassword: '',
-    name: '',
-    phoneNumber: ''
+    // name: '',
+    // phoneNumber: ''
   });
 
   const [termsAgreements, setTermsAgreements] = useState({
@@ -168,9 +73,9 @@ export default function SignUpPage() {
     }
 
     // 이름 검증
-    if (!formData.name) {
-      validationErrors.name = '이름을 입력해주세요.';
-    }
+    // if (!formData.name) {
+    //   validationErrors.name = '이름을 입력해주세요.';
+    // }
 
     // 필수 약관 검증
     const requiredTerms = TERMS.filter(term => term.required);
@@ -225,8 +130,8 @@ export default function SignUpPage() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-xl shadow-lg">
         <div className="text-center">
-          <h2 className="text-3xl font-bold text-gray-900">회원가입</h2>
-          <p className="mt-2 text-sm text-gray-600">
+          <h2 className="text-2xl  text-gray-700">회원가입</h2>
+          {/* <p className="mt-2 text-sm text-gray-600">
             이미 계정이 있으신가요?{' '}
             <button
               onClick={() => router.push('/login')}
@@ -234,7 +139,7 @@ export default function SignUpPage() {
             >
               로그인하기
             </button>
-          </p>
+          </p> */}
         </div>
 
         {/* 소셜 로그인 버튼 */}
@@ -270,6 +175,7 @@ export default function SignUpPage() {
           </div>
         </div>
 
+        {/* 로컬 회원가입 폼 */}
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* 에러 메시지 */}
           {(errors.submit || errors.social) && (
@@ -311,7 +217,7 @@ export default function SignUpPage() {
                 value={formData.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400
-                  focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  focus:outline-none text-gray-700 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 placeholder="8자 이상 입력해주세요"
               />
               <button
@@ -343,7 +249,7 @@ export default function SignUpPage() {
               value={formData.confirmPassword}
               onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400
-                focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                focus:outline-none text-gray-700 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
               placeholder="비밀번호를 한번 더 입력해주세요"
             />
             {errors.confirmPassword && (
@@ -352,7 +258,7 @@ export default function SignUpPage() {
           </div>
 
           {/* 이름 입력 */}
-          <div>
+          {/* <div>
             <label htmlFor="name" className="block text-sm font-medium text-gray-700">
               이름
             </label>
@@ -369,10 +275,10 @@ export default function SignUpPage() {
             {errors.name && (
               <p className="mt-1 text-sm text-red-600">{errors.name}</p>
             )}
-          </div>
+          </div> */}
 
           {/* 전화번호 입력 */}
-          <div>
+          {/* <div>
             <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-700">
               전화번호
             </label>
@@ -385,7 +291,7 @@ export default function SignUpPage() {
                 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
               placeholder="010-0000-0000"
             />
-          </div>
+          </div> */}
 
           {/* 약관 동의 */}
           <div className="space-y-4">

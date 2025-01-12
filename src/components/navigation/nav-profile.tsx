@@ -112,6 +112,7 @@ export function NavProfile() {
                     trigger={null}
                     isOpen={isDrawerOpen} 
                     onClose={() => setIsDrawerOpen(false)}
+                    title={`${email}`}
                     portalTo="drawer-root"
                 >
                     <ProfileMenuContent inDrawer={true} />
