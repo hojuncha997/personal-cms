@@ -5,7 +5,8 @@ import { useRouter } from 'next/navigation';
 import { Eye, EyeOff, ChevronDown, ChevronUp } from 'lucide-react';
 import { TERMS } from '@/constants/auth/terms';
 import { SOCIAL_CONFIG } from '@/constants/auth/social-config';
-
+import { useLocalSignup } from '@/hooks/auth/useLocalSignup';
+import { LocalSignupCredentials } from '@/types/authTypes';
 type SocialProvider = 'google' | 'kakao' | 'naver';
 
 
@@ -15,7 +16,9 @@ export default function SignUpPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [expandedTermId, setExpandedTermId] = useState<string | null>(null);
-  
+  // const localSignup = useLocalSignup();
+  const { mutateAsync: localSignup, isPending } = useLocalSignup()
+ 
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -96,16 +99,22 @@ export default function SignUpPage() {
       setIsLoading(true);
       setErrors({});
 
-      // TODO: API 연동
-      const signUpData = {
-        ...formData,
-        marketingAgreed: termsAgreements.marketing
+      const signUpData: LocalSignupCredentials = {
+        email: formData.email,
+        password: formData.password,
+        termsAgreed: termsAgreements.service,
+        privacyAgreed: termsAgreements.privacy,
+        marketingAgreed: termsAgreements.marketing,
+        provider: 'email',
       };
+      // await new Promise(resolve => setTimeout(resolve, 1000)); // 임시 딜레이
+
+      console.log('Sending signup data:', signUpData);
       
-      console.log('Sign up data:', signUpData);
-      await new Promise(resolve => setTimeout(resolve, 1000)); // 임시 딜레이
+      await localSignup(signUpData);
       
-      router.push('/signup/complete'); // 또는 로그인 페이지로 이동
+      router.push('/auth/signup/complete');
+      
     } catch (error) {
       console.error('Sign up failed:', error);
       setErrors(prev => ({ 
@@ -196,7 +205,7 @@ export default function SignUpPage() {
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400
-                focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                text-gray-700 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
               placeholder="example@example.com"
             />
             {errors.email && (

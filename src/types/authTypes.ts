@@ -7,6 +7,15 @@ export interface LoginCredentials {
   keepLoggedIn: boolean;
 }
 
+export interface LocalSignupCredentials {
+  email: string;
+  password: string;
+  provider: string;
+  termsAgreed: boolean;
+  marketingAgreed: boolean;
+  privacyAgreed: boolean;
+}
+
 export class AuthError extends Error {
   constructor(
     message: string, 
