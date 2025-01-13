@@ -141,7 +141,7 @@ export default function LoginModal({
             onChange={handleKeepLoggedIn}
             className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
           />
-          <label className="ml-2 text-sm text-gray-600">로그인 상태 유지</label>
+          <label onClick={handleKeepLoggedIn} className="ml-2 text-sm text-gray-600">로그인 상태 유지</label>
         </div>
         <div className="text-sm">
           <button

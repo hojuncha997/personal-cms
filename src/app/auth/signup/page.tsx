@@ -8,7 +8,8 @@ import { SOCIAL_CONFIG } from '@/constants/auth/social-config';
 import { useLocalSignup } from '@/hooks/auth/useLocalSignup';
 import { LocalSignupCredentials } from '@/types/authTypes';
 type SocialProvider = 'google' | 'kakao' | 'naver';
-
+// import { useSignupNavigation } from '@/hooks/auth/useSignupNavigation';
+import { useSignupStore } from '@/store/useSignupStore';
 
 
 export default function SignUpPage() {
@@ -16,8 +17,13 @@ export default function SignUpPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [expandedTermId, setExpandedTermId] = useState<string | null>(null);
-  // const localSignup = useLocalSignup();
-  const { mutateAsync: localSignup, isPending } = useLocalSignup()
+  const { mutateAsync: localSignup } = useLocalSignup();
+  // const { mutateAsync: localSignup, isPending } = useLocalSignup()
+
+  const { setIsSignupComplete } = useSignupStore();
+
+  // const { handleSignupSuccess } = useSignupNavigation();
+
  
   const [formData, setFormData] = useState({
     email: '',
@@ -97,6 +103,8 @@ export default function SignUpPage() {
 
     try {
       setIsLoading(true);
+      await new Promise(resolve => setTimeout(resolve, 1000)); // 임시 딜레이
+
       setErrors({});
 
       const signUpData: LocalSignupCredentials = {
@@ -110,18 +118,26 @@ export default function SignUpPage() {
       // await new Promise(resolve => setTimeout(resolve, 1000)); // 임시 딜레이
 
       console.log('Sending signup data:', signUpData);
-      
-      await localSignup(signUpData);
-      
-      router.push('/auth/signup/complete');
-      
+      const result = await localSignup(signUpData);
+      if(result.status === 201) {
+        // alert('회원가입 완료');
+        setIsSignupComplete(true);
+        router.replace('/auth/signup/complete');
+        // setIsLoading(false); 너무 빨리 호출하여 페이지가 넘어가기 전에 로딩이 끝남.
+        // 따라서 false하지 않음으로써 완료 페이지로 이동하기 전까지는 로딩 상태를 유지하도록 함.
+      } else if(result.status === 409) {
+        setErrors(prev => ({ 
+          ...prev, 
+          submit: '이미 가입된 이메일입니다.' 
+        }));
+        setIsLoading(false);
+      }
     } catch (error) {
       console.error('Sign up failed:', error);
       setErrors(prev => ({ 
         ...prev, 
         submit: '회원가입 중 오류가 발생했습니다. 다시 시도해주세요.' 
       }));
-    } finally {
       setIsLoading(false);
     }
   };

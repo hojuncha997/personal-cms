@@ -16,6 +16,7 @@ export const useLocalSignup = () => {
         skipAuth: true // 인증 헤더 추가하지 않음
       } as FetchOptions)
       console.log("response from localSignup", response)
+      return response;
     }
   })
 }
