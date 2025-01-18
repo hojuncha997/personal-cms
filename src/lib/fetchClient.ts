@@ -28,8 +28,13 @@ export interface FetchOptions extends RequestInit {
 export async function fetchClient(url: string, options: FetchOptions = {}): Promise<Response> {
   const { skipAuth, ...fetchOptions } = options
 
+  // 제외할 엔드포인트 체크
+  const isExcludedEndpoint = ['/auth/access-token', '/auth/google/callback', '/auth/kakao/callback', '/auth/naver/callback'].some(
+    endpoint => url.includes(endpoint)
+  );
+
   // 요청 전 인터셉터
-  if (!skipAuth) {
+  if (!skipAuth && !isExcludedEndpoint) {  // 제외 엔드포인트 체크 추가
     // 토큰 만료 임박 체크
     if (shouldRefreshToken()) {
       console.log('토큰 만료 임박 체크')

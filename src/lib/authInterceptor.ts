@@ -72,6 +72,21 @@ export { isRefreshing }
 
 
 export function setAuthToken(token: string | null) {
+
+  console.log('setAuthToken 호출:', token);
+
+   // 현재 상태 확인
+   const currentState = useAuthStore.getState();
+  
+   // 토큰이 이미 설정되어 있고, 같은 토큰으로 다시 설정하려는 경우 스킵
+   if (currentState.accessToken === token) {
+     console.log('Token already set, skipping...');
+     return;
+   }
+ 
+   console.log('Setting new auth token...');
+
+
   if (!token) {
     useAuthStore.getState().resetAuthState();
     return;
@@ -87,6 +102,8 @@ export function setAuthToken(token: string | null) {
       sub: payload.sub,
       isAuthenticated: true,
     });
+
+    console.log('setAuthToken 호출 후:', useAuthStore.getState());
 
     // useAuthStore에서 Partial을 사용했기 때문에 아래와 같이 개별 필드를 업데이트할 수 있다.
     // useAuthStore.getState().updateAuthState({
