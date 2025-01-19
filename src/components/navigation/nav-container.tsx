@@ -83,7 +83,7 @@ export function NavContainer({ onOpenDrawer, onOpenLogin }: NavContainerProps) {
         <div className="flex justify-between h-16 items-center">
           {/* 로고 */}
           <div className="flex items-center">
-            <a href="/" className="text-xl text-gray-600">블로그</a>
+            <Link href="/" className="text-xl text-gray-600">블로그</Link>
           </div>
 
           {/* 데스크탑 메뉴 */}
