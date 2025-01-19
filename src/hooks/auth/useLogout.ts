@@ -10,6 +10,8 @@ export const useLogout = () => {
 
   return useMutation({
     mutationFn: async () => {
+      await new Promise(resolve => setTimeout(resolve, 2000))
+      
       const response = await fetchClient('/auth/logout', {
         method: 'POST',
         credentials: 'include',

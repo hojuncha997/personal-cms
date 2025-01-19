@@ -13,24 +13,24 @@ export const SOCIAL_CONFIG = {
         </svg>
       )
     },
-    kakao: {
-      color: 'bg-[#FEE500] hover:bg-[#FDD800]',
-      textColor: 'text-[#000000]',
-      border: 'border-transparent',
-      icon: (
-        <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M12 3C6.48 3 2 6.48 2 12c0 5.52 4.48 10 10 10s10-4.48 10-10c0-5.52-4.48-10-10-10zm4.01 14.23l-1.79-2.44c-.19-.26-.55-.3-.84-.14l-2.12 1.17c-.23.13-.52.07-.67-.14L8.6 13.46c-.15-.21-.44-.27-.67-.14l-2.12 1.17c-.29.16-.65.12-.84-.14l-1.79-2.44c-.19-.26-.1-.62.19-.76l8.47-4.15c.29-.14.63-.14.92 0l8.47 4.15c.29.14.38.5.19.76z"/>
-        </svg>
-      )
-    },
-    naver: {
-      color: 'bg-[#03C75A] hover:bg-[#02b351]',
-      textColor: 'text-white',
-      border: 'border-transparent',
-      icon: (
-        <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M16.273 12.845L7.376 0H0v24h7.726V11.155L16.624 24H24V0h-7.727z"/>
-        </svg>
-      )
-    }
+    // kakao: {
+    //   color: 'bg-[#FEE500] hover:bg-[#FDD800]',
+    //   textColor: 'text-[#000000]',
+    //   border: 'border-transparent',
+    //   icon: (
+    //     <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+    //       <path d="M12 3C6.48 3 2 6.48 2 12c0 5.52 4.48 10 10 10s10-4.48 10-10c0-5.52-4.48-10-10-10zm4.01 14.23l-1.79-2.44c-.19-.26-.55-.3-.84-.14l-2.12 1.17c-.23.13-.52.07-.67-.14L8.6 13.46c-.15-.21-.44-.27-.67-.14l-2.12 1.17c-.29.16-.65.12-.84-.14l-1.79-2.44c-.19-.26-.1-.62.19-.76l8.47-4.15c.29-.14.63-.14.92 0l8.47 4.15c.29.14.38.5.19.76z"/>
+    //     </svg>
+    //   )
+    // },
+    // naver: {
+    //   color: 'bg-[#03C75A] hover:bg-[#02b351]',
+    //   textColor: 'text-white',
+    //   border: 'border-transparent',
+    //   icon: (
+    //     <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+    //       <path d="M16.273 12.845L7.376 0H0v24h7.726V11.155L16.624 24H24V0h-7.727z"/>
+    //     </svg>
+    //   )
+    // }
   };

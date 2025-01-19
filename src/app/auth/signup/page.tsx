@@ -7,13 +7,12 @@ import { TERMS } from '@/constants/auth/terms';
 import { SOCIAL_CONFIG } from '@/constants/auth/social-config';
 import { useLocalSignup } from '@/hooks/auth/useLocalSignup';
 import { LocalSignupCredentials } from '@/types/authTypes';
-type SocialProvider = 'google' | 'kakao' | 'naver';
 // import { useSignupNavigation } from '@/hooks/auth/useSignupNavigation';
 import { useSignupStore } from '@/store/useSignupStore';
 import { fetchClient } from '@/lib/fetchClient';
 import { useWindowSize } from '@/hooks/layout';
-
-
+import { SocialProvider } from '@/types/authTypes';
+import useSocialSignUp from '@/hooks/auth/useSocialSignup';
 export default function SignUpPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
@@ -47,29 +46,14 @@ export default function SignUpPage() {
   const handleSocialSignUp = async (provider: SocialProvider) => {
     try {
       setIsLoading(true);
-      
-      // 소셜 로그인 URL 가져오기
-      const response = await fetchClient(`/auth/social/${provider}/url`, { skipAuth: true });
-      // console.log('response', response);
-      // alert('response: ' + JSON.stringify(await response.json()));
-      const { url } = await response.json();
-      
-      if (!url) {
-        throw new Error('인증 URL을 가져오는데 실패했습니다.');
-      }
-
-      // 현재 창에서 소셜 로그인 페이지로 리다이렉트
-      window.location.href = url;
-
-      // 소셜 로그인 페이지 팝업
-      // window.open(url, '_blank');
-      
+      await useSocialSignUp(provider);
     } catch (error) {
       console.error(`${provider} sign up failed:`, error);
       setErrors(prev => ({ 
         ...prev, 
         social: '소셜 로그인 연동 중 오류가 발생했습니다.' 
       }));
+    } finally {
       setIsLoading(false);
     }
   };

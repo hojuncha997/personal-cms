@@ -6,7 +6,7 @@ import { CommonDrawer } from "@/components/common/common-drawer"
 import { useState } from 'react'
 
 export function NavProfile() {
-    const { mutate: logout } = useLogout()
+    const { mutateAsync: logout, isPending: isLogoutPending } = useLogout()
     const [isDrawerOpen, setIsDrawerOpen] = useState(false)
     
     const email = useAuthStore(state => state.email)
@@ -17,6 +17,15 @@ export function NavProfile() {
         'ADMIN': '관리자',
         'USER': '사용자',
         'GUEST': '게스트'
+    }
+
+    const handleLogout = async () => {
+        try {
+            await logout()
+            setIsDrawerOpen(false)  // 드로어 닫기
+        } catch (error) {
+            console.error('로그아웃 실패:', error)
+        }
     }
 
     // 프로필 메뉴 아이템 정의
@@ -44,7 +53,8 @@ export function NavProfile() {
             id: 'logout',
             section: 'footer',
             label: '로그아웃',
-            onClick: () => logout(),
+            onClick: handleLogout,
+            isLoading: isLogoutPending
         },
     ]
 
@@ -90,13 +100,19 @@ export function NavProfile() {
                 {profileMenuItems
                     .filter(item => item.section === 'footer')
                     .map(item => (
-                        <span 
+                        <div 
                             key={item.id}
-                            className="cursor-pointer hover:text-blue-800"
+                            className="flex items-center cursor-pointer hover:text-blue-800"
                             onClick={item.onClick}
                         >
-                            {item.label}
-                        </span>
+                            <span>{item.label}</span>
+                            {item.isLoading && (
+                                <svg className="animate-spin ml-2 h-4 w-4 text-gray-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                            )}
+                        </div>
                     ))}
             </div>
         </div>

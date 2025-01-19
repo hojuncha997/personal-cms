@@ -40,3 +40,5 @@ export class LoginError extends AuthError {
     this.name = 'LoginError';
   }
 }
+
+export type SocialProvider = 'google' | 'kakao' | 'naver';
