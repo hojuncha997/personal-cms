@@ -6,8 +6,13 @@ import { CommonDrawer } from "@/components/common/common-drawer"
 import { useState } from 'react'
 
 export function NavProfile() {
-    const { mutateAsync: logout, isPending: isLogoutPending } = useLogout()
     const [isDrawerOpen, setIsDrawerOpen] = useState(false)
+
+    const { mutateAsync: logoutMutation, isPending: isLogoutPending } = useLogout({
+        // alert는 숨기고, 로그인 폼 상태는 자동으로 초기화됨
+        showAlert: false,
+        onSuccess: () => setIsDrawerOpen(false)
+    });
     
     const email = useAuthStore(state => state.email)
     const role = useAuthStore(state => state.role)
@@ -19,10 +24,19 @@ export function NavProfile() {
         'GUEST': '게스트'
     }
 
+    // const handleLogout = async () => {
+    //     try {
+    //         await logout()
+    //         setIsDrawerOpen(false)  // 드로어 닫기
+    //     } catch (error) {
+    //         console.error('로그아웃 실패:', error)
+    //     }
+    // }
+
     const handleLogout = async () => {
         try {
-            await logout()
-            setIsDrawerOpen(false)  // 드로어 닫기
+            await logoutMutation(); // 폼 리셋 + 로그아웃 api 호출
+            // setIsDrawerOpen(false)는 onSuccess 옵션으로 이동했으므로 여기서는 제거
         } catch (error) {
             console.error('로그아웃 실패:', error)
         }
