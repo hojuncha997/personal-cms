@@ -1,8 +1,12 @@
 import { Container } from '@/components/layouts/Container'          
 import Link from 'next/link'
+import { colors } from '@/constants/styles'
+
 export default function AboutPage() {
     return (
-        <div className="min-h-screen bg-white">
+        // <div className="min-h-screen bg-[colors.primary.main]">
+        // <div className="min-h-screen bg-[#fcd0b1]">
+        <div className={`min-h-screen bg-[${colors.primary.main}]`}>
             <Container>
                 <section className="py-12 max-w-4xl mx-auto">
                     <div className="mb-12">
@@ -16,7 +20,7 @@ export default function AboutPage() {
                     </div>
 
                     <div className="mb-12">
-                        <h2 className="text-2xl font-bold text-gray-800 mb-6 pb-2 border-b-2">소개</h2>
+                        <h2 className="text-2xl text-gray-800 mb-6 pb-2 border-b-2">소개</h2>
                         <p className="text-gray-600 leading-relaxed">
 
                             백엔드, 프론트엔드, 인프라 등 여러 영역을 경험하며 문제 해결 능력을 키워왔습니다.
@@ -30,18 +34,18 @@ export default function AboutPage() {
                         <h2 className="text-2xl font-bold text-gray-800 mb-6 pb-2 border-b-2">기술 스택</h2>
                         <div className="grid grid-cols-2 gap-4">
                             <div>
-                                <h3 className="font-semibold mb-2">프론트엔드</h3>
+                                <h3 className="font-semibold mb-2 text-gray-800">프론트엔드</h3>
                                 <p className="text-gray-600">React, TypeScript, Next.js, Tailwind CSS</p>
                             </div>
                             <div>
-                                <h3 className="font-semibold mb-2">백엔드</h3>
+                                <h3 className="font-semibold mb-2 text-gray-800">백엔드</h3>
                                 <p className="text-gray-600">Node.js, Express, NestJS, PostgreSQL</p>
                             </div>
                         </div>
                     </div>
 
                     <div className="mb-12">
-                        <h2 className="text-2xl font-bold text-gray-800 mb-6 pb-2 border-b-2">경력</h2>
+                        <h2 className="text-2xl  text-gray-800 mb-6 pb-2 border-b-2">경력</h2>
                         <div className="space-y-8">
                             <div>
                                 <div className="flex justify-between items-center mb-2">
@@ -53,6 +57,16 @@ export default function AboutPage() {
                                     <li>대규모 커머스 플랫폼 개발 및 유지보수</li>
                                     <li>마이크로서비스 아키텍처 설계 및 구현</li>
                                     <li>팀 내 코드 리뷰 문화 정착</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <div className="flex justify-between items-center mb-2">
+                                    <h3 className="text-xl font-semibold text-gray-800">COS</h3>
+                                    <span className="text-gray-600">2016.4.10 - 2019.4.10 (총 3년)</span>
+                                </div>
+                                <p className="text-gray-700 font-medium mb-2">재고관리 및 매장관리</p>
+                                <ul className="list-disc list-inside text-gray-600 space-y-1">
+                                    <li>매장 내 재고 관리</li>
                                 </ul>
                             </div>
 {/* 
@@ -72,7 +86,7 @@ export default function AboutPage() {
                     </div>
 
                     <div className="mb-12">
-                        <h2 className="text-2xl font-bold text-gray-800 mb-6 pb-2 border-b-2">프로젝트</h2>
+                        <h2 className="text-2xl text-gray-800 mb-6 pb-2 border-b-2">프로젝트</h2>
                         <div className="space-y-8">
                             <div>
                                 <h3 className="text-xl font-semibold mb-2">실시간 협업 툴</h3>
@@ -86,11 +100,23 @@ export default function AboutPage() {
                         </div>
                     </div>
 
-                    <div>
-                        <h2 className="text-2xl font-bold text-gray-800 mb-6 pb-2 border-b-2">교육</h2>
+                    <div className="mb-12">
+                        <h2 className="text-2xl text-gray-800 mb-6 pb-2 border-b-2">교육</h2>
                         <div>
                             <h3 className="text-xl font-semibold mb-2 text-gray-800">국민대학교</h3>
                             <p className="text-gray-600">경영정보학(Management Information System) 학사 (2008 - 2015)</p>
+                        </div>
+                    </div>
+
+                    <div className="mb-12">
+                        <h2 className="text-2xl text-gray-800 mb-6 pb-2 border-b-2">자격증</h2>
+                        {/* <div className="grid grid-cols-2 gap-4"> */}
+                        <div className="">
+
+                            <ul className="list-disc list-inside text-gray-600 space-y-1">
+                                <li>AWS Certified Cloud Practitioner</li>
+                                <li>북미생산재고관리사(CPIM,Certified Professional in Supply Management)</li>
+                            </ul>
                         </div>
                     </div>
                 </section>

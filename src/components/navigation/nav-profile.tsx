@@ -81,7 +81,7 @@ export function NavProfile() {
                     .filter(item => item.section === 'info')
                     .map(item => (
                         <div key={item.id} className="pb-1">
-                            <span className="text-sm hover:text-blue-800 cursor-pointer">{item.label}</span>
+                            <span className=" cursor-pointer">{item.label}</span>
                             {item.subLabel && (
                                 <div className="pb-1">
                                     <span>{item.subLabel}</span>
@@ -132,11 +132,11 @@ export function NavProfile() {
         </div>
     )
 
-    if(isMobile() || isTablet()) {
+    if(isMobile || isTablet) {
         return (
             <>
                 <div onClick={() => setIsDrawerOpen(true)}>
-                    <p className="text-gray-700 hover:text-blue-800 cursor-pointer">{email?.split('@')[0]}</p>
+                    <p>{email?.split('@')[0]}</p>
                 </div>
                 <CommonDrawer 
                     trigger={null}
@@ -154,7 +154,7 @@ export function NavProfile() {
     return (
         <CommonPopover 
             trigger={
-                <div className="text-gray-700 hover:text-blue-800 cursor-pointer">
+                <div>
                     <div className="flex items-center">
                         <p>{email?.split('@')[0]}</p>
                     </div>

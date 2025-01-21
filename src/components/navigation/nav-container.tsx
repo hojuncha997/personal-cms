@@ -8,6 +8,7 @@ import { Container } from '@/components/layouts/Container'
 import { CommonDrawer } from '@components/common/common-drawer'
 import { useState } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
+import { colors } from '@/constants/styles'
 
 interface NavContainerProps {
   onOpenDrawer: () => void;
@@ -30,6 +31,17 @@ const NavMenuContent = [
     label: '서비스',
     path: '/service'
   },
+  {
+    id: 'blog',
+    label: '블로그',
+    path: '/blog'
+  },
+  {
+    id: 'projects',
+    label: '프로젝트',
+    path: '/projects'
+  },
+
   {
     id: 'contact',
     label: '문의하기',
@@ -55,8 +67,10 @@ export function NavContainer({ onOpenDrawer, onOpenLogin }: NavContainerProps) {
   const renderAuthButton = () => {
     if (isAuthenticated) {
       return (
-        <div className="border-[1px] border-gray-300 rounded-md p-1 flex items-center">
-          <NavProfile />
+        <div className="border-[1px] border-black rounded-md p-1 flex items-center text-black hover:bg-black hover:text-white group">
+          <div className="group-hover:text-white cursor-pointer">
+            <NavProfile />
+          </div>
         </div>
       )
     }
@@ -68,7 +82,7 @@ export function NavContainer({ onOpenDrawer, onOpenLogin }: NavContainerProps) {
     return (
       <button 
         onClick={onOpenLogin} 
-        className="border-[1px] border-gray-300 rounded-md p-1 text-gray-700 hover:text-gray-700"
+        className="border-[1px] border-black p-1 text-black hover:text-gray-700"
       >
         로그인
       </button>
@@ -76,21 +90,24 @@ export function NavContainer({ onOpenDrawer, onOpenLogin }: NavContainerProps) {
   }
 
   return (
-    <nav className={`fixed w-full bg-white shadow-md z-10 transition-transform duration-200 ${
+    // <nav className={`fixed w-full bg-white shadow-md z-10 transition-transform duration-200 ${
+    //   isScrollingDown ? '-translate-y-full' : 'translate-y-0'
+    // }`}>
+    <nav className={`fixed w-full bg-[${colors.primary.main}] border-b-[1px] border-black z-10 transition-transform duration-200 ${
       isScrollingDown ? '-translate-y-full' : 'translate-y-0'
     }`}>
       <Container>
         <div className="flex justify-between h-16 items-center">
           {/* 로고 */}
           <div className="flex items-center">
-            <Link href="/" className="text-xl text-gray-600">블로그</Link>
+            <Link href="/" className="text-xl text-black">차호준의 블로그</Link>
           </div>
 
           {/* 데스크탑 메뉴 */}
           <div className="hidden lg:flex lg:items-center lg:space-x-8">
            {NavMenuContent.map((item) => {
              return (
-              <Link href={item.path} key={item.id} className="text-gray-600 hover:text-gray-900">
+              <Link href={item.path} key={item.id} className="text-black hover:text-gray-900">
                 {item.label}
               </Link>
              )
@@ -105,7 +122,7 @@ export function NavContainer({ onOpenDrawer, onOpenLogin }: NavContainerProps) {
               onClick={() => setIsDrawerOpen(true)}
               className="text-gray-500 hover:text-gray-700"
             >
-              <svg className="h-6 w-6" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="h-6 w-6 text-black" fill="none" strokeWidth="1" viewBox="0 0 24 24" stroke="currentColor">
                 <path d="M4 6h16M4 12h16M4 18h16"></path>
               </svg>
             </button>
