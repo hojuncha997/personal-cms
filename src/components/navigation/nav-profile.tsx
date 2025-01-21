@@ -4,6 +4,7 @@ import { useLogout } from "@/hooks/auth/useLogout"
 import { useWindowSize } from "@/hooks/layout/useWindowSize"
 import { CommonDrawer } from "@/components/common/common-drawer"
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 
 export function NavProfile() {
     const [isDrawerOpen, setIsDrawerOpen] = useState(false)
@@ -17,7 +18,7 @@ export function NavProfile() {
     const email = useAuthStore(state => state.email)
     const role = useAuthStore(state => state.role)
     const {isMobile, isTablet} = useWindowSize()
-
+    const router = useRouter()
     const roleType: { [key: string]: string } = {
         'ADMIN': '관리자',
         'USER': '사용자',
@@ -55,7 +56,9 @@ export function NavProfile() {
             id: 'mypage',
             section: 'menu',
             label: '마이페이지',
-            onClick: () => {},
+            onClick: () => {
+                router.push('/mypage')
+            },
         },
         {
             id: 'settings',
