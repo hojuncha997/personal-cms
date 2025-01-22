@@ -1,7 +1,10 @@
 export const colors = {
     primary: {
-      main: '#fcd0b1',
-      // main: '#fdd5b1',
+      // main: '#fcd0b1', // salmon pink
+      // main: '#b1d4e0', // baby blue
+      // main: '#c3e0e5', // light baby blue
+      main: '#b1d8b7',
+
       light: '#ffe3d4',
       dark: '#c9a08e'
     },

@@ -286,7 +286,7 @@ export default function LoginModal({
     <>
       {isOpen && (
         <div className={`fixed inset-0 ${overlayColor} ${overlayOpacity} ${hasBlur ? 'backdrop-blur-sm' : ''} flex items-center justify-center z-50 p-4`}>
-          <div className={`bg-[${colors.primary.main}] rounded-xl w-full max-w-md mx-4 sm:mx-auto shadow-xl transform transition-all duration-300 border-[1px] border-black `}>
+          <div className={`bg-[${colors.primary.main}] rounded-xl w-full max-w-md mx-4 sm:mx-auto shadow-xl transform transition-all duration-300 border-[1px] border-black `} style={{backgroundColor: colors.primary.main}}>
             <div className="p-6 sm:p-8">
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-2xl font-bold text-gray-800">

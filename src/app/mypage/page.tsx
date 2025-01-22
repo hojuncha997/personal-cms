@@ -26,7 +26,7 @@ export default function MyPage() {
   }
 
   return (
-    <div className={`container mx-auto px-4 py-8 bg-[${colors.primary.main}]`}>
+    <div className={`container mx-auto px-4 py-8 bg-[${colors.primary.main}]`} style={{backgroundColor: colors.primary.main}}>
       <div className="max-w-3xl mx-auto">
         <h1 className="text-xl text-black mb-8">마이페이지</h1>
         

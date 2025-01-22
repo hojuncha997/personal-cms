@@ -98,7 +98,7 @@ export function NavContainer({ onOpenDrawer, onOpenLogin }: NavContainerProps) {
     // <nav className={`fixed w-full bg-white shadow-md z-10 transition-transform duration-200 ${
     //   isScrollingDown ? '-translate-y-full' : 'translate-y-0'
     // }`}>
-    <nav className={`fixed w-full bg-[${colors.primary.main}] border-b-[1px] border-black z-10 transition-transform duration-200 ${
+    <nav style={{backgroundColor: colors.primary.main}} className={`fixed w-full bg-[${colors.primary.main}] border-b-[1px] border-black z-10 transition-transform duration-200 ${
       isScrollingDown ? '-translate-y-full' : 'translate-y-0'
     }`}>
       <Container>

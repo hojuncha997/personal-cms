@@ -27,7 +27,7 @@ export default function Projects() {
     return (
         <div className={`min-h-screen`} style={{ backgroundColor: colors.primary.main }}>
             <Container>
-                <div className={`bg-[${colors.primary.main}] text-black`}>
+                <div className={`bg-[${colors.primary.main}] text-black`} style={{backgroundColor: colors.primary.main}}>
                     <h1>Projects</h1>
                     <div className={`flex ${layoutClass} gap-4 justify-center`}>
                         <Link href="/projects/chainverse" className={widthClass}>

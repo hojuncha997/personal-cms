@@ -24,7 +24,7 @@ export default function AboutPage() {
         // <div className="min-h-screen bg-[colors.primary.main]">
         // <div className="min-h-screen bg-[#fcd0b1]">
         
-        <div className={`min-h-screen bg-[${colors.primary.main}]`}>
+        <div className={`min-h-screen bg-[${colors.primary.main}]`} style={{backgroundColor: colors.primary.main}}>
             <Container>
                 <section className="py-12 max-w-4xl mx-auto">
                     <div className={`mb-12 ${isMobile ? 'flex flex-col' : 'flex flex-row'} gap-8`}>
