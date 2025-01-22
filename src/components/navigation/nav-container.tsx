@@ -46,6 +46,11 @@ const NavMenuContent = [
     id: 'contact',
     label: '문의하기',
     path: '/contact'
+  },
+  {
+    id: 'guestbook',
+    label: '방명록',
+    path: '/guestbook'
   }
 ]
 
