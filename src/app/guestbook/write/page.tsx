@@ -1,107 +1,144 @@
 'use client'
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Container } from '@/components/layouts/Container';
-import { colors } from '@/constants/styles/colors';
 import { useRouter } from 'next/navigation';
+import Tiptap from '@/components/editor/tiptap/Tiptap';
+import { type JSONContent } from '@tiptap/react';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { colors } from '@/constants/styles';
+const formSchema = z.object({
+  title: z.string()
+    .min(1, { message: '제목은 필수 입력 항목입니다.' })
+    .max(50, { message: '제목은 최대 50자까지 입력 가능합니다.' }),
+  content: z.any(),
+  category: z.string().min(1, { message: '카테고리는 필수 입력 항목입니다.' }),
+  isPrivate: z.boolean(),
+  password: z.string().optional()
+    .refine((val) => !val || val.length >= 4, { message: '비밀번호는 4자리 이상이어야 합니다.' })
+});
 
-interface GuestbookForm {
-    title: string;
-    content: string;
-}
+type FormValues = z.infer<typeof formSchema>;
 
 const GuestbookWrite: React.FC = () => {
     const router = useRouter();
-    const [form, setForm] = useState<GuestbookForm>({
-        title: '',
-        content: ''
+    const categories = ['일반', '문의', '칭찬', '제안'];
+
+    const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm<FormValues>({
+        resolver: zodResolver(formSchema),
+        defaultValues: {
+            title: '',
+            content: {
+                type: 'doc',
+                content: [{ type: 'paragraph' }]
+            },
+            category: '일반',
+            isPrivate: false
+        }
     });
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        const { name, value } = e.target;
-        setForm(prev => ({
-            ...prev,
-            [name]: value
-        }));
-    };
+    const isPrivate = watch('isPrivate');
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        
-        // TODO: API 연동
-        // const response = await fetch('/api/guestbook', {
-        //     method: 'POST',
-        //     headers: {
-        //         'Content-Type': 'application/json',
-        //     },
-        //     body: JSON.stringify(form)
-        // });
-
-        // 임시로 콘솔에 출력
-        console.log('제출된 데이터:', form);
-        
-        // 목록 페이지로 이동
+    const onSubmit = async (data: FormValues) => {
+        console.log('제출된 데이터:', data);
         router.push('/guestbook');
     };
 
     return (
-        <div className={`bg-[${colors.primary.main}] min-h-screen text-black`} style={{backgroundColor: colors.primary.main}}>
-            <Container>
-                <div className="max-w-4xl w-full mx-auto py-8">
-                    <div className="w-full">
-                        <h1 className="text-3xl font-bold mb-8 pb-4 border-b border-black">방명록 작성</h1>
-                        <div className="bg-white rounded-lg shadow-md p-6">
-                            <form onSubmit={handleSubmit} className="space-y-6">
-                                <div>
-                                    <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">
-                                        제목
-                                    </label>
-                                    <input
-                                        type="text"
-                                        id="title"
-                                        name="title"
-                                        value={form.title}
-                                        onChange={handleChange}
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                        placeholder="제목을 입력하세요"
-                                        required
-                                    />
-                                </div>
-                                <div>
-                                    <label htmlFor="content" className="block text-sm font-medium text-gray-700 mb-2">
-                                        내용
-                                    </label>
-                                    <textarea
-                                        id="content"
-                                        name="content"
-                                        value={form.content}
-                                        onChange={handleChange}
-                                        rows={8}
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                        placeholder="방명록 내용을 입력하세요"
-                                        required
-                                    />
-                                </div>
-                                <div className="flex justify-end gap-3">
-                                    <button
-                                        type="button"
-                                        onClick={() => router.back()}
-                                        className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors"
-                                    >
-                                        취소
-                                    </button>
-                                    <button
-                                        type="submit"
-                                        className="px-4 py-2 bg-black text-white rounded-md hover:bg-blue-600 transition-colors"
-                                    >
-                                        작성하기
-                                    </button>
-                                </div>
-                            </form>
+        <div className="bg-gray-100 text-black" style={{ backgroundColor: colors.primary.main }}>
+        <Container>
+            <div className="max-w-4xl mx-auto py-8" style={{ backgroundColor: colors.primary.main }}>
+                <h1 className="text-3xl font-bold mb-8">방명록 작성</h1>
+                <form onSubmit={handleSubmit(onSubmit)} className="space-y-6" onKeyDown={(e) => {
+                    if (e.key === 'Enter' && e.target instanceof HTMLInputElement) {
+                        e.preventDefault();
+                    }
+                }}>
+                    <div className="flex gap-4">
+                        <div className="w-1/4">
+                            <label className="block text-sm font-medium mb-2">카테고리</label>
+                            <select
+                                {...register('category')}
+                                className="w-full px-4 py-2 border rounded-md"
+                            >
+                                {categories.map(category => (
+                                    <option key={category} value={category}>{category}</option>
+                                ))}
+                            </select>
+                            {errors.category && (
+                                <p className="text-red-500 text-sm mt-1">{errors.category.message}</p>
+                            )}
+                        </div>
+                        <div className="flex-1">
+                            <label className="block text-sm font-medium mb-2">제목</label>
+                            <input
+                                type="text"
+                                {...register('title')}
+                                className="w-full px-4 py-2 border rounded-md"
+                                placeholder="제목을 입력하세요"
+                            />
+                            {errors.title && (
+                                <p className="text-red-500 text-sm mt-1">{errors.title.message}</p>
+                            )}
                         </div>
                     </div>
-                </div>
-            </Container>
+
+                    <div>
+                        <label className="block text-sm font-medium mb-2">내용</label>
+                        <Tiptap
+                            initialContent={watch('content')}
+                            onChange={(content) => setValue('content', content)}
+                            toolbarStyle="border-b bg-gray-50 p-2 flex flex-wrap gap-1"
+                            // prose설정을 넣어줬음에 유의
+                            contentStyle="p-4 min-h-[200px] bg-white prose-sm"
+
+                        />
+                    </div>
+
+                    <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-2">
+                            <input
+                                type="checkbox"
+                                {...register('isPrivate')}
+                                className="rounded"
+                            />
+                            <label className="text-sm">비밀글로 작성</label>
+                        </div>
+                        {isPrivate && (
+                            <div className="flex-1">
+                                <input
+                                    type="password"
+                                    {...register('password')}
+                                    className="w-full px-4 py-2 border rounded-md"
+                                    placeholder="비밀번호를 입력하세요 (4자리 이상)"
+                                />
+                                {errors.password && (
+                                    <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>
+                                )}
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="flex justify-end gap-3">
+                        <button
+                            type="button"
+                            onClick={() => router.back()}
+                            className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200"
+                        >
+                            취소
+                        </button>
+                        <button
+                            type="submit"
+                            className="px-4 py-2 bg-black text-white rounded-md hover:bg-gray-800"
+                        >
+                            작성하기
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </Container>
         </div>
     );
 };
