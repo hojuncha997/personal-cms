@@ -3,8 +3,8 @@ export const colors = {
       // main: '#fcd0b1', // salmon pink
       // main: '#b1d4e0', // baby blue
       // main: '#c3e0e5', // light baby blue
-      main: '#b1d8b7',
-
+      // main: '#b1d8b7',
+      main: 'lightgray',
       light: '#ffe3d4',
       dark: '#c9a08e'
     },

@@ -14,6 +14,7 @@ const dummyGuestbooks = [
         author: '김방문',
         views: 42,
         date: '2024-03-15',
+        like: 10,
     },
     {
         id: 2,
@@ -21,6 +22,7 @@ const dummyGuestbooks = [
         author: '이개발',
         views: 38,
         date: '2024-03-14',
+        like: 10,
     },
     {
         id: 3,
@@ -28,6 +30,7 @@ const dummyGuestbooks = [
         author: '박채용',
         views: 56,
         date: '2024-03-13',
+        like: 10,
     },
 ];
 
@@ -47,6 +50,7 @@ export default function Guestbook() {
                                         <div className='flex-1'>제목</div>
                                         <div className='w-24 text-center'>작성자</div>
                                         <div className='w-20 text-center'>조회수</div>
+                                        <div className='w-20 text-center'>좋아요</div>
                                         <div className='w-28 text-center'>일자</div>
                                     </div>
                                     
@@ -69,6 +73,7 @@ export default function Guestbook() {
                                                 </div>
                                                 <div className='w-24 text-center text-gray-600'>{guestbook.author}</div>
                                                 <div className='w-20 text-center text-gray-600'>{guestbook.views}</div>
+                                                <div className='w-20 text-center text-gray-600'>{guestbook.like}</div>
                                                 <div className='w-28 text-center text-gray-600'>{guestbook.date}</div>
                                             </div>
 
@@ -87,6 +92,7 @@ export default function Guestbook() {
                                                         <div className='mt-1 text-sm text-gray-500 flex gap-3'>
                                                             <span>{guestbook.author}</span>
                                                             <span>조회 {guestbook.views}</span>
+                                                            <span>좋아요 {guestbook.like}</span>
                                                             <span>{guestbook.date}</span>
                                                         </div>
                                                     </Link>
