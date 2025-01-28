@@ -20,6 +20,7 @@ import {
   Image as ImageIcon,
   Link
 } from "lucide-react"
+import { addImagePlaceholder } from "../ImagePlaceholder"
 
 interface ToolbarProps {
     editor: Editor
@@ -206,7 +207,8 @@ export default function Toolbar({
             {/* Media */}
             <button
                 type="button"
-                onClick={addImage}
+                // onClick={addImage}
+                onClick={() => addImagePlaceholder(editor)}
                 className="p-2 rounded hover:bg-gray-200"
                 title="이미지 URL 삽입"
             >

@@ -14,7 +14,7 @@ import Paragraph from '@tiptap/extension-paragraph'
 import Text from '@tiptap/extension-text'
 import { useEffect } from 'react'
 import { Toolbar } from './index'
-
+import { ImagePlaceholder } from '../ImagePlaceholder'
 interface TiptapProps {
   // 본문 기본값
   initialContent: JSONContent
@@ -81,6 +81,7 @@ const Tiptap = ({
         types: ['heading', 'paragraph'],
       }),
       Underline,
+      ImagePlaceholder,
     ],
     content: initialContent,
     // 수정 가능 여부 설정. false인 경우 readOnly
