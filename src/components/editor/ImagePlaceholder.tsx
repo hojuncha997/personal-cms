@@ -1,7 +1,7 @@
 import { Node, mergeAttributes } from '@tiptap/core'
 import { ReactNodeViewRenderer, NodeViewWrapper, NodeViewProps } from '@tiptap/react'
-import React, { useRef } from 'react'
-import { Image as ImageIcon } from 'lucide-react'
+import React, { useRef, useState } from 'react'
+import { Image as ImageIcon, Loader2 } from 'lucide-react'
 import { createClient } from '@supabase/supabase-js'
 
 // Supabase 클라이언트 초기화
@@ -17,6 +17,7 @@ interface ImagePlaceholderProps extends NodeViewProps {
 
 const ImagePlaceholderComponent = ({ node, updateAttributes }: ImagePlaceholderProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const [isUploading, setIsUploading] = useState(false)
 
   const handleClick = () => {
     fileInputRef.current?.click()
@@ -45,16 +46,20 @@ const ImagePlaceholderComponent = ({ node, updateAttributes }: ImagePlaceholderP
       const filePath = `images/project-images/${fileName}`    // 파일 경로 생성. 버킷 내의 디렉토리명(버킷은 스토리지의 하위 디렉토리)
 
       // 스토리지에 업로드
+      setIsUploading(true)
       const { error: uploadError, data } = await supabase.storage
         .from('media-storage') // 수파베이스 버킷 이름으로 변경
         .upload(filePath, file)
 
       if (uploadError) throw uploadError
 
+
       // 공개 URL 가져오기
       const { data: { publicUrl } } = supabase.storage
         .from('media-storage')
         .getPublicUrl(filePath)
+
+      setIsUploading(false)
 
       // 이미지 URL 업데이트
       updateAttributes({
@@ -92,8 +97,17 @@ const ImagePlaceholderComponent = ({ node, updateAttributes }: ImagePlaceholderP
           className="hidden"
           onChange={handleFileUpload}
         />
-        <ImageIcon className="mx-auto mb-2 text-gray-400" size={32} />
-        <p className="text-gray-500">클릭하여 이미지 업로드</p>
+        {isUploading ? (
+          <>
+            <Loader2 className="mx-auto mb-2 text-gray-400 animate-spin" size={32} />
+            <p className="text-gray-500">업로드 중...</p>
+          </>
+        ) : (
+          <>
+            <ImageIcon className="mx-auto mb-2 text-gray-400" size={32} />
+            <p className="text-gray-500">클릭하여 이미지 업로드</p>
+          </>
+        )}
       </div>
     </NodeViewWrapper>
   )
