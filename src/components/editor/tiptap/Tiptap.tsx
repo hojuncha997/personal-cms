@@ -91,7 +91,7 @@ const Tiptap = ({
       console.log('Editor content updated:', editor.getJSON())
       onChange(editor.getJSON())
     },
-})
+  })
 
   //   const editor = useEditor({
   //   extensions: [
@@ -145,7 +145,7 @@ const Tiptap = ({
 
   return (
     <div className="border rounded-lg overflow-hidden sticky top-0">
-      <Toolbar editor={editor} toolbarStyle={toolbarStyle} />
+      {editable && <Toolbar editor={editor} toolbarStyle={toolbarStyle} />}
 
       {/* [&_*]:outline-none는 해당 div 내부의 모든 요소에 outline: none을 적용 */}
       <div 
