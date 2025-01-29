@@ -75,7 +75,12 @@ const Tiptap = ({
         allowBase64: true,
       }),
       Link.configure({
-        openOnClick: false,
+        openOnClick: true,
+        linkOnPaste: true,
+        autolink: true,
+        HTMLAttributes: {
+          class: 'cursor-pointer text-blue-500 hover:underline',
+        },
       }),
       TextAlign.configure({
         types: ['heading', 'paragraph'],

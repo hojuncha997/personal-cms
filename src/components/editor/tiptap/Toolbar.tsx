@@ -57,10 +57,39 @@ export default function Toolbar({
     }, [editor])
 
     const addLink = useCallback(() => {
-        const url = window.prompt('URL 입력:')
-        if (url) {
-            editor.chain().focus().setLink({ href: url }).run()
+        // 현재 선택된 텍스트 가져오기
+        const previousUrl = editor.getAttributes('link').href
+        const url = window.prompt('URL을 입력하세요:', previousUrl)
+        
+        // 취소를 누른 경우
+        if (url === null) {
+            return
         }
+
+        // URL이 비어있는 경우 링크 제거
+        if (url === '') {
+            editor.chain().focus().unsetLink().run()
+            return
+        }
+
+        // URL 유효성 검사
+        try {
+            new URL(url.startsWith('http') ? url : `https://${url}`)
+        } catch {
+            alert('유효하지 않은 URL입니다.')
+            return
+        }
+
+        // 링크 설정
+        editor.chain().focus().setLink({ 
+            href: url.startsWith('http') ? url : `https://${url}`,
+            target: '_blank' 
+        }).run()
+    }, [editor])
+
+    // 링크 제거 버튼 추가
+    const removeLink = useCallback(() => {
+        editor.chain().focus().unsetLink().run()
     }, [editor])
 
     return (
@@ -222,6 +251,16 @@ export default function Toolbar({
             >
                 <Link size={20} />
             </button>
+            {editor.isActive('link') && (
+                <button
+                    type="button"
+                    onClick={removeLink}
+                    className="p-2 rounded hover:bg-gray-200"
+                    title="링크 제거"
+                >
+                    <Link size={20} className="text-red-500" />
+                </button>
+            )}
         </div>
     )
 }
