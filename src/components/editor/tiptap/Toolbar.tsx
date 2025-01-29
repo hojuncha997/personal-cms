@@ -1,7 +1,7 @@
 "use client"
 
 import { Editor } from "@tiptap/react"
-import { useCallback } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import { 
   Bold, 
   Italic, 
@@ -18,7 +18,8 @@ import {
   ListOrdered,
   CheckSquare,
   Image as ImageIcon,
-  Link
+  Link,
+  Palette
 } from "lucide-react"
 import { addImagePlaceholder } from "../ImagePlaceholder"
 
@@ -28,6 +29,16 @@ interface ToolbarProps {
 }
 
 const Divider = () => <div className="w-px h-6 bg-gray-300 mx-1" />
+
+// 색상 옵션 배열 추가
+const colors = [
+    { name: '검정', value: '#000000' },
+    { name: '회색', value: '#666666' },
+    { name: '빨강', value: '#ff0000' },
+    { name: '파랑', value: '#0000ff' },
+    { name: '초록', value: '#00ff00' },
+    { name: '노랑', value: '#ffff00' },
+]
 
 export default function Toolbar({ 
   editor, 
@@ -92,6 +103,24 @@ export default function Toolbar({
         editor.chain().focus().unsetLink().run()
     }, [editor])
 
+    // 색상 선택 상태 관리
+    const [showColorPicker, setShowColorPicker] = useState(false)
+
+    const colorPickerRef = useRef<HTMLDivElement>(null)
+
+    useEffect(() => {
+        function handleClickOutside(event: MouseEvent) {
+            if (colorPickerRef.current && !colorPickerRef.current.contains(event.target as Node)) {
+                setShowColorPicker(false)
+            }
+        }
+
+        document.addEventListener('mousedown', handleClickOutside)
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside)
+        }
+    }, [])
+
     return (
         <div className={toolbarStyle}>
             {/* Text Style */}
@@ -127,6 +156,46 @@ export default function Toolbar({
             >
                 <Underline size={20} />
             </button>
+
+            <div className="relative" ref={colorPickerRef}>
+                <button
+                    type="button"
+                    onClick={() => setShowColorPicker(!showColorPicker)}
+                    className="p-2 rounded hover:bg-gray-200"
+                    title="글자 색상"
+                >
+                    <Palette size={20} />
+                </button>
+                
+                {showColorPicker && (
+                    <div className="absolute z-10 top-full left-0 mt-1 p-2 bg-white rounded-lg shadow-lg border">
+                        <div className="grid grid-cols-3 gap-1">
+                            {colors.map((color) => (
+                                <button
+                                    key={color.value}
+                                    onClick={() => {
+                                        editor.chain().focus().setColor(color.value).run()
+                                        setShowColorPicker(false)
+                                    }}
+                                    className="w-8 h-8 rounded border"
+                                    style={{ backgroundColor: color.value }}
+                                    title={color.name}
+                                />
+                            ))}
+                            <button
+                                onClick={() => {
+                                    editor.chain().focus().unsetColor().run()
+                                    setShowColorPicker(false)
+                                }}
+                                className="w-8 h-8 rounded border flex items-center justify-center"
+                                title="색상 제거"
+                            >
+                                <span className="text-xs">없음</span>
+                            </button>
+                        </div>
+                    </div>
+                )}
+            </div>
 
             <Divider />
 

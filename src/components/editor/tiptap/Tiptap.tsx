@@ -12,6 +12,8 @@ import TextAlign from '@tiptap/extension-text-align'
 import Document from '@tiptap/extension-document'
 import Paragraph from '@tiptap/extension-paragraph'
 import Text from '@tiptap/extension-text'
+import Color from '@tiptap/extension-color'
+import TextStyle from '@tiptap/extension-text-style'
 import { useEffect } from 'react'
 import { Toolbar } from './index'
 import { ImagePlaceholder } from '../ImagePlaceholder'
@@ -45,6 +47,7 @@ const Tiptap = ({
 
   const editor = useEditor({
     extensions: [
+       
       StarterKit.configure({
         // StarterKit에서 모든 것을 비활성화
         document: false,
@@ -56,13 +59,32 @@ const Tiptap = ({
         // },
         bulletList: false,
         orderedList: false,
-        // taskList: false,
-        // taskItem: false,
+        // 마크 관련 설정은 유지
+        bold: {
+          HTMLAttributes: {
+            class: 'font-bold',
+          },
+        },
+        italic: {
+          HTMLAttributes: {
+            class: 'italic',
+          },
+        },
+        strike: {
+          HTMLAttributes: {
+            class: 'line-through',
+          },
+        },
       }),
       // 필수 확장기능
       Document,
       Paragraph,
       Text,
+      TextStyle,
+      // Color는 TextStyle을 확장
+      Color.configure({
+        types: ['textStyle'], // textStyle 마크 타입에 적용
+      }),
       // 나머지 확장기능
       Heading.configure({
         levels: [1, 2, 3]
@@ -87,6 +109,11 @@ const Tiptap = ({
       }),
       Underline,
       ImagePlaceholder,
+      // TextStyle.configure(),
+      // Color.configure({
+      //   types: ['textStyle'],
+      // }),
+      // Color,
     ],
     content: initialContent,
     // 수정 가능 여부 설정. false인 경우 readOnly
