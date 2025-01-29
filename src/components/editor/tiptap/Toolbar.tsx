@@ -36,7 +36,8 @@ const colors = [
     { name: '회색', value: '#666666' },
     { name: '빨강', value: '#ff0000' },
     { name: '파랑', value: '#0000ff' },
-    { name: '초록', value: '#00ff00' },
+    // { name: '초록', value: '#00ff00' },
+    { name: '녹색', value: '#008000' },
     { name: '노랑', value: '#ffff00' },
 ]
 
@@ -168,7 +169,7 @@ export default function Toolbar({
                 </button>
                 
                 {showColorPicker && (
-                    <div className="absolute z-10 top-full left-0 mt-1 p-2 bg-white rounded-lg shadow-lg border">
+                    <div className="absolute z-10 top-full left-0 mt-1 p-2 w-32 bg-white rounded-lg shadow-lg border">
                         <div className="grid grid-cols-3 gap-1">
                             {colors.map((color) => (
                                 <button
