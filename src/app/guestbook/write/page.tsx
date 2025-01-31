@@ -42,7 +42,25 @@ const GuestbookWrite: React.FC = () => {
     const isPrivate = watch('isPrivate');
 
     const onSubmit = async (data: FormValues) => {
-        console.log('제출된 데이터:', data);
+        // 데이터를 보기 좋게 포맷팅
+        const formattedData = {
+            ...data,
+            content: JSON.stringify(data.content, null, 2)
+        };
+        
+        // 콘솔에 출력
+        console.log('제출된 데이터:', formattedData);
+        
+        // alert으로도 표시
+        alert(
+            '제출된 데이터:\n' + 
+            `제목: ${data.title}\n` +
+            `카테고리: ${data.category}\n` +
+            `비밀글 여부: ${data.isPrivate}\n` +
+            `비밀번호: ${data.isPrivate ? data.password : '없음'}\n` +
+            `내용: ${JSON.stringify(data.content, null, 2)}`
+        );
+
         router.push('/guestbook');
     };
 

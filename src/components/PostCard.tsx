@@ -6,9 +6,17 @@ interface PostCardProps {
   date: string
   category: string
   imageUrl: string
+  post?: {
+    content?: string
+  }
 }
 
-export default function PostCard({ title, description, date, category, imageUrl }: PostCardProps) {
+export default function PostCard({ title, description, date, category, imageUrl, post }: PostCardProps) {
+
+  // if (!post?.content) {
+  //   return null;
+  // }
+
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow">
       <div className="relative h-48">
