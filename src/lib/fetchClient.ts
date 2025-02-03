@@ -21,8 +21,9 @@ import {
 } from './authInterceptor'
 
 export interface FetchOptions extends RequestInit {
- // 인증 헤더를 건너뛰는 옵션
- skipAuth?: boolean
+  body?: any;
+  // 인증 헤더를 건너뛰는 옵션
+  skipAuth?: boolean
 }
 
 export async function fetchClient(url: string, options: FetchOptions = {}): Promise<Response> {
@@ -57,11 +58,27 @@ export async function fetchClient(url: string, options: FetchOptions = {}): Prom
     }
   }
 
-  // 요청 실행
-  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}${url}`, {
+  const headers: HeadersInit = {
+    'Content-Type': 'application/json',
+    ...fetchOptions.headers,
+  };
+
+  const config = {
     ...fetchOptions,
-    credentials: 'include'
-  })
+    headers,
+    credentials: 'include' as RequestCredentials,
+  };
+
+  // POST나 PUT 요청이고 body가 있다면 JSON 문자열로 변환
+  if (config.body && (options.method === 'POST' || options.method === 'PUT')) {
+    // body가 이미 문자열인지 확인
+    config.body = typeof config.body === 'string' 
+      ? config.body 
+      : JSON.stringify(config.body);
+  }
+
+  // 요청 실행
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}${url}`, config);
 
   // 응답 인터셉터
   if (response.status === 401 && !skipAuth) {
@@ -84,5 +101,23 @@ export async function fetchClient(url: string, options: FetchOptions = {}): Prom
     })
   }
 
-  return response
+  if (!response.ok) {
+    // 서버로부터 더 자세한 에러 정보 가져오기
+    let errorDetails;
+    try {
+      errorDetails = await response.json();
+    } catch (jsonError) {
+      try {
+        errorDetails = await response.text();
+      } catch (textError) {
+        errorDetails = "서버에서 제공된 에러 메시지가 없습니다.";
+      }
+    }
+
+    throw new Error(
+      `HTTP error! status: ${response.status} - ${JSON.stringify(errorDetails)}`
+    );
+  }
+
+  return response.json();  // response를 JSON으로 파싱하여 반환
 }

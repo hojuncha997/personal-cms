@@ -9,15 +9,21 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { colors } from '@/constants/styles';
+import { useCreateGuestbook } from '@/hooks/guestbooks/useCreateGuestbook';
+import { GuestbookData } from '@/types/guestbooks/guestbookTypes';
+
 const formSchema = z.object({
   title: z.string()
     .min(1, { message: '제목은 필수 입력 항목입니다.' })
     .max(50, { message: '제목은 최대 50자까지 입력 가능합니다.' }),
   content: z.any(),
   category: z.string().min(1, { message: '카테고리는 필수 입력 항목입니다.' }),
-  isPrivate: z.boolean(),
+  isSecret: z.boolean(),
+  isFeatured: z.boolean(),
+  status: z.enum(['draft', 'published']).default('published'),
   password: z.string().optional()
-    .refine((val) => !val || val.length >= 4, { message: '비밀번호는 4자리 이상이어야 합니다.' })
+    .refine((val) => !val || val.length >= 4, { message: '비밀번호는 4자리 이상이어야 합니다.' }),
+  tags: z.array(z.string()).default([]),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -25,8 +31,10 @@ type FormValues = z.infer<typeof formSchema>;
 const GuestbookWrite: React.FC = () => {
     const router = useRouter();
     const categories = ['일반', '문의', '칭찬', '제안'];
+    const [tagInput, setTagInput] = React.useState('');
+    const { createGuestbook } = useCreateGuestbook();
 
-    const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm<FormValues>({
+    const { register, handleSubmit, watch, setValue, getValues, formState: { errors } } = useForm<FormValues>({
         resolver: zodResolver(formSchema),
         defaultValues: {
             title: '',
@@ -35,33 +43,47 @@ const GuestbookWrite: React.FC = () => {
                 content: [{ type: 'paragraph' }]
             },
             category: '일반',
-            isPrivate: false
+            isSecret: false,
+            isFeatured: false,
+            status: 'published',
+            tags: []
         }
     });
 
-    const isPrivate = watch('isPrivate');
+    const isSecret = watch('isSecret');
 
     const onSubmit = async (data: FormValues) => {
-        // 데이터를 보기 좋게 포맷팅
-        const formattedData = {
+        const guestbookData: GuestbookData = {
             ...data,
-            content: JSON.stringify(data.content, null, 2)
+            content: data.content,
+            slug: data.title
+                .toLowerCase()
+                .replace(/ /g, '-')
+                .replace(/[^\w-]+/g, ''),
+            thumbnail: null,
+            isFeatured: data.isFeatured,
+            status: data.status,
         };
-        
-        // 콘솔에 출력
-        console.log('제출된 데이터:', formattedData);
-        
-        // alert으로도 표시
-        alert(
-            '제출된 데이터:\n' + 
-            `제목: ${data.title}\n` +
-            `카테고리: ${data.category}\n` +
-            `비밀글 여부: ${data.isPrivate}\n` +
-            `비밀번호: ${data.isPrivate ? data.password : '없음'}\n` +
-            `내용: ${JSON.stringify(data.content, null, 2)}`
-        );
 
+        // 방명록 작성 훅 호출
+        await createGuestbook(guestbookData);
         router.push('/guestbook');
+    };
+
+    const handleAddTag = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Enter' && tagInput.trim()) {
+            e.preventDefault();
+            const currentTags = getValues('tags');
+            if (!currentTags.includes(tagInput.trim())) {
+                setValue('tags', [...currentTags, tagInput.trim()]);
+            }
+            setTagInput('');
+        }
+    };
+
+    const handleRemoveTag = (tagToRemove: string) => {
+        const currentTags = getValues('tags');
+        setValue('tags', currentTags.filter(tag => tag !== tagToRemove));
     };
 
     return (
@@ -111,7 +133,35 @@ const GuestbookWrite: React.FC = () => {
                             toolbarStyle="border-b bg-gray-50 p-2 flex flex-wrap gap-1"
                             // prose설정을 넣어줬음에 유의
                             contentStyle="p-4 min-h-[200px] bg-white prose-sm"
+                        />
+                    </div>
 
+                    <div>
+                        <label className="block text-sm font-medium mb-2">태그</label>
+                        <div className="flex flex-wrap gap-2 mb-2">
+                            {watch('tags').map((tag) => (
+                                <span 
+                                    key={tag} 
+                                    className="bg-gray-200 px-2 py-1 rounded-md flex items-center gap-1"
+                                >
+                                    {tag}
+                                    <button
+                                        type="button"
+                                        onClick={() => handleRemoveTag(tag)}
+                                        className="text-gray-500 hover:text-gray-700"
+                                    >
+                                        ×
+                                    </button>
+                                </span>
+                            ))}
+                        </div>
+                        <input
+                            type="text"
+                            value={tagInput}
+                            onChange={(e) => setTagInput(e.target.value)}
+                            onKeyDown={handleAddTag}
+                            className="w-full px-4 py-2 border rounded-md"
+                            placeholder="태그를 입력하고 Enter를 누르세요"
                         />
                     </div>
 
@@ -119,22 +169,31 @@ const GuestbookWrite: React.FC = () => {
                         <div className="flex items-center gap-2">
                             <input
                                 type="checkbox"
-                                {...register('isPrivate')}
+                                {...register('isSecret')}
                                 className="rounded"
                             />
                             <label className="text-sm">비밀글로 작성</label>
                         </div>
-                        {isPrivate && (
+                        <div className="flex items-center gap-2">
+                            <input
+                                type="checkbox"
+                                {...register('isFeatured')}
+                                className="rounded"
+                            />
+                            <label className="text-sm">주요 게시물로 설정</label>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <select
+                                {...register('status')}
+                                className="px-2 py-1 border rounded-md text-sm"
+                            >
+                                <option value="published">공개</option>
+                                <option value="draft">임시저장</option>
+                            </select>
+                        </div>
+                        {isSecret && (
                             <div className="flex-1">
-                                <input
-                                    type="password"
-                                    {...register('password')}
-                                    className="w-full px-4 py-2 border rounded-md"
-                                    placeholder="비밀번호를 입력하세요 (4자리 이상)"
-                                />
-                                {errors.password && (
-                                    <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>
-                                )}
+                                작성자와 본인만 볼 수 있습니다.
                             </div>
                         )}
                     </div>
