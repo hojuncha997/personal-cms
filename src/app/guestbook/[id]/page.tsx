@@ -5,6 +5,10 @@ import { Container } from '@/components/layouts/Container';
 import { colors } from '@/constants/styles/colors';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
+import { useGetGuestbookDetail } from '@/hooks/guestbooks/useGetGuestbookDetail';
+import { format } from 'date-fns';
+import Tiptap from '@/components/editor/tiptap/Tiptap';
+
 
 interface Comment {
     id: string;
@@ -29,87 +33,20 @@ interface GuestbookDetail {
 
 const GuestbookDetail: React.FC = () => {
     const params = useParams();
-    const id = params.id as string;
-    const [newComment, setNewComment] = useState('');
+    const uuid = params.id as string;
+    const { data: post, isLoading, error } = useGetGuestbookDetail(uuid);
     const [isLiked, setIsLiked] = useState(false);
+    const [newComment, setNewComment] = useState('');
     const [replyTo, setReplyTo] = useState<Comment | null>(null);
     const [replyContent, setReplyContent] = useState('');
 
-    // 임시 더미 데이터 리스트
-    const dummyList = [
-        {
-            id: "1",
-            title: "첫 번째 방명록입니다",
-            author: "이방문",
-            views: 35,
-            date: "2024-03-14",
-            like: 8,
-            category: "일반",
-            comments: [],
-        },
-        {
-            id: "2",
-            title: "두 번째 방명록이에요",
-            author: "박방문",
-            views: 38,
-            date: "2024-03-14",
-            like: 9,
-            category: "문의",
-            comments: [
-                { id: '1', author: '김댓글', content: '반갑습니다!', date: '2024-03-14' }
-            ],
-        },
-        {
-            id: "3",
-            title: "정말 멋진 포트폴리오네요!",
-            content: "프로젝트들이 매우 인상적입니다. 특히 React를 활용한 프로젝트가 눈에 띄네요.",
-            author: "김방문",
-            views: 42,
-            date: "2024-03-15",
-            like: 10,
-            category: "칭찬",
-            comments: [
-                {
-                    id: '1',
-                    author: '이댓글',
-                    content: '저도 동의합니다!',
-                    date: '2024-03-15',
-                    replies: [
-                        {
-                            id: '1-1',
-                            author: '김답글',
-                            content: '감사합니다 :)',
-                            date: '2024-03-15',
-                            parentId: '1'
-                        }
-                    ]
-                },
-                { id: '2', author: '박댓글', content: '정말 멋져요~', date: '2024-03-15' }
-            ],
-        },
-        {
-            id: "4",
-            title: "네 번째 방명록입니다",
-            author: "최방문",
-            views: 30,
-            date: "2024-03-16",
-            like: 7,
-            category: "일반",
-            comments: [],
-        },
-        {
-            id: "5",
-            title: "다섯 번째 방명록이에요",
-            author: "정방문",
-            views: 25,
-            date: "2024-03-16",
-            like: 5,
-            category: "일반",
-            comments: [],
-        },
-    ];
+    if (isLoading) {
+        return <div>로딩 중...</div>;
+    }
 
-    const currentPost = dummyList.find(post => post.id === id) || dummyList[2];
+    if (error || !post) {
+        return <div>에러가 발생했습니다.</div>;
+    }
 
     const handleLike = () => {
         setIsLiked(!isLiked);
@@ -198,23 +135,46 @@ const GuestbookDetail: React.FC = () => {
             <Container>
                 <div className="max-w-4xl w-full mx-auto py-8">
                     <div className="w-full">
+                        {/* 방명록 상세 컨테이너 */}
                         <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+                            {/* 방명록 상세 헤더 */}
                             <div className="border-b border-gray-200 pb-4">
                                 <div className="flex items-center gap-2 mb-2">
-                                    <span className="px-2 py-1 bg-gray-100 text-sm rounded-md">{currentPost.category}</span>
-                                    <h1 className="text-2xl font-bold">{currentPost.title}</h1>
-                                    {currentPost.comments.length > 0 && (
-                                        <span className="text-blue-500">[{currentPost.comments.length}]</span>
-                                    )}
+                                    <span className="px-2 py-1 bg-gray-100 text-sm rounded-md">{post.category}</span>
+                                    <h1 className="text-2xl font-bold">{post.title}</h1>
+                                    {/* {post.commentCount > 0 && (
+                                        <span className="text-blue-500">[{post.commentCount}]</span>
+                                    )} */}
                                 </div>
                                 <div className="flex gap-4 text-sm text-gray-600">
-                                    <span>작성자: {currentPost.author}</span>
-                                    <span>조회수: {currentPost.views}</span>
-                                    <span>작성일: {currentPost.date}</span>
+                                    <span>작성자: {post.author_display_name}</span>
+                                    <span>조회수: {post.viewCount}</span>
+                                    <span>작성일: {format(new Date(post.createdAt), 'yyyy-MM-dd')}</span>
                                 </div>
                             </div>
+                            {/* <div className="mt-6 whitespace-pre-wrap prose"> */}
                             <div className="mt-6 whitespace-pre-wrap">
-                                {currentPost.content}
+
+                                {/* TODO: TipTap 뷰어로 교체 */}
+                                {/* {JSON.stringify(post.content, null, 2)} */}
+
+                                {/* </label>
+                        <Tiptap
+                            initialContent={watch('content')}
+                            onChange={(content) => setValue('content', content)}
+                            toolbarStyle="border-b bg-gray-50 p-2 flex flex-wrap gap-1"
+                            // prose설정을 넣어줬음에 유의
+                            contentStyle="p-4 min-h-[200px] bg-white prose-sm"
+                        /> */}
+                                
+                                <Tiptap
+                                    initialContent={post.content}
+                                    contentStyle="min-h-[200px] bg-transparent prose-sm"
+                                    wrapperStyle="overflow-hidden"
+                                    editable={false}
+                                    // onChange={() => {}}
+                                />
+
                             </div>
                             <div className="mt-8 border-t pt-4">
                                 <div className="flex justify-center mb-8">
@@ -224,15 +184,14 @@ const GuestbookDetail: React.FC = () => {
                                             ${isLiked ? 'bg-red-500 text-white' : 'bg-gray-100 hover:bg-gray-200'}`}
                                     >
                                         <span className="text-lg">❤️</span>
-                                        <span>좋아요 {currentPost.like + (isLiked ? 1 : 0)}</span>
+                                        <span>좋아요 {post.likeCount + (isLiked ? 1 : 0)}</span>
                                     </button>
                                 </div>
                                 
-                                {/* 댓글 섹션 */}
-                                <div className="space-y-4">
-                                    <h3 className="text-lg font-semibold">댓글 {currentPost.comments.length}개</h3>
+                                {/* 댓글 섹션 - 추후 구현 */}
+                                {/* <div className="space-y-4">
+                                    <h3 className="text-lg font-semibold">댓글 {post.comments.length}개</h3>
                                     
-                                    {/* 댓글 작성 폼 */}
                                     <form onSubmit={handleCommentSubmit} className="space-y-2">
                                         <textarea
                                             value={newComment}
@@ -251,47 +210,19 @@ const GuestbookDetail: React.FC = () => {
                                         </div>
                                     </form>
 
-                                    {/* 댓글 목록 */}
                                     <div className="space-y-4">
-                                        {currentPost.comments.map((comment) => renderComment(comment))}
+                                        {post.comments.map((comment) => renderComment(comment))}
                                     </div>
-                                </div>
+                                </div> */}
                             </div>
                             <div className="mt-8 flex justify-end">
-                                <button 
-                                    onClick={() => window.history.back()}
+                                <Link 
+                                    href="/guestbook"
                                     className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors"
                                 >
                                     목록으로
-                                </button>
-                            </div>
-                        </div>
-
-                        {/* 하단 목록 (기존 코드) */}
-                        <div className="bg-white rounded-lg shadow-md overflow-hidden">
-                            {dummyList.map((post) => (
-                                <Link href={`/guestbook/${post.id}`} key={post.id}>
-                                    <div className={`border-b border-gray-100 px-6 py-4 hover:bg-gray-50 cursor-pointer
-                                        ${post.id === id ? 'bg-blue-50' : ''}`}
-                                    >
-                                        <div className="flex justify-between items-center">
-                                            <div className="flex-1">
-                                                <div className="flex items-center gap-2">
-                                                    <span className="text-sm text-gray-500">[{post.category}]</span>
-                                                    <span className="text-blue-600">{post.title}</span>
-                                                    {post.comments.length > 0 && (
-                                                        <span className="text-blue-500">[{post.comments.length}]</span>
-                                                    )}
-                                                </div>
-                                            </div>
-                                            <div className="flex gap-4 text-sm text-gray-600">
-                                                <span>{post.author}</span>
-                                                <span>{post.date}</span>
-                                            </div>
-                                        </div>
-                                    </div>
                                 </Link>
-                            ))}
+                            </div>
                         </div>
                     </div>
                 </div>

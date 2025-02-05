@@ -17,11 +17,12 @@ import TextStyle from '@tiptap/extension-text-style'
 import { useEffect } from 'react'
 import { Toolbar } from './index'
 import { ImagePlaceholder } from '../ImagePlaceholder'
+
 interface TiptapProps {
   // 본문 기본값
   initialContent: JSONContent
   // 내용변경 함수
-  onChange: (content: JSONContent) => void
+  onChange?: (content: JSONContent) => void
   // 본문 편집 가능 여부
   editable?: boolean
   // 툴바 스타일
@@ -30,7 +31,7 @@ interface TiptapProps {
   contentStyle?: string
   //proseMirror 설정
   // proseSizeClass?: string
-
+  wrapperStyle?: string;  // 새로운 prop 추가
 }
 
 // 모듈 시작
@@ -42,7 +43,7 @@ const Tiptap = ({
   contentStyle = "p-4 min-h-[200px]",
   // proseMirror가 자체적으로 기본 스타일링을 가지고 있기 때문에 설정이 필요할 수 있음.
   // proseSizeClass = "prose-sm sm:prose lg:prose-lg xl:prose-2xl"  // 기본값 설정
-
+  wrapperStyle = "border rounded-lg overflow-hidden sticky top-0",  // 기본값 설정
 }: TiptapProps) => {
 
   const editor = useEditor({
@@ -121,7 +122,7 @@ const Tiptap = ({
     onUpdate: ({ editor }) => {
       // 디버깅을 위한 콘솔 로그 추가
       console.log('Editor content updated:', editor.getJSON())
-      onChange(editor.getJSON())
+      onChange && onChange(editor.getJSON())
     },
   })
 
@@ -176,7 +177,8 @@ const Tiptap = ({
   }
 
   return (
-    <div className="border rounded-lg overflow-hidden sticky top-0">
+    // <div className="border rounded-lg overflow-hidden sticky top-0">
+    <div className={wrapperStyle}>
       {editable && <Toolbar editor={editor} toolbarStyle={toolbarStyle} />}
 
       {/* [&_*]:outline-none는 해당 div 내부의 모든 요소에 outline: none을 적용 */}
