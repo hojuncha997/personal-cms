@@ -11,33 +11,49 @@ export class LoginError extends Error {
  }
 }
 
+interface LoginResponse {
+  access_token: string;
+}
+
 export const useLogin = () => {
  return useMutation({
    mutationFn: async (credentials: LoginCredentials) => {
-     const response = await fetchClient('/auth/local/login', {
-       method: 'POST',
-       headers: {
-         'Content-Type': 'application/json',
-       },
-       body: JSON.stringify({
-         ...credentials,
-         clientType: 'web'
-       }),
-       skipAuth: true
-     } as FetchOptions)
+     try {
+       const response = await fetchClient('/auth/local/login', {
+         method: 'POST',
+         headers: {
+           'Content-Type': 'application/json',
+         },
+         body: JSON.stringify({
+           ...credentials,
+           clientType: 'web'
+         }),
+         skipAuth: true
+       } as FetchOptions);
 
-     if (!response.ok) {
-       const errorData = await response.json();
-       throw new LoginError(errorData.message || '로그인에 실패했습니다.', response.status);
+       const data = await response.json();
+       console.log('서버 응답:', data);
+       
+       if (data.access_token) {
+         console.log('로그인 성공');
+         setAuthToken(data.access_token);
+         return data;
+       } else {
+         throw new LoginError('인증 토큰이 없습니다.', 500);
+       }
+     } catch (error) {
+       console.error('로그인 에러:', error);
+       if (error instanceof LoginError) {
+         throw error;
+       }
+       if (error instanceof Error && error.message.includes('HTTP error!')) {
+         const errorMessage = error.message.includes('message')
+           ? JSON.parse(error.message.split(' - ')[1]).message
+           : '로그인에 실패했습니다.';
+         throw new LoginError(errorMessage, 500);
+       }
+       throw new LoginError('로그인 처리 중 오류가 발생했습니다.', 500);
      }
-
-     const data = await response.json();
-     if (data.access_token) {
-       console.log('로그인 성공', data.access_token);
-       setAuthToken(data.access_token);
-     }
-
-     return data;
    }
  });
 };

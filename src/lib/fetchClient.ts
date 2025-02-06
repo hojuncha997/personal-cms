@@ -118,6 +118,6 @@ export async function fetchClient(url: string, options: FetchOptions = {}): Prom
       `HTTP error! status: ${response.status} - ${JSON.stringify(errorDetails)}`
     );
   }
-
-  return response.json();  // response를 JSON으로 파싱하여 반환
+  // return response.json();  // response를 JSON으로 파싱하여 반환
+  return response;  // response.json() 대신 Response 객체 반환: 개별 엔드포인트에서 변환하여 사용
 }

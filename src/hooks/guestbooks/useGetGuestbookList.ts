@@ -26,7 +26,7 @@ export const useGetGuestbookList = () => {
         queryFn: async () => {
             const data = await fetchClient('/guestbooks', {skipAuth: true});
             // return data as GuestbookResponse;
-            return (data as unknown) as GuestbookResponse;
+            return await data.json() as GuestbookResponse;
         },
         staleTime: 1000 * 30, // 3분 동안 데이터를 "신선한" 상태로 유지(3분 동안은 서버에 재요청하지 않고 캐시된 데이터를 사용)
         gcTime: 1000 * 60 * 5,    // cacheTime 대신 gcTime 사용(컴포넌트가 언마운트되더라도 5분 동안은 캐시를 유지)
