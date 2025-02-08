@@ -32,7 +32,10 @@ export default function RootLayout({
     다만, 스크롤바가 나타날 수 있는 공간을 미리 확보해
     이를 통해 스크롤바가 갑자기 나타날 때 레이아웃이 밀리는 현상을 방지
     */
-    <html lang="en" className="scrollbar-gutter-stable">
+    // scrollbar-gutter-stable: 스크롤바 유무에 따른 레이아웃 변화 방지
+    // scrollBehavior: 스크롤 위치 이동 방식
+    // auto: 자동으로 스크롤 위치 즉시 이동, smooth: 스크롤 위치 부드럽게 이동
+    <html lang="en" className="scrollbar-gutter-stable" style={{ scrollBehavior:'auto' }}> 
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
