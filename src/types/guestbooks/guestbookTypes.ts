@@ -13,6 +13,75 @@ export type GuestbookData = {
     status: string | 'published';
 }
 
+export interface GuestbookPost {
+  public_id: string;
+  title: string;
+  content: {
+    type: string;
+    content: any[];
+  };
+  author_display_name: string;
+  current_author_name: string;
+  isSecret: boolean;
+  category: string;
+  slug: string;
+  tags: string[];
+  thumbnail: string | null;
+  status: string;
+  isFeatured: boolean;
+  createdAt: string;
+  updatedAt: string;
+  viewCount: number;
+  likeCount: number;
+  commentCount: number;
+}
+
+export interface GuestbookResponse {
+  posts: GuestbookPost[];
+  meta: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
+}
+
+export interface GuestbookQueryParams {
+  page?: number;
+  limit?: number;
+  search?: string;
+  category?: string;
+  status?: string;
+  sortBy?: 'createdAt' | 'viewCount' | 'likeCount';
+  order?: 'ASC' | 'DESC';
+  tag?: string;
+  startDate?: string;
+  endDate?: string;
+}
+
+export interface GuestbookDetailResponse {
+  public_id: string;
+  title: string;
+  content: {
+    type: string;
+    content: any[];
+  };
+  author_display_name: string;
+  current_author_name: string;
+  isSecret: boolean;
+  category: string;
+  slug: string;
+  tags: string[];
+  thumbnail: string | null;
+  status: string;
+  isFeatured: boolean;
+  createdAt: string;
+  updatedAt: string;
+  viewCount: number;
+  likeCount: number;
+  commentCount: number;
+}
+
 /*
 {
     "title" : "test-guestbook1",

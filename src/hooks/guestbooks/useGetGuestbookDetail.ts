@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchClient } from "@/lib/fetchClient";
 
 interface GuestbookDetailResponse {
-    uuid: string;
+    public_id: string;
     title: string;
     content: {
         type: string;
@@ -20,11 +20,11 @@ interface GuestbookDetailResponse {
     updatedAt: string;
 }
 
-export const useGetGuestbookDetail = (uuid: string) => {
+export const useGetGuestbookDetail = (public_id: string) => {
     const { data, isLoading, error } = useQuery<GuestbookDetailResponse>({
-        queryKey: ['guestbooks', uuid],
+        queryKey: ['guestbooks', public_id],
         queryFn: async () => {
-            const data = await fetchClient(`/guestbooks/${uuid}`, {skipAuth: true});
+            const data = await fetchClient(`/guestbooks/${public_id}`, {skipAuth: true});
             return await data.json() as GuestbookDetailResponse;
         },
         staleTime: 1000 * 60 * 30, // 30분 동안 데이터를 "신선한" 상태로 유지(30분 동안은 서버에 재요청하지 않고 캐시된 데이터를 사용)
@@ -37,7 +37,7 @@ export const useGetGuestbookDetail = (uuid: string) => {
         
         // refetchInterval: 1000 * 60 * 5, // 5분 마다 재요청 : 굳이 필요 없음
         // refetchIntervalInBackground: true, // 백그라운드에서도 재요청(브라우저 탭이 비활성화 되어 있어도 재요청- 현재 불필요)
-        enabled: !!uuid, // uuid가 있을 때만 쿼리 실행
+        enabled: !!public_id, // public_id가 있을 때만 쿼리 실행
     });
     return { data, isLoading, error };
 }; 
