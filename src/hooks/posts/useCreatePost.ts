@@ -2,7 +2,7 @@
 
 import { fetchClient } from '@/lib/fetchClient';
 import { useMutation } from '@tanstack/react-query';
-import { GuestbookData } from '@/types/guestbooks/guestbookTypes';
+import { PostData } from '@/types/posts/postTypes';
 
 
 // export default async function useCreateGuestbook( data: GuestbookData ) {
@@ -10,7 +10,7 @@ import { GuestbookData } from '@/types/guestbooks/guestbookTypes';
     // return response;
 export function useCreatePost() {
     const { mutateAsync: createPost } = useMutation({
-        mutationFn: (data: GuestbookData) => fetchClient('/posts', { 
+        mutationFn: (data: PostData) => fetchClient('/posts', { 
             method: 'POST', 
             body: data  // 여기서는 stringify 하지 않음
         }),

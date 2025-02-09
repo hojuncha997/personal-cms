@@ -32,9 +32,9 @@ const NavMenuContent = [
     path: '/service'
   },
   {
-    id: 'blog',
-    label: '블로그',
-    path: '/blog'
+    id: 'posts',
+    label: '포스팅',
+    path: '/posts'
   },
   {
     id: 'projects',
