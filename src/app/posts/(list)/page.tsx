@@ -1,5 +1,5 @@
 // src/app/posts/page.tsx
-// 방명록 페이지
+// 게시글 페이지
 
 'use client'
 
@@ -81,7 +81,7 @@ export default function Post() {
     
     return (
         <div className="w-full">
-            <h1 className="text-3xl font-bold mb-12 border-b border-black pb-4">게시판</h1>
+            <h1 className="text-3xl font-bold mb-12 border-b border-black pb-4">포스팅</h1>
             
             {/* 검색 및 필터 영역 */}
             <div className="mb-6 flex flex-wrap gap-4">
@@ -148,18 +148,6 @@ export default function Post() {
                         </button>
                     </div>
                 </div>
-
-                <select
-                    value={currentCategory}
-                    onChange={(e) => handleCategoryChange(e.target.value)}
-                    className="px-4 py-2 border rounded-md"
-                >
-                    <option value="">전체 카테고리</option>
-                    <option value="일반">일반</option>
-                    <option value="문의">문의</option>
-                    <option value="칭찬">칭찬</option>
-                    <option value="제안">제안</option>
-                </select>
             </div>
 
             {/* 정렬 옵션 */}

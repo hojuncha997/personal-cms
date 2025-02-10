@@ -28,7 +28,7 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
-const PostWrite: React.FC = () => {
+export default function PostWrite() {
     const router = useRouter();
     const categories = ['일반', '문의', '칭찬', '제안'];
     const [tagInput, setTagInput] = React.useState('');
@@ -218,6 +218,4 @@ const PostWrite: React.FC = () => {
         </Container>
         </div>
     );
-};
-
-export default PostWrite; 
+} 

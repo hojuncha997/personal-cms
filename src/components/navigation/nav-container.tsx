@@ -136,8 +136,10 @@ export function NavContainer({ onOpenDrawer, onOpenLogin }: NavContainerProps) {
               isOpen={isDrawerOpen} 
               onClose={() => setIsDrawerOpen(false)}
               portalTo="drawer-root"
-              drawerWidth={10}
+              drawerWidth='10rem'
+              drawerHeight='100vh'
               hasBlur={false}
+              hasOverlay={true}
               position='right'
               title={`메뉴`}
             >
