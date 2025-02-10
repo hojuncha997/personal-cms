@@ -5,8 +5,8 @@ import { createPortal } from 'react-dom';
 
 // z-index 관리를 위한 상수
 const Z_INDEX = {
-  overlay: 'z-40',
-  drawer: 'z-50'
+  overlay: 'z-[15]',
+  drawer: 'z-[15]'
 } as const;
 
 interface CommonDrawerProps {
@@ -15,22 +15,47 @@ interface CommonDrawerProps {
     isOpen: boolean;
     onClose: () => void;
     portalTo?: string;
+    /** 드로어의 높이 (rem 또는 vh 단위) */
+    drawerHeight?: string;
     /** 드로어의 너비 (rem 단위) */
-    drawerWidth?: number;
+    drawerWidth?: string;
     /** 드로어의 위치 */
-    position?: 'left' | 'right';
+    position?: 'left' | 'right' | 'top' | 'bottom';
     /** 백드롭 블러 효과 사용 여부 */
     hasBlur?: boolean;
     /** 드로어 제목 */
     title?: string;
+    /** 오버레이 표시 여부 */
+    hasOverlay?: boolean;
+    /** 추가 클래스명 */
+    className?: string;
+    /** 드로어 열릴 때 스크롤 방지 여부 */
+    preventScroll?: boolean;
 }
 
+const getTransformValue = (position: string, isOpen: boolean) => {
+    if (!isOpen) {
+        switch(position) {
+            case 'left': return '-translate-x-full';
+            case 'right': return 'translate-x-full';
+            case 'top': return '-translate-y-full';
+            case 'bottom': return 'translate-y-full';
+            default: return '';
+        }
+    }
+    return 'translate-x-0 translate-y-0';
+};
+
 export function CommonDrawer({ 
-    portalTo, 
-    drawerWidth = 24, // 384px
+    portalTo,
+    drawerHeight = '100vh',
+    drawerWidth = '24rem', // 384px
     position = 'right',
     hasBlur = false,
+    hasOverlay = true,
+    preventScroll = true, // 기본값은 true로 설정
     title = '메뉴',
+    className = '',
     ...props 
 }: CommonDrawerProps) {
     // SSR 환경에서 document 객체 접근을 안전하게 하기 위한 mounted 상태
@@ -42,7 +67,8 @@ export function CommonDrawer({
     const drawerRef = useRef<HTMLDivElement>(null);
 
     const drawerStyle = {
-        width: `${drawerWidth}rem`,
+        height: drawerHeight,
+        width: drawerWidth,
         maxWidth: 'min(calc(100vw - 2rem), 32rem)', // 최대 너비를 뷰포트 기준으로 제한
         minWidth: '18rem' // 288px
     };
@@ -113,7 +139,7 @@ export function CommonDrawer({
 
     // 드로어가 열릴 때 스크롤 방지
     useEffect(() => {
-        if (props.isOpen) {
+        if (props.isOpen && preventScroll) {
             const scrollY = window.scrollY;
             const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
             
@@ -132,23 +158,25 @@ export function CommonDrawer({
                 window.scrollTo(0, scrollY);
             };
         }
-    }, [props.isOpen]);
+    }, [props.isOpen, preventScroll]);
 
     const content = (
         <>
             <div>{props.trigger}</div>
             
             {/* 오버레이 */}
-            <div 
-                className={`
-                    fixed inset-0 bg-black/50 ${Z_INDEX.overlay}
-                    transition-opacity duration-300 ease-in-out
-                    ${props.isOpen ? 'opacity-100 visible' : 'opacity-0 invisible'}
-                    ${hasBlur ? 'backdrop-blur-sm' : ''}
-                `}
-                onClick={props.onClose}
-                aria-hidden="true"
-            />
+            {hasOverlay && (
+                <div 
+                    className={`
+                        fixed inset-0 bg-black/50 ${Z_INDEX.overlay}
+                        transition-opacity duration-300 ease-in-out
+                        ${props.isOpen ? 'opacity-100 visible' : 'opacity-0 invisible'}
+                        ${hasBlur ? 'backdrop-blur-sm' : ''}
+                    `}
+                    onClick={props.onClose}
+                    aria-hidden="true"
+                />
+            )}
 
             {/* 드로어 */}
             <div 
@@ -158,12 +186,14 @@ export function CommonDrawer({
                 aria-label={title}
                 style={drawerStyle}
                 className={`
-                    fixed top-0 ${position}-0 h-full bg-white shadow-xl ${Z_INDEX.drawer}
+                    fixed ${position === 'top' || position === 'bottom' ? `${position}-0 left-0 w-full` : `top-0 ${position}-0 h-full`} 
+                    bg-white shadow-xl ${Z_INDEX.drawer}
                     transform transition-all duration-300 ease-in-out
                     ${props.isOpen 
-                        ? 'translate-x-0 opacity-100 visible' 
-                        : `${position === 'right' ? 'translate-x-full' : '-translate-x-full'} opacity-0 invisible`
+                        ? 'opacity-100 visible' 
+                        : `${getTransformValue(position, false)} opacity-0 invisible`
                     }
+                    ${className}
                 `}
             >
                 <div className="flex flex-col h-full">
