@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import Image from 'next/image'
 
 interface PostCardProps {
@@ -5,38 +6,48 @@ interface PostCardProps {
   description: string
   date: string
   category: string
-  imageUrl: string
-  post?: {
-    content?: string
-  }
+  imageUrl?: string
+  slug: string
 }
 
-export default function PostCard({ title, description, date, category, imageUrl, post }: PostCardProps) {
-
-  // if (!post?.content) {
-  //   return null;
-  // }
-
+export default function PostCard({
+  title,
+  description,
+  date,
+  category,
+  imageUrl,
+  slug
+}: PostCardProps) {
   return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow">
-      <div className="relative h-48">
-        <Image
-          src={imageUrl}
-          alt={title}
-          fill
-          className="object-cover"
-        />
-        <div className="absolute top-4 left-4">
-          <span className="bg-blue-500 text-white px-3 py-1 rounded-full text-sm">
-            {category}
-          </span>
+    <Link href={`/posts/${slug}`}>
+      <article className="h-full rounded-lg overflow-hidden border border-gray-200 transition-all hover:shadow-lg">
+        {imageUrl ? (
+          <div className="relative h-48 w-full">
+            <Image
+              src={imageUrl}
+              alt={title}
+              fill
+              className="object-cover"
+            />
+          </div>
+        ) : (
+          <div className="h-48 bg-gradient-to-r from-blue-500 to-purple-500 p-6 flex items-center justify-center">
+            <h3 className="text-white text-xl font-bold text-center line-clamp-3">
+              {title}
+            </h3>
+          </div>
+        )}
+        <div className="p-4">
+          {imageUrl && (
+            <h3 className="text-xl font-bold mb-2 line-clamp-2">{title}</h3>
+          )}
+          <p className="text-gray-600 mb-2 line-clamp-2">{description}</p>
+          <div className="flex items-center justify-between text-sm text-gray-500">
+            <span>{category}</span>
+            <span>{date}</span>
+          </div>
         </div>
-      </div>
-      <div className="p-6">
-        <h3 className="text-xl font-bold mb-2 line-clamp-2 text-gray-600">{title}</h3>
-        <p className="text-gray-600 mb-4 line-clamp-3">{description}</p>
-        <div className="text-gray-400 text-sm">{date}</div>
-      </div>
-    </div>
+      </article>
+    </Link>
   )
 }

@@ -9,28 +9,7 @@ import { format, subMonths } from 'date-fns';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { ChevronDown } from 'lucide-react';
-
-// content에서 텍스트만 추출하는 헬퍼 함수 수정
-const extractTextFromContent = (content: any) => {
-    if (!content?.content) return '';
-    
-    const fullText = content.content
-        .map((block: any) => {
-            if (block.type === 'paragraph' && block.content) {
-                return block.content
-                    .map((item: any) => item.text || '')
-                    .join('')
-            }
-            return '';
-        })
-        .join('\n')
-        .trim();
-
-    const maxLength = 100;
-    if (fullText.length <= maxLength) return fullText;
-    
-    return fullText.slice(0, maxLength).trim() + '...';
-};
+import { extractTextFromContent } from '@/utils/postUtils'
 
 export default function Post() {
     const router = useRouter();
