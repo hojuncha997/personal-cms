@@ -10,6 +10,28 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { ChevronDown } from 'lucide-react';
 
+// content에서 텍스트만 추출하는 헬퍼 함수 수정
+const extractTextFromContent = (content: any) => {
+    if (!content?.content) return '';
+    
+    const fullText = content.content
+        .map((block: any) => {
+            if (block.type === 'paragraph' && block.content) {
+                return block.content
+                    .map((item: any) => item.text || '')
+                    .join('')
+            }
+            return '';
+        })
+        .join('\n')
+        .trim();
+
+    const maxLength = 100;
+    if (fullText.length <= maxLength) return fullText;
+    
+    return fullText.slice(0, maxLength).trim() + '...';
+};
+
 export default function Post() {
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -237,6 +259,10 @@ export default function Post() {
                                                             <span className="text-xs bg-gray-200 px-2 py-0.5 rounded">비밀글</span>
                                                         )}
                                                         {post.title}
+                                                    </div>
+                                                    {/* 본문 미리보기 추가 */}
+                                                    <div className='text-sm text-gray-600 mb-2 line-clamp-2'>
+                                                        {extractTextFromContent(post.content)}
                                                     </div>
                                                     <div className='text-sm text-gray-500 flex flex-wrap gap-4'>
                                                         <span>{post.author_display_name.includes('@') ? post.author_display_name.split('@')[0] : post.author_display_name}</span>
