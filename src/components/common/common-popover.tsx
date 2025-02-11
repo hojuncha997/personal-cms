@@ -70,7 +70,7 @@ export function CommonPopover({
           
            border 
            border-black 
-           bg-[#fcd0b1] 
+           bg-[#ffffff] 
            rounded-xl
            
            outline-none 

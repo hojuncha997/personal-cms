@@ -38,7 +38,7 @@ export default function PostLayoutClient({
     }, []);
 
     return (
-        <div className='min-h-screen bg-[#f5f5f5] relative '>
+        <div className='min-h-screen bg-[#ffffff] relative '>
             {/* 모바일/태블릿 햄버거 버튼 */}
             <button
                 className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-white rounded-md shadow-md"
@@ -59,13 +59,13 @@ export default function PostLayoutClient({
                         isOpen={isDrawerOpen}
                         onClose={() => setIsDrawerOpen(false)}
                         hasOverlay={false}
-                        className={`border-[1px] border-black ${isDesktop ? 'absolute left-0 overflow-y-auto' : ''}`}
+                        className={`border-[1px] border-black ${isDesktop ? 'absolute left-0 overflow-y-auto rounded-lg mt-8' : ''}`}
                         preventScroll={false}
                     >
-                        <nav className="p-6">
+                        <nav className="p-6 rounded-md">
                             <ul className="space-y-3">
                                 {categories.map((category) => (
-                                    <li key={category.id}>
+                                    <li key={category.id} onClick={() => isMobile && setIsDrawerOpen(false)}>
                                         <Link
                                             href={`/posts${category.id ? `?category=${category.id}` : ''}`}
                                             className={`block p-2 rounded-md transition-colors
@@ -86,8 +86,9 @@ export default function PostLayoutClient({
                         transition-all
                         duration-300
                         ${isDesktop ? 'p-6' : 'py-6'}
-                        ${isDrawerOpen ? 'md:ml-64' : 'ml-0'}
+                        ${isDesktop && isDrawerOpen ? 'ml-64' : 'ml-0'}
                         overflow-y-auto
+                        ${isDesktop ? 'w-[calc(100%-16rem)]' : 'w-full'}
                     `}>
                         <div id="posts-root" />
                         <div className="max-w-4xl mx-auto">

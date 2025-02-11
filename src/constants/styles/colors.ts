@@ -4,7 +4,7 @@ export const colors = {
       // main: '#b1d4e0', // baby blue
       // main: '#c3e0e5', // light baby blue
       // main: '#b1d8b7',
-      main: 'lightgray',
+      main: '#ffffff',
       light: '#ffe3d4',
       dark: '#c9a08e'
     },

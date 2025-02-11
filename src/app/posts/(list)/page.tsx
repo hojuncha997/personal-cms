@@ -80,75 +80,10 @@ export default function Post() {
     }
     
     return (
-        <div className="w-full">
-            <h1 className="text-3xl font-bold mb-12 border-b border-black pb-4">포스팅</h1>
+        <div className="w-full m-4">
+            {/* <h1 className="text-3xl font-bold mb-12 border-b border-black pb-4">포스팅</h1> */}
             
-            {/* 검색 및 필터 영역 */}
-            <div className="mb-6 flex flex-wrap gap-4">
-                <form onSubmit={handleSearch} className="flex-1">
-                    <div className="flex gap-2">
-                        <input
-                            type="text"
-                            name="search"
-                            defaultValue={currentSearch}
-                            placeholder="검색어를 입력하세요"
-                            className="flex-1 px-4 py-2 border rounded-md"
-                        />
-                        <button
-                            type="submit"
-                            className="px-4 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-700"
-                        >
-                            검색
-                        </button>
-                    </div>
-                </form>
-
-                {/* 기간 검색 추가 */}
-                <div className="flex items-center gap-2">
-                    <input
-                        type="date"
-                        value={currentStartDate}
-                        onChange={(e) => handleDateChange(e.target.value, currentEndDate)}
-                        className="px-3 py-2 border rounded-md"
-                    />
-                    <span>~</span>
-                    <input
-                        type="date"
-                        value={currentEndDate}
-                        onChange={(e) => handleDateChange(currentStartDate, e.target.value)}
-                        className="px-3 py-2 border rounded-md"
-                    />
-                    {/* 기간 단축 버튼 */}
-                    <div className="flex gap-2 ml-2">
-                        <button
-                            onClick={() => {
-                                const end = new Date();
-                                const start = subMonths(end, 1);
-                                handleDateChange(
-                                    format(start, 'yyyy-MM-dd'),
-                                    format(end, 'yyyy-MM-dd')
-                                );
-                            }}
-                            className="px-3 py-1 text-sm bg-gray-100 rounded hover:bg-gray-200"
-                        >
-                            1개월
-                        </button>
-                        <button
-                            onClick={() => {
-                                const end = new Date();
-                                const start = subMonths(end, 3);
-                                handleDateChange(
-                                    format(start, 'yyyy-MM-dd'),
-                                    format(end, 'yyyy-MM-dd')
-                                );
-                            }}
-                            className="px-3 py-1 text-sm bg-gray-100 rounded hover:bg-gray-200"
-                        >
-                            3개월
-                        </button>
-                    </div>
-                </div>
-            </div>
+            
 
             {/* 정렬 옵션 */}
             <div className="mb-4 flex gap-4">
@@ -177,71 +112,49 @@ export default function Post() {
                     <div className="text-center py-8">로딩중...</div>
                 ) : (
                     <div>
-                        <div className='bg-white rounded-lg shadow-md overflow-hidden'>
-                            <div className='border-b border-gray-200 bg-gray-50 hidden md:flex justify-between px-6 py-3 font-medium text-gray-600'>
+                        <div className='bg-white rounded-lg overflow-hidden'>
+                            {/* <div className='border-b border-gray-200 bg-gray-50 hidden md:flex justify-between px-6 py-3 font-medium text-gray-600'>
                                 <div className='flex-1'>제목</div>
                                 <div className='w-24 text-center'>작성자</div>
                                 <div className='w-20 text-center'>조회수</div>
                                 <div className='w-20 text-center'>좋아요</div>
                                 <div className='w-28 text-center'>일자</div>
-                            </div>
+                            </div> */}
                             
                             {data?.posts.map((post) => (
                                 <div 
                                     key={post.public_id} 
-                                    className='border-b border-gray-100 hover:bg-gray-50 cursor-pointer'
+                                    className='border-b border-black cursor-pointer py-4 hover:bg-gray-100'
                                 >
-                                    {/* 데스크톱 뷰 */}
-                                    <div className='hidden md:flex justify-between px-6 py-4'>
+                                    <div className='flex items-center'>
                                         <div className='flex-1'>
                                             <Link 
-                                                // href={`/guestbook/${encodeURIComponent(post.title)}-${post.public_id}`}
                                                 href={`/posts/${post.slug}-${post.public_id}`}
-                                                className='text-blue-600 hover:underline flex items-center gap-2'
+                                                className='block'
                                             >
-                                                {post.isSecret && (
-                                                    <span className="text-xs bg-gray-200 px-2 py-0.5 rounded">비밀글</span>
-                                                )}
-                                                {post.title}
+                                                <div className='text-lg font-medium text-black hover:underline flex items-center gap-2 mb-2'>
+                                                    {post.isSecret && (
+                                                        <span className="text-xs bg-gray-200 px-2 py-0.5 rounded">비밀글</span>
+                                                    )}
+                                                    {post.title}
+                                                </div>
+                                                <div className='text-sm text-gray-500 flex flex-wrap gap-4'>
+                                                    <span>{post.author_display_name.includes('@') ? post.author_display_name.split('@')[0] : post.author_display_name}</span>
+                                                    <span>조회 {post.viewCount}</span>
+                                                    <span>좋아요 {post.likeCount}</span>
+                                                    <span>{format(new Date(post.createdAt), 'yyyy-MM-dd')}</span>
+                                                </div>
                                             </Link>
                                         </div>
-                                        <div className='w-24 text-center text-gray-600'>{post.author_display_name}</div>
-                                        <div className='w-20 text-center text-gray-600'>{post.viewCount}</div>
-                                        <div className='w-20 text-center text-gray-600'>{post.likeCount}</div>
-                                        <div className='w-28 text-center text-gray-600'>
-                                            {format(new Date(post.createdAt), 'yyyy-MM-dd')}
+                                        <div className='w-40 ml-4'>
+                                            {/* 썸네일 영역 */}
+                                            <div className='bg-gray-100 w-full h-24 border border-black rounded-lg'>
+                                                {/* 썸네일 이미지가 들어갈 공간 */}
+                                            </div>
                                         </div>
-                                    </div>
-
-                                    {/* 모바일 뷰 */}
-                                    <div className='md:hidden p-4'>
-                                        <Link 
-                                            href={`/posts/${post.slug}-${post.public_id}`}
-                                            className='block'
-                                        >
-                                            <div className='text-blue-600 font-medium hover:underline flex items-center gap-2'>
-                                                {post.isSecret && (
-                                                    <span className="text-xs bg-gray-200 px-2 py-0.5 rounded">비밀글</span>
-                                                )}
-                                                {post.title}
-                                            </div>
-                                            <div className='mt-1 text-sm text-gray-500 flex gap-3'>
-                                                <span>{post.author_display_name}</span>
-                                                <span>조회 {post.viewCount}</span>
-                                                <span>좋아요 {post.likeCount}</span>
-                                                <span>{format(new Date(post.createdAt), 'yyyy-MM-dd')}</span>
-                                            </div>
-                                        </Link>
                                     </div>
                                 </div>
                             ))}
-                        </div>
-                        <div className="mt-4 flex justify-end">
-                            <Link href="/posts/write">
-                                <button className="px-4 py-2 bg-black text-white rounded-md hover:bg-blue-600 transition-colors">
-                                    게시글 작성
-                                </button>
-                            </Link>
                         </div>
 
                         {/* 페이지네이션 */}
@@ -262,9 +175,92 @@ export default function Post() {
                                 ))}
                             </div>
                         )}
+
+
+
+                        {/* 검색 및 필터 영역 */}
+            <div className="mb-6 flex flex-wrap gap-4 mt-4">
+                 {/* 기간 단축 버튼 */}
+                 {/* <div className="flex gap-2 ml-2">
+                        <button
+                            onClick={() => {
+                                const end = new Date();
+                                const start = subMonths(end, 1);
+                                handleDateChange(
+                                    format(start, 'yyyy-MM-dd'),
+                                    format(end, 'yyyy-MM-dd')
+                                );
+                            }}
+                            className="px-3 py-1 text-sm bg-gray-100 rounded hover:bg-gray-200"
+                        >
+                            1개월
+                        </button>
+                        <button
+                            onClick={() => {
+                                const end = new Date();
+                                const start = subMonths(end, 3);
+                                handleDateChange(
+                                    format(start, 'yyyy-MM-dd'),
+                                    format(end, 'yyyy-MM-dd')
+                                );
+                            }}
+                            className="px-3 py-1 text-sm bg-gray-100 rounded hover:bg-gray-200"
+                        >
+                            3개월
+                        </button>
+                    </div> */}
+
+
+                {/* 기간 검색 추가 */}
+                <div className="flex items-center gap-2">
+                    <input
+                        type="date"
+                        value={currentStartDate}
+                        onChange={(e) => handleDateChange(e.target.value, currentEndDate)}
+                        className="px-3 py-2 border rounded-md"
+                    />
+                    <span>~</span>
+                    <input
+                        type="date"
+                        value={currentEndDate}
+                        onChange={(e) => handleDateChange(currentStartDate, e.target.value)}
+                        className="px-3 py-2 border rounded-md"
+                    />
+                   
+                </div>
+                <form onSubmit={handleSearch} className="flex-1">
+                    <div className="flex gap-2">
+                        <input
+                            type="text"
+                            name="search"
+                            defaultValue={currentSearch}
+                            placeholder="검색어를 입력하세요"
+                            className="flex-1 px-4 py-2 border rounded-md"
+                        />
+                        <button
+                            type="submit"
+                            className="px-4 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-700"
+                        >
+                            검색
+                        </button>
+                    </div>
+                </form>
+
+            </div>
+                        <div className="mt-4 flex justify-end">
+                            <Link href="/posts/write">
+                                <button className="px-4 py-2 bg-black text-white rounded-md hover:bg-blue-600 transition-colors">
+                                    게시글 작성
+                                </button>
+                            </Link>
+                        </div>
+
+                        
                     </div>
                 )}
             </div>
+
+            
         </div>
     )
 }
