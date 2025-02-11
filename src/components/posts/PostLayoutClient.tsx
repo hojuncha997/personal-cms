@@ -53,10 +53,15 @@ export default function PostLayoutClient({
             {/* 모바일/태블릿에서만 보이는 햄버거 버튼 */}
             {showDrawer && (
                 <button
-                    className="fixed top-4 left-4 z-50 p-2 bg-white rounded-md shadow-md"
-                    onClick={() => setIsDrawerOpen(true)}
+                    className="fixed bottom-20 left-0 z-50 p-3 bg-gradient-to-r from-blue-600 to-purple-600 rounded-r-2xl shadow-[0_4px_20px_rgba(0,0,0,0.15)] transition-all duration-300 hover:shadow-[0_4px_25px_rgba(59,130,246,0.3)]"
+                    onClick={() => setIsDrawerOpen(!isDrawerOpen)}
                 >
-                    <Menu size={24} />
+                    <Menu 
+                        size={22} 
+                        color='white' 
+                        strokeWidth={2.5}
+                        className={`transition-transform duration-300 ${isDrawerOpen ? 'rotate-90' : ''}`}
+                    />
                 </button>
             )}
 

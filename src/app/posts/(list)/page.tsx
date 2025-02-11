@@ -253,8 +253,18 @@ export default function Post() {
                                             </div>
                                             <div className='w-40 ml-4'>
                                                 {/* 썸네일 영역 */}
-                                                <div className='bg-gray-100 w-full h-24 border border-black rounded-lg'>
-                                                    {/* 썸네일 이미지가 들어갈 공간 */}
+                                                <div className={`w-full h-24 rounded-lg overflow-hidden ${!post.thumbnail ? 'bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center p-2' : ''}`}>
+                                                    {post.thumbnail ? (
+                                                        <img 
+                                                            src={post.thumbnail} 
+                                                            alt={post.title}
+                                                            className="w-full h-full object-cover"
+                                                        />
+                                                    ) : (
+                                                        <span className="text-white text-sm font-medium text-center line-clamp-2">
+                                                            {post.title}
+                                                        </span>
+                                                    )}
                                                 </div>
                                             </div>
                                         </div>
