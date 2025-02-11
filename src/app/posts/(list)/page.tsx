@@ -7,27 +7,61 @@ import Link from 'next/link';
 import { useGetPostList } from '@/hooks/posts/useGetPostList';
 import { format, subMonths } from 'date-fns';
 import { useSearchParams, useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
+import { ChevronDown } from 'lucide-react';
 
 export default function Post() {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const currentPage = Number(searchParams.get('page')) || 1;
-    const currentSearch = searchParams.get('search') || '';
-    const currentCategory = searchParams.get('category') || '';
-    const currentSort = searchParams.get('sortBy') || 'createdAt';
-    const currentOrder = searchParams.get('order') || 'DESC';
-    const currentStartDate = searchParams.get('startDate') || '';
-    const currentEndDate = searchParams.get('endDate') || '';
     
+    // useEffect를 사용하여 클라이언트 사이드에서만 상태를 업데이트
+    const [searchState, setSearchState] = useState({
+        page: 1,
+        search: '',
+        category: '',
+        sort: 'createdAt',
+        order: 'DESC',
+        startDate: '',
+        endDate: ''
+    });
+
+    useEffect(() => {
+        setSearchState({
+            page: Number(searchParams.get('page')) || 1,
+            search: searchParams.get('search') || '',
+            category: searchParams.get('category') || '',
+            sort: searchParams.get('sortBy') || 'createdAt',
+            order: searchParams.get('order') || 'DESC',
+            startDate: searchParams.get('startDate') || '',
+            endDate: searchParams.get('endDate') || ''
+        });
+    }, [searchParams]);
+
+    // 로컬 상태도 searchState에서 가져오도록 수정
+    const [localSort, setLocalSort] = useState(searchState.sort);
+    const [localOrder, setLocalOrder] = useState(searchState.order);
+    const [localStartDate, setLocalStartDate] = useState(searchState.startDate);
+    const [localEndDate, setLocalEndDate] = useState(searchState.endDate);
+    const [localSearch, setLocalSearch] = useState(searchState.search);
+
+    // useEffect를 사용하여 로컬 상태 업데이트
+    useEffect(() => {
+        setLocalSort(searchState.sort);
+        setLocalOrder(searchState.order);
+        setLocalStartDate(searchState.startDate);
+        setLocalEndDate(searchState.endDate);
+        setLocalSearch(searchState.search);
+    }, [searchState]);
+
     const { data, isLoading, error } = useGetPostList({
-        page: currentPage,
+        page: searchState.page,
         limit: 10,
-        search: currentSearch,
-        category: currentCategory,
-        sortBy: currentSort as 'createdAt' | 'viewCount' | 'likeCount',
-        order: currentOrder as 'ASC' | 'DESC',
-        startDate: currentStartDate,
-        endDate: currentEndDate,
+        search: searchState.search,
+        category: searchState.category,
+        sortBy: searchState.sort as 'createdAt' | 'viewCount' | 'likeCount',
+        order: searchState.order as 'ASC' | 'DESC',
+        startDate: searchState.startDate,
+        endDate: searchState.endDate,
     });
 
     const createQueryString = (updates: Record<string, string>) => {
@@ -47,9 +81,16 @@ export default function Post() {
 
     const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        const formData = new FormData(e.currentTarget);
-        const search = formData.get('search') as string;
-        router.push(`/posts?${createQueryString({ search, page: '1' })}`);
+        
+        // 모든 필터 옵션을 한 번에 적용
+        router.push(`/posts?${createQueryString({
+            search: localSearch,
+            sortBy: localSort,
+            order: localOrder,
+            startDate: localStartDate,
+            endDate: localEndDate,
+            page: '1'
+        })}`);
     };
 
     const handleCategoryChange = (category: string) => {
@@ -57,8 +98,9 @@ export default function Post() {
     };
 
     const handleSortChange = (sortBy: string) => {
-        const newOrder = sortBy === currentSort && currentOrder === 'DESC' ? 'ASC' : 'DESC';
-        router.push(`/posts?${createQueryString({ sortBy, order: newOrder })}`);
+        const newOrder = sortBy === localSort && localOrder === 'DESC' ? 'ASC' : 'DESC';
+        setLocalSort(sortBy);
+        setLocalOrder(newOrder);
     };
 
     const handlePageChange = (page: number) => {
@@ -68,8 +110,11 @@ export default function Post() {
     };
 
     const handleDateChange = (startDate: string, endDate: string) => {
-        router.push(`/posts?${createQueryString({ startDate, endDate, page: '1' })}`);
+        setLocalStartDate(startDate);
+        setLocalEndDate(endDate);
     };
+
+    const [isFilterOpen, setIsFilterOpen] = useState(false);
 
     console.log('방명록 데이터:', data);
     console.log('로딩 상태:', isLoading);
@@ -80,31 +125,89 @@ export default function Post() {
     }
     
     return (
-        <div className="w-full m-4">
+        <div className="w-full ">
             {/* <h1 className="text-3xl font-bold mb-12 border-b border-black pb-4">포스팅</h1> */}
             
-            
+            {/* 아코디언 필터 영역 */}
+            <div className="mb-6 border border-gray-200 rounded-lg">
+                <button
+                    onClick={() => setIsFilterOpen(!isFilterOpen)}
+                    className="w-full px-4 py-3 flex items-center justify-between bg-white rounded-lg hover:bg-gray-50"
+                >
+                    <span className="font-medium">검색 및 정렬 옵션</span>
+                    <ChevronDown 
+                        className={`transform transition-transform duration-200 ${isFilterOpen ? 'rotate-180' : ''}`}
+                        size={20}
+                    />
+                </button>
+                
+                {isFilterOpen && (
+                    <div className="p-4 border-t border-gray-200">
+                        {/* 정렬 옵션 */}
+                        <div className="mb-4 flex gap-4">
+                            <button
+                                onClick={() => handleSortChange('createdAt')}
+                                className={`text-sm ${localSort === 'createdAt' ? 'text-blue-600 font-bold' : 'text-gray-600'}`}
+                            >
+                                최신순 {localSort === 'createdAt' && (localOrder === 'DESC' ? '↓' : '↑')}
+                            </button>
+                            <button
+                                onClick={() => handleSortChange('viewCount')}
+                                className={`text-sm ${localSort === 'viewCount' ? 'text-blue-600 font-bold' : 'text-gray-600'}`}
+                            >
+                                조회순 {localSort === 'viewCount' && (localOrder === 'DESC' ? '↓' : '↑')}
+                            </button>
+                            <button
+                                onClick={() => handleSortChange('likeCount')}
+                                className={`text-sm ${localSort === 'likeCount' ? 'text-blue-600 font-bold' : 'text-gray-600'}`}
+                            >
+                                좋아요순 {localSort === 'likeCount' && (localOrder === 'DESC' ? '↓' : '↑')}
+                            </button>
+                        </div>
 
-            {/* 정렬 옵션 */}
-            <div className="mb-4 flex gap-4">
-                <button
-                    onClick={() => handleSortChange('createdAt')}
-                    className={`text-sm ${currentSort === 'createdAt' ? 'text-blue-600 font-bold' : 'text-gray-600'}`}
-                >
-                    최신순 {currentSort === 'createdAt' && (currentOrder === 'DESC' ? '↓' : '↑')}
-                </button>
-                <button
-                    onClick={() => handleSortChange('viewCount')}
-                    className={`text-sm ${currentSort === 'viewCount' ? 'text-blue-600 font-bold' : 'text-gray-600'}`}
-                >
-                    조회순 {currentSort === 'viewCount' && (currentOrder === 'DESC' ? '↓' : '↑')}
-                </button>
-                <button
-                    onClick={() => handleSortChange('likeCount')}
-                    className={`text-sm ${currentSort === 'likeCount' ? 'text-blue-600 font-bold' : 'text-gray-600'}`}
-                >
-                    좋아요순 {currentSort === 'likeCount' && (currentOrder === 'DESC' ? '↓' : '↑')}
-                </button>
+                        {/* 검색 영역 */}
+                        <div className="space-y-4">
+                            {/* 날짜 선택 영역을 모바일에서 세로로 배치 */}
+                            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
+                                <div className="w-full sm:w-auto">
+                                    <label className="block text-sm text-gray-600 mb-1">시작일</label>
+                                    <input
+                                        type="date"
+                                        value={localStartDate}
+                                        onChange={(e) => handleDateChange(e.target.value, localEndDate)}
+                                        className="w-full sm:w-auto px-3 py-2 border rounded-md"
+                                    />
+                                </div>
+                                <span className="hidden sm:block">~</span>
+                                <div className="w-full sm:w-auto">
+                                    <label className="block text-sm text-gray-600 mb-1">종료일</label>
+                                    <input
+                                        type="date"
+                                        value={localEndDate}
+                                        onChange={(e) => handleDateChange(localStartDate, e.target.value)}
+                                        className="w-full sm:w-auto px-3 py-2 border rounded-md"
+                                    />
+                                </div>
+                            </div>
+                            
+                            <form onSubmit={handleSearch} className="flex gap-2">
+                                <input
+                                    type="text"
+                                    value={localSearch}
+                                    onChange={(e) => setLocalSearch(e.target.value)}
+                                    placeholder="검색어를 입력하세요"
+                                    className="flex-1 px-4 py-2 border rounded-md"
+                                />
+                                <button
+                                    type="submit"
+                                    className="px-4 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-700"
+                                >
+                                    검색
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                )}
             </div>
 
             <div className="w-full">
@@ -113,48 +216,46 @@ export default function Post() {
                 ) : (
                     <div>
                         <div className='bg-white rounded-lg overflow-hidden'>
-                            {/* <div className='border-b border-gray-200 bg-gray-50 hidden md:flex justify-between px-6 py-3 font-medium text-gray-600'>
-                                <div className='flex-1'>제목</div>
-                                <div className='w-24 text-center'>작성자</div>
-                                <div className='w-20 text-center'>조회수</div>
-                                <div className='w-20 text-center'>좋아요</div>
-                                <div className='w-28 text-center'>일자</div>
-                            </div> */}
-                            
-                            {data?.posts.map((post) => (
-                                <div 
-                                    key={post.public_id} 
-                                    className='border-b border-black cursor-pointer py-4 hover:bg-gray-100'
-                                >
-                                    <div className='flex items-center'>
-                                        <div className='flex-1'>
-                                            <Link 
-                                                href={`/posts/${post.slug}-${post.public_id}`}
-                                                className='block'
-                                            >
-                                                <div className='text-lg font-medium text-black hover:underline flex items-center gap-2 mb-2'>
-                                                    {post.isSecret && (
-                                                        <span className="text-xs bg-gray-200 px-2 py-0.5 rounded">비밀글</span>
-                                                    )}
-                                                    {post.title}
+                            {data?.posts.length === 0 ? (
+                                <div className='text-center py-20 text-gray-500'>
+                                    <p className='text-lg font-medium'>등록된 포스팅이 없습니다.</p>
+                                </div>
+                            ) : (
+                                data?.posts.map((post) => (
+                                    <div 
+                                        key={post.public_id} 
+                                        className='border-b border-black cursor-pointer py-4 group'
+                                    >
+                                        <div className='flex items-center'>
+                                            <div className='flex-1'>
+                                                <Link 
+                                                    href={`/posts/${post.slug}-${post.public_id}`}
+                                                    className='block'
+                                                >
+                                                    <div className='text-lg font-medium text-black group-hover:text-blue-500 flex items-center gap-2 mb-2'>
+                                                        {post.isSecret && (
+                                                            <span className="text-xs bg-gray-200 px-2 py-0.5 rounded">비밀글</span>
+                                                        )}
+                                                        {post.title}
+                                                    </div>
+                                                    <div className='text-sm text-gray-500 flex flex-wrap gap-4'>
+                                                        <span>{post.author_display_name.includes('@') ? post.author_display_name.split('@')[0] : post.author_display_name}</span>
+                                                        <span>조회 {post.viewCount}</span>
+                                                        <span>좋아요 {post.likeCount}</span>
+                                                        <span>{format(new Date(post.createdAt), 'yyyy-MM-dd')}</span>
+                                                    </div>
+                                                </Link>
+                                            </div>
+                                            <div className='w-40 ml-4'>
+                                                {/* 썸네일 영역 */}
+                                                <div className='bg-gray-100 w-full h-24 border border-black rounded-lg'>
+                                                    {/* 썸네일 이미지가 들어갈 공간 */}
                                                 </div>
-                                                <div className='text-sm text-gray-500 flex flex-wrap gap-4'>
-                                                    <span>{post.author_display_name.includes('@') ? post.author_display_name.split('@')[0] : post.author_display_name}</span>
-                                                    <span>조회 {post.viewCount}</span>
-                                                    <span>좋아요 {post.likeCount}</span>
-                                                    <span>{format(new Date(post.createdAt), 'yyyy-MM-dd')}</span>
-                                                </div>
-                                            </Link>
-                                        </div>
-                                        <div className='w-40 ml-4'>
-                                            {/* 썸네일 영역 */}
-                                            <div className='bg-gray-100 w-full h-24 border border-black rounded-lg'>
-                                                {/* 썸네일 이미지가 들어갈 공간 */}
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                            ))}
+                                ))
+                            )}
                         </div>
 
                         {/* 페이지네이션 */}
@@ -165,7 +266,7 @@ export default function Post() {
                                         key={page}
                                         onClick={() => handlePageChange(page)}
                                         className={`px-4 py-2 rounded-md ${
-                                            currentPage === page 
+                                            searchState.page === page 
                                                 ? 'bg-blue-500 text-white' 
                                                 : 'bg-gray-100 hover:bg-gray-200'
                                         }`}
@@ -176,77 +277,6 @@ export default function Post() {
                             </div>
                         )}
 
-
-
-                        {/* 검색 및 필터 영역 */}
-            <div className="mb-6 flex flex-wrap gap-4 mt-4">
-                 {/* 기간 단축 버튼 */}
-                 {/* <div className="flex gap-2 ml-2">
-                        <button
-                            onClick={() => {
-                                const end = new Date();
-                                const start = subMonths(end, 1);
-                                handleDateChange(
-                                    format(start, 'yyyy-MM-dd'),
-                                    format(end, 'yyyy-MM-dd')
-                                );
-                            }}
-                            className="px-3 py-1 text-sm bg-gray-100 rounded hover:bg-gray-200"
-                        >
-                            1개월
-                        </button>
-                        <button
-                            onClick={() => {
-                                const end = new Date();
-                                const start = subMonths(end, 3);
-                                handleDateChange(
-                                    format(start, 'yyyy-MM-dd'),
-                                    format(end, 'yyyy-MM-dd')
-                                );
-                            }}
-                            className="px-3 py-1 text-sm bg-gray-100 rounded hover:bg-gray-200"
-                        >
-                            3개월
-                        </button>
-                    </div> */}
-
-
-                {/* 기간 검색 추가 */}
-                <div className="flex items-center gap-2">
-                    <input
-                        type="date"
-                        value={currentStartDate}
-                        onChange={(e) => handleDateChange(e.target.value, currentEndDate)}
-                        className="px-3 py-2 border rounded-md"
-                    />
-                    <span>~</span>
-                    <input
-                        type="date"
-                        value={currentEndDate}
-                        onChange={(e) => handleDateChange(currentStartDate, e.target.value)}
-                        className="px-3 py-2 border rounded-md"
-                    />
-                   
-                </div>
-                <form onSubmit={handleSearch} className="flex-1">
-                    <div className="flex gap-2">
-                        <input
-                            type="text"
-                            name="search"
-                            defaultValue={currentSearch}
-                            placeholder="검색어를 입력하세요"
-                            className="flex-1 px-4 py-2 border rounded-md"
-                        />
-                        <button
-                            type="submit"
-                            className="px-4 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-700"
-                        >
-                            검색
-                        </button>
-                    </div>
-                </form>
-
-            </div>
                         <div className="mt-4 flex justify-end">
                             <Link href="/posts/write">
                                 <button className="px-4 py-2 bg-black text-white rounded-md hover:bg-blue-600 transition-colors">
@@ -254,13 +284,9 @@ export default function Post() {
                                 </button>
                             </Link>
                         </div>
-
-                        
                     </div>
                 )}
             </div>
-
-            
         </div>
     )
 }
