@@ -50,26 +50,28 @@ export function NavProfile() {
             section: 'info',
             label: email,
             subLabel: role ? roleType[role] : '게스트',
-            onClick: () => {},
-        },
-        {
-            id: 'mypage',
-            section: 'menu',
-            label: '마이페이지',
             onClick: () => {
                 router.push('/mypage')
             },
         },
+        // {
+        //     id: 'mypage',
+        //     section: 'menu',
+        //     label: '마이페이지',
+        //     onClick: () => {
+        //         router.push('/mypage')
+        //     },
+        // },
         {
             id: 'settings',
             section: 'menu',
-            label: '설정',
+            label: 'Settings',
             onClick: () => {},
         },
         {
             id: 'logout',
             section: 'footer',
-            label: '로그아웃',
+            label: 'Logout',
             onClick: handleLogout,
             isLoading: isLogoutPending
         },
@@ -79,30 +81,30 @@ export function NavProfile() {
     const ProfileMenuContent = ({ inDrawer = false }) => (
         <div className={`min-h-[12rem] text-gray-700 text-sm ${!inDrawer && 'w-[14rem]'}`}>
             {/* 프로필 정보 섹션 */}
-            <div className="px-3 py-3">
+            <div className="px-3 py-3 hover:bg-gray-100 hover:text-blue-500 rounded-t-xl">
                 {profileMenuItems
                     .filter(item => item.section === 'info')
                     .map(item => (
-                        <div key={item.id} className="pb-1">
-                            <span className=" cursor-pointer">{item.label}</span>
-                            {item.subLabel && (
+                        <div key={item.id} className="pb-1 cursor-pointer p-1" onClick={item.onClick}>
+                            <span className="">{item.label}</span>
+                            {/* {item.subLabel && (
                                 <div className="pb-1">
                                     <span>{item.subLabel}</span>
                                 </div>
-                            )}
+                            )} */}
                         </div>
                     ))}
             </div>
 
             {/* 메인 메뉴 섹션 */}
-            <div className="bg-gray-100">
+            <div className="hover:bg-gray-100 hover:text-blue-500">
                 <div className="px-3 py-3">
                     {profileMenuItems
                         .filter(item => item.section === 'menu')
                         .map(item => (
                             <div key={item.id} className="pb-1">
                                 <span 
-                                    className="cursor-pointer hover:text-blue-800"
+                                    className="cursor-pointer hoer:text-blue-800"
                                     onClick={item.onClick}
                                 >
                                     {item.label}
@@ -139,7 +141,14 @@ export function NavProfile() {
         return (
             <>
                 <div onClick={() => setIsDrawerOpen(true)}>
-                    <p>{email?.split('@')[0]}</p>
+                    {/* <p>{email?.split('@')[0]}</p> */}
+                    <svg 
+                            className="w-6 h-6" 
+                            viewBox="0 0 24 24" 
+                            fill="currentColor"
+                        >
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
+                        </svg>
                 </div>
                 <CommonDrawer 
                     trigger={null}
@@ -159,7 +168,14 @@ export function NavProfile() {
             trigger={
                 <div>
                     <div className="flex items-center">
-                        <p>{email?.split('@')[0]}</p>
+                    {/* <p>{email?.split('@')[0]}</p> */}
+                        <svg 
+                            className="w-6 h-6" 
+                            viewBox="0 0 24 24" 
+                            fill="currentColor"
+                        >
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
+                        </svg>
                     </div>
                 </div>
             }
