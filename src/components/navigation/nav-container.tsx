@@ -13,6 +13,7 @@ import { colors } from '@/constants/styles'
 interface NavContainerProps {
   onOpenDrawer: () => void;
   onOpenLogin: () => void;
+  hideOnScroll?: boolean;
 }
 
 const NavMenuContent = [
@@ -26,11 +27,11 @@ const NavMenuContent = [
     label: '소개',
     path: '/about'
   },
-  {
-    id: 'service',
-    label: '서비스',
-    path: '/service'
-  },
+  // {
+  //   id: 'service',
+  //   label: '서비스',
+  //   path: '/service'
+  // },
   {
     id: 'posts',
     label: '포스팅',
@@ -42,11 +43,11 @@ const NavMenuContent = [
     path: '/projects'
   },
 
-  {
-    id: 'contact',
-    label: '문의하기',
-    path: '/contact'
-  },
+  // {
+  //   id: 'contact',
+  //   label: '문의하기',
+  //   path: '/contact'
+  // },
   {
     id: 'guestbook',
     label: '방명록',
@@ -54,8 +55,12 @@ const NavMenuContent = [
   }
 ]
 
-export function NavContainer({ onOpenDrawer, onOpenLogin }: NavContainerProps) {
-  const isScrollingDown = useScrollDirection()
+export function NavContainer({ 
+  onOpenDrawer, 
+  onOpenLogin, 
+  hideOnScroll = false
+}: NavContainerProps) {
+  const isScrollingDown = hideOnScroll ? useScrollDirection() : false
   const isAuthenticated = useAuthStore(state => state.isAuthenticated)
   const email = useAuthStore(state => state.email)
   const loading = useAuthStore(state => state.loading)
