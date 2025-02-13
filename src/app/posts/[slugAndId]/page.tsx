@@ -9,6 +9,7 @@ import { useGetPostDetail } from '@/hooks/posts/useGetPostDetail';
 import { format } from 'date-fns';
 import Tiptap from '@/components/editor/tiptap/Tiptap';
 import { notFound } from 'next/navigation';
+import { PostNavigation } from '@/components/posts/PostNavigation';
 
 interface Comment {
     id: string;
@@ -22,6 +23,9 @@ interface Comment {
 const GuestbookDetail: React.FC = () => {
     const params = useParams();
     const publicId = params.slugAndId?.toString().split('-').pop() || '';
+    
+    console.log('publicId:', publicId); // 디버깅용
+    
     const { data: post, isLoading, error } = useGetPostDetail(publicId);
     const [isLiked, setIsLiked] = useState(false);
     const [newComment, setNewComment] = useState('');
@@ -43,9 +47,9 @@ const GuestbookDetail: React.FC = () => {
             <Container>
                 <div className="max-w-4xl w-full mx-auto py-8">
                     <div className="w-full">
-                        {/* 방명록 상세 컨테이너 */}
+                        {/* 본문 컨테이너 */}
                         <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-                            {/* 방명록 상세 헤더 */}
+                            {/* 헤더 */}
                             <div className="border-b border-gray-200 pb-4">
                                 <div className="flex items-center gap-2 mb-2">
                                     <span className="px-2 py-1 bg-gray-100 text-sm rounded-md">{post.category}</span>
@@ -57,6 +61,8 @@ const GuestbookDetail: React.FC = () => {
                                     <span>작성일: {format(new Date(post.createdAt), 'yyyy-MM-dd')}</span>
                                 </div>
                             </div>
+
+                            {/* 본문 내용 */}
                             <div className="mt-6 whitespace-pre-wrap">
                                 <Tiptap
                                     initialContent={post.content}
@@ -65,10 +71,11 @@ const GuestbookDetail: React.FC = () => {
                                     editable={false}
                                 />
                             </div>
+
+                            {/* 좋아요 버튼 */}
                             <div className="mt-8 border-t pt-4">
                                 <div className="flex justify-center mb-8">
                                     <button 
-                                        // onClick={handleLike}
                                         className={`flex items-center gap-2 px-4 py-2 rounded-full transition-colors
                                             ${isLiked ? 'bg-red-500 text-white' : 'bg-gray-100 hover:bg-gray-200'}`}
                                     >
@@ -77,14 +84,31 @@ const GuestbookDetail: React.FC = () => {
                                     </button>
                                 </div>
                             </div>
-                            <div className="mt-8 flex justify-end">
-                                <Link 
-                                    href="/posts"
-                                    className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors"
-                                >
-                                    목록으로
-                                </Link>
+                        </div>
+
+                            {/* 댓글 섹션을 위한 공간 */}
+                            <div className="bg-white rounded-lg shadow-md p-6">
+                            {/* 댓글 컴포넌트가 들어갈 자리 */}
+                            <div className="text-gray-500 text-center py-4">
+                                댓글 기능 준비 중...
                             </div>
+                        </div>
+
+                        {/* 네비게이션 섹션 */}
+                        <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+                            <PostNavigation publicId={publicId} />
+                        </div>
+
+                    
+
+                        {/* 목록으로 버튼 */}
+                        <div className="mt-8 flex justify-end">
+                            <Link 
+                                href="/posts"
+                                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors"
+                            >
+                                목록으로
+                            </Link>
                         </div>
                     </div>
                 </div>
