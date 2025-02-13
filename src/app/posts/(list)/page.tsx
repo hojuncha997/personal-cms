@@ -10,21 +10,29 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { ChevronDown } from 'lucide-react';
 import { extractTextFromContent } from '@/utils/postUtils'
+import { PostForList, PostListResponse } from '@/types/posts/postTypes';
 
 export default function Post() {
     const router = useRouter();
     const searchParams = useSearchParams();
     
-    // useEffect를 사용하여 클라이언트 사이드에서만 상태를 업데이트
+    // 초기 상태값을 URL 파라미터에서 가져오도록 수정
     const [searchState, setSearchState] = useState({
-        page: 1,
-        search: '',
-        category: '',
-        sort: 'createdAt',
-        order: 'DESC',
-        startDate: '',
-        endDate: ''
+        page: Number(searchParams.get('page')) || 1,
+        search: searchParams.get('search') || '',
+        category: searchParams.get('category') || '',
+        sort: searchParams.get('sortBy') || 'createdAt',
+        order: searchParams.get('order') || 'DESC',
+        startDate: searchParams.get('startDate') || '',
+        endDate: searchParams.get('endDate') || ''
     });
+
+    // 로컬 상태도 URL 파라미터에서 초기값을 가져오도록 수정
+    const [localSort, setLocalSort] = useState(searchParams.get('sortBy') || 'createdAt');
+    const [localOrder, setLocalOrder] = useState(searchParams.get('order') || 'DESC');
+    const [localStartDate, setLocalStartDate] = useState(searchParams.get('startDate') || '');
+    const [localEndDate, setLocalEndDate] = useState(searchParams.get('endDate') || '');
+    const [localSearch, setLocalSearch] = useState(searchParams.get('search') || '');
 
     useEffect(() => {
         setSearchState({
@@ -37,13 +45,6 @@ export default function Post() {
             endDate: searchParams.get('endDate') || ''
         });
     }, [searchParams]);
-
-    // 로컬 상태도 searchState에서 가져오도록 수정
-    const [localSort, setLocalSort] = useState(searchState.sort);
-    const [localOrder, setLocalOrder] = useState(searchState.order);
-    const [localStartDate, setLocalStartDate] = useState(searchState.startDate);
-    const [localEndDate, setLocalEndDate] = useState(searchState.endDate);
-    const [localSearch, setLocalSearch] = useState(searchState.search);
 
     // useEffect를 사용하여 로컬 상태 업데이트
     useEffect(() => {
@@ -120,10 +121,6 @@ export default function Post() {
     console.log('방명록 데이터:', data);
     console.log('로딩 상태:', isLoading);
     console.log('에러:', error);
-    
-    if (error) {
-        return <div>에러가 발생했습니다: {error.message}</div>;
-    }
     
     return (
         <div className="w-full ">
@@ -214,15 +211,17 @@ export default function Post() {
             <div className="w-full">
                 {isLoading ? (
                     <div className="text-center py-8">로딩중...</div>
+                ) : !data ? (
+                    <div className="text-center py-8">데이터를 불러올 수 없습니다.</div>
                 ) : (
                     <div>
                         <div className='bg-white rounded-lg overflow-hidden'>
-                            {data?.posts.length === 0 ? (
+                            {data.data.length === 0 ? (
                                 <div className='text-center py-20 text-gray-500'>
                                     <p className='text-lg font-medium'>등록된 포스팅이 없습니다.</p>
                                 </div>
                             ) : (
-                                data?.posts.map((post) => (
+                                data.data.map((post: PostForList) => (
                                     <div 
                                         key={post.public_id} 
                                         className='border-b border-black cursor-pointer py-4 group'
@@ -239,10 +238,12 @@ export default function Post() {
                                                         )}
                                                         {post.title}
                                                     </div>
-                                                    {/* 본문 미리보기 추가 */}
-                                                    <div className='text-sm text-gray-600 mb-2 line-clamp-2'>
-                                                        {extractTextFromContent(post.content)}
-                                                    </div>
+                                                    {/* 본문 미리보기 */}
+                                                    {post.excerpt && (
+                                                        <div className='text-sm text-gray-600 mb-2 line-clamp-2'>
+                                                            {post.excerpt}
+                                                        </div>
+                                                    )}
                                                     <div className='text-sm text-gray-500 flex flex-wrap gap-4'>
                                                         <span>{post.author_display_name.includes('@') ? post.author_display_name.split('@')[0] : post.author_display_name}</span>
                                                         <span>조회 {post.viewCount}</span>
@@ -274,7 +275,7 @@ export default function Post() {
                         </div>
 
                         {/* 페이지네이션 */}
-                        {data?.meta && (
+                        {data.meta && (
                             <div className="mt-6 flex justify-center gap-2">
                                 {Array.from({ length: data.meta.totalPages }, (_, i) => i + 1).map((page) => (
                                     <button

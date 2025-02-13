@@ -1,26 +1,8 @@
 // 방명록 목록 조회
 import { useQuery } from "@tanstack/react-query";
 import { fetchClient } from "@/lib/fetchClient";
-import { PostQueryParams, PostResponse } from "@/types/posts/postTypes";
+import { PostQueryParams, PostListResponse } from "@/types/posts/postTypes";
 
-// interface GuestbookResponse {
-//     posts: {
-//         public_id: string;
-//         title: string;
-//         author_display_name: string;
-//         isSecret: boolean;
-//         createdAt: string;
-//         viewCount: number;
-//         likeCount: number;
-//         slug: string;
-//     }[];
-//     meta: {
-//         total: number;
-//         page: number;
-//         limit: number;
-//         totalPages: number;
-//     };
-// }
 
 export const useGetPostList = (params: PostQueryParams = {}) => {
     return useQuery({
@@ -48,7 +30,7 @@ export const useGetPostList = (params: PostQueryParams = {}) => {
             }).toString();
 
             const response = await fetchClient(`/posts?${queryString}`);
-            return response.json() as Promise<PostResponse>;
+            return response.json() as Promise<PostListResponse>;
         }
     });
 };
