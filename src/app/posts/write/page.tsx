@@ -66,10 +66,13 @@ export default function PostWrite() {
         });
     };
 
+    // 이미지 URL을 받아서 300x300 크기의 썸네일 Blob을 생성하는 함수
     const createThumbnail = async (imageUrl: string): Promise<Blob> => {
         return new Promise((resolve, reject) => {
             const img = new Image();
+            // CORS 이슈 방지를 위한 crossOrigin 설정
             img.crossOrigin = "anonymous";
+            
             img.onload = () => {
                 const canvas = document.createElement('canvas');
                 const ctx = canvas.getContext('2d');
@@ -79,17 +82,45 @@ export default function PostWrite() {
                     return;
                 }
 
+                // 썸네일 크기 설정 (300x300 픽셀)
                 canvas.width = 300;
                 canvas.height = 300;
 
+                // 이미지 비율 유지하면서 캔버스에 맞추기: 짧은 쪽을 기준으로 비율 맞추기
                 const scale = Math.max(canvas.width / img.width, canvas.height / img.height);
+                // 이미지를 캔버스 중앙에 배치하기 위한 좌표 계산
                 const x = (canvas.width - img.width * scale) / 2;
                 const y = (canvas.height - img.height * scale) / 2;
 
-                ctx.fillStyle = '#fff';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                // 흰색 배경 그리기(캔버스는 기본적으로 투명 배경. 이를 jpeg로 저장하면 검정색으로 변환된다. 흰 배경이 더 자연스럽기 때문에 이렇게 설정.)
+                ctx.fillStyle = '#fff'; // 그리기 색상을 흰색으로 설정하고
+                ctx.fillRect(0, 0, canvas.width, canvas.height); // 캔버스 영역을 채운다. 이 코드들이 없으면 이미지가 어둡게 보일 수 있다. 투명 png를 사용하는 경우 유용.
+                /* 
+                    아래와 같이도 사용 가능하다(그라데이션이라든지 패턴 등).
+
+                     // 단색 설정
+                    ctx.fillStyle = '#fff';  // 흰색
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';  // 반투명 흰색
+
+                    // 그라데이션 설정
+                    const gradient = ctx.createLinearGradient(0, 0, 300, 300);
+                    gradient.addColorStop(0, '#ff6b6b');    // 시작 색상
+                    gradient.addColorStop(1, '#4ecdc4');    // 끝 색상
+                    ctx.fillStyle = gradient;
+
+                    // 패턴 설정
+                    const img = new Image();
+                    img.src = 'pattern.png';
+                    const pattern = ctx.createPattern(img, 'repeat');
+                    ctx.fillStyle = pattern;
+                */
+
+                // 이미지 그리기: 이미지를 캔버스에 그릴 때 브라우저의 이미지 리샘플링 알고리즘이 적용됨.
+                // 큰 이미지를 작은 크기로 줄일 때 픽셀을 적절히 보간하여 처리
                 ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
 
+                // 캔버스를 JPEG Blob으로 변환 (품질: 80%). png는 무손실 압축이라 용량이 커져서 사용하지 않음.
+                // webp는 품질이 좋고 용량도 jpeg보다 적어지지만 로직을 많이 바꿔야 하므로 추후 적용.
                 canvas.toBlob((blob) => {
                     if (blob) {
                         resolve(blob);
@@ -98,6 +129,7 @@ export default function PostWrite() {
                     }
                 }, 'image/jpeg', 0.8);
             };
+
             img.onerror = () => reject(new Error('이미지 로드 실패'));
             img.src = imageUrl;
         });
@@ -109,15 +141,19 @@ export default function PostWrite() {
 
             let thumbnailUrl = null;
             if (selectedThumbnails.length > 0) {
+                // 선택된 첫 번째 이미지로 썸네일 생성
                 const thumbnailBlob = await createThumbnail(selectedThumbnails[0]);
                 
+                // 썸네일 파일명 생성 (타임스탬프-랜덤문자열.jpg)
                 const fileName = `images/thumbnails/${Date.now()}-${Math.random().toString(36).substring(2)}.jpg`;
+                // Supabase 스토리지에 썸네일 업로드
                 const { data: uploadData, error: uploadError } = await supabase.storage
                     .from('media-storage')
                     .upload(fileName, thumbnailBlob);
 
                 if (uploadError) throw uploadError;
 
+                // 업로드된 썸네일의 공개 URL 가져오기
                 const { data: { publicUrl } } = supabase.storage
                     .from('media-storage')
                     .getPublicUrl(fileName);
