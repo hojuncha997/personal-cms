@@ -2,20 +2,14 @@ import { Node, mergeAttributes } from '@tiptap/core'
 import { ReactNodeViewRenderer, NodeViewWrapper, NodeViewProps } from '@tiptap/react'
 import React, { useRef, useState } from 'react'
 import { Image as ImageIcon, Loader2 } from 'lucide-react'
-import { createClient } from '@supabase/supabase-js'
-
-// Supabase 클라이언트 초기화
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-)
+import { supabase } from '@/lib/supabase'
 
 interface ImagePlaceholderProps extends NodeViewProps {
   editor: any;
   updateAttributes: (attrs: Record<string, any>) => void;
 }
 
-const ImagePlaceholderComponent = ({ node, updateAttributes }: ImagePlaceholderProps) => {
+const ImagePlaceholderComponent = ({ node, updateAttributes, editor }: ImagePlaceholderProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [isUploading, setIsUploading] = useState(false)
 
@@ -24,48 +18,35 @@ const ImagePlaceholderComponent = ({ node, updateAttributes }: ImagePlaceholderP
   }
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]    
-    
-    // 파일 업로드 테스트: 에디터 본문에 표시
-    // if (file) {
-    //     const reader = new FileReader()
-    //     reader.onloadend = () => {
-    //       updateAttributes({
-    //         src: reader.result,
-    //         isPlaceholder: false
-    //       })
-    //     }
-    //     reader.readAsDataURL(file)
-
+    const file = e.target.files?.[0]
     if (!file) return
 
     try {
-      // 파일 이름 생성 (timestamp-originalname)
-      const fileExt = file.name.split('.').pop()    // 파일 확장자 추출
-      const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`    // 파일 이름 생성
-      const filePath = `images/project-images/${fileName}`    // 파일 경로 생성. 버킷 내의 디렉토리명(버킷은 스토리지의 하위 디렉토리)
-
-      // 스토리지에 업로드
       setIsUploading(true)
+      const fileExt = file.name.split('.').pop()
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`
+      const filePath = `images/project-images/${fileName}`
+
       const { error: uploadError, data } = await supabase.storage
-        .from('media-storage') // 수파베이스 버킷 이름으로 변경
+        .from('media-storage')
         .upload(filePath, file)
 
       if (uploadError) throw uploadError
 
-
-      // 공개 URL 가져오기
       const { data: { publicUrl } } = supabase.storage
         .from('media-storage')
         .getPublicUrl(filePath)
 
       setIsUploading(false)
 
-      // 이미지 URL 업데이트
-      updateAttributes({
-        src: publicUrl,
-        isPlaceholder: false
-      })
+      editor.chain().focus().deleteNode('imagePlaceholder').insertContent({
+        type: 'image',
+        attrs: {
+          src: publicUrl,
+          alt: file.name,
+        }
+      }).run()
+      
     } catch (error) {
       console.error('Upload error:', error)
       alert('이미지 업로드에 실패했습니다.')

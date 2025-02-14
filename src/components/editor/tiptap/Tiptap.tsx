@@ -32,6 +32,8 @@ interface TiptapProps {
   //proseMirror 설정
   // proseSizeClass?: string
   wrapperStyle?: string;  // 새로운 prop 추가
+  onImageClick?: (imageUrl: string) => void;
+  selectedImages?: string[];
 }
 
 // 모듈 시작
@@ -44,7 +46,39 @@ const Tiptap = ({
   // proseMirror가 자체적으로 기본 스타일링을 가지고 있기 때문에 설정이 필요할 수 있음.
   // proseSizeClass = "prose-sm sm:prose lg:prose-lg xl:prose-2xl"  // 기본값 설정
   wrapperStyle = "border rounded-lg overflow-hidden sticky top-0",  // 기본값 설정
+  onImageClick,
+  selectedImages = [],
 }: TiptapProps) => {
+
+  const CustomImage = Image.extend({
+    addAttributes() {
+        return {
+            ...this.parent?.(),
+            class: {
+                default: 'max-w-full h-auto cursor-pointer',
+                rendered: false
+            }
+        }
+    },
+
+    renderHTML({ HTMLAttributes, node }) {
+        const { src } = HTMLAttributes;
+        const isSelected = selectedImages.includes(src as string);
+        
+        return ['div', { 
+            class: 'image-wrapper'
+        }, [
+            'img', 
+            {
+                ...HTMLAttributes,
+                class: `${HTMLAttributes.class} transition-all duration-200 ${
+                    isSelected ? 'border-4 border-blue-500 shadow-lg scale-[0.98]' : 'hover:shadow-md hover:scale-[0.99]'
+                }`,
+                'data-image-select': 'true'
+            }
+        ]];
+    },
+  });
 
   const editor = useEditor({
     extensions: [
@@ -94,7 +128,7 @@ const Tiptap = ({
       OrderedList.configure(),
       TaskList,
       TaskItem,
-      Image.configure({
+      CustomImage.configure({
         allowBase64: true,
       }),
       Link.configure({
@@ -123,6 +157,20 @@ const Tiptap = ({
       // 디버깅을 위한 콘솔 로그 추가
       console.log('Editor content updated:', editor.getJSON())
       onChange && onChange(editor.getJSON())
+    },
+    editorProps: {
+        handleClick: (view, pos, event) => {
+            const target = event.target as HTMLElement;
+            if (target.matches('img[data-image-select]')) {
+                const src = target.getAttribute('src');
+                if (src) {
+                    event.preventDefault();
+                    onImageClick?.(src);
+                }
+                return true;
+            }
+            return false;
+        }
     },
   })
 

@@ -11,6 +11,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { colors } from '@/constants/styles';
 import { useCreatePost } from '@/hooks/posts/useCreatePost';
 import { PostData } from '@/types/posts/postTypes';
+import { supabase } from '@/lib/supabase';
 
 const formSchema = z.object({
   title: z.string()
@@ -33,6 +34,8 @@ export default function PostWrite() {
     const categories = ['일반', '문의', '칭찬', '제안'];
     const [tagInput, setTagInput] = React.useState('');
     const { createPost } = useCreatePost();
+    const [selectedThumbnails, setSelectedThumbnails] = React.useState<string[]>([]);
+    const [isProcessing, setIsProcessing] = React.useState(false);
 
     const { register, handleSubmit, watch, setValue, getValues, formState: { errors } } = useForm<FormValues>({
         resolver: zodResolver(formSchema),
@@ -52,22 +55,96 @@ export default function PostWrite() {
 
     const isSecret = watch('isSecret');
 
-    const onSubmit = async (data: FormValues) => {
-        const postData: PostData = {
-            ...data,
-            content: data.content,
-            slug: data.title
-                .toLowerCase()
-                .replace(/ /g, '-')
-                .replace(/[^\w-]+/g, ''),
-            thumbnail: null,
-            isFeatured: data.isFeatured,
-            status: data.status,
-        };
+    const handleImageSelect = (imageUrl: string) => {
+        console.log('handleImageSelect called with:', imageUrl);
+        setSelectedThumbnails(prev => {
+            const newSelection = prev.includes(imageUrl)
+                ? prev.filter(url => url !== imageUrl)
+                : [...prev, imageUrl];
+            console.log('New selection:', newSelection);
+            return newSelection;
+        });
+    };
 
-        // 방명록 작성 훅 호출
-        await createPost(postData);
-        router.push('/posts');
+    const createThumbnail = async (imageUrl: string): Promise<Blob> => {
+        return new Promise((resolve, reject) => {
+            const img = new Image();
+            img.crossOrigin = "anonymous";
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                
+                if (!ctx) {
+                    reject(new Error('Canvas context를 생성할 수 없습니다.'));
+                    return;
+                }
+
+                canvas.width = 300;
+                canvas.height = 300;
+
+                const scale = Math.max(canvas.width / img.width, canvas.height / img.height);
+                const x = (canvas.width - img.width * scale) / 2;
+                const y = (canvas.height - img.height * scale) / 2;
+
+                ctx.fillStyle = '#fff';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
+
+                canvas.toBlob((blob) => {
+                    if (blob) {
+                        resolve(blob);
+                    } else {
+                        reject(new Error('썸네일 생성 실패'));
+                    }
+                }, 'image/jpeg', 0.8);
+            };
+            img.onerror = () => reject(new Error('이미지 로드 실패'));
+            img.src = imageUrl;
+        });
+    };
+
+    const onSubmit = async (data: FormValues) => {
+        try {
+            setIsProcessing(true);
+
+            let thumbnailUrl = null;
+            if (selectedThumbnails.length > 0) {
+                const thumbnailBlob = await createThumbnail(selectedThumbnails[0]);
+                
+                const fileName = `images/thumbnails/${Date.now()}-${Math.random().toString(36).substring(2)}.jpg`;
+                const { data: uploadData, error: uploadError } = await supabase.storage
+                    .from('media-storage')
+                    .upload(fileName, thumbnailBlob);
+
+                if (uploadError) throw uploadError;
+
+                const { data: { publicUrl } } = supabase.storage
+                    .from('media-storage')
+                    .getPublicUrl(fileName);
+
+                thumbnailUrl = publicUrl;
+            }
+
+            const postData: PostData = {
+                ...data,
+                content: data.content,
+                slug: data.title
+                    .toLowerCase()
+                    .replace(/ /g, '-')
+                    .replace(/[^\w-]+/g, ''),
+                thumbnail: thumbnailUrl,
+                isFeatured: data.isFeatured,
+                status: data.status,
+            };
+
+            await createPost(postData);
+            router.push('/posts');
+        } catch (error) {
+            console.error('게시글 작성 중 오류:', error);
+            alert('게시글 작성에 실패했습니다.');
+        } finally {
+            setIsProcessing(false);
+        }
     };
 
     const handleAddTag = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -130,11 +207,28 @@ export default function PostWrite() {
                         <Tiptap
                             initialContent={watch('content')}
                             onChange={(content) => setValue('content', content)}
+                            onImageClick={handleImageSelect}
+                            selectedImages={selectedThumbnails}
                             toolbarStyle="border-b bg-gray-50 p-2 flex flex-wrap gap-1"
-                            // prose설정을 넣어줬음에 유의
                             contentStyle="p-4 min-h-[200px] bg-white prose-sm"
                         />
                     </div>
+
+                    {selectedThumbnails.length > 0 && (
+                        <div>
+                            <label className="block text-sm font-medium mb-2">선택된 썸네일</label>
+                            <div className="flex gap-2 overflow-x-auto">
+                                {selectedThumbnails.map((url) => (
+                                    <img
+                                        key={url}
+                                        src={url}
+                                        alt="썸네일 미리보기"
+                                        className="w-20 h-20 object-cover rounded border-2 border-blue-500"
+                                    />
+                                ))}
+                            </div>
+                        </div>
+                    )}
 
                     <div>
                         <label className="block text-sm font-medium mb-2">태그</label>
@@ -203,14 +297,16 @@ export default function PostWrite() {
                             type="button"
                             onClick={() => router.back()}
                             className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200"
+                            disabled={isProcessing}
                         >
                             취소
                         </button>
                         <button
                             type="submit"
-                            className="px-4 py-2 bg-black text-white rounded-md hover:bg-gray-800"
+                            className="px-4 py-2 bg-black text-white rounded-md hover:bg-gray-800 disabled:bg-gray-400"
+                            disabled={isProcessing}
                         >
-                            작성하기
+                            {isProcessing ? '처리 중...' : '작성하기'}
                         </button>
                     </div>
                 </form>
