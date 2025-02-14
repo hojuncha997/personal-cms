@@ -15,7 +15,7 @@ export const PostNavigation = ({ publicId }: PostNavigationProps) => {
 
     return (
         <div className="border-t border-gray-200 mt-12 pt-8">
-            <h3 className="text-lg font-semibold mb-4">다른 글 둘러보기</h3>
+            <h3 className="text-lg font-semibold mb-4">같은 주제의 글</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* 이전 포스트 */}
                 <div className="space-y-4">
