@@ -7,7 +7,7 @@ import Link from 'next/link';
 import { useGetPostList } from '@/hooks/posts/useGetPostList';
 import { format, subMonths } from 'date-fns';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { ChevronDown } from 'lucide-react';
 import { extractTextFromContent } from '@/utils/postUtils'
 import { PostForList, PostListResponse } from '@/types/posts/postTypes';
@@ -18,8 +18,8 @@ export default function Post() {
     const router = useRouter();
     const searchParams = useSearchParams();
     
-    // 초기 상태값을 URL 파라미터에서 가져오도록 수정
-    const [searchState, setSearchState] = useState({
+    // searchState를 useMemo로 최적화
+    const searchState = useMemo(() => ({
         page: Number(searchParams.get('page')) || 1,
         search: searchParams.get('search') || '',
         category: searchParams.get('category') || '',
@@ -27,7 +27,22 @@ export default function Post() {
         order: searchParams.get('order') || 'DESC',
         startDate: searchParams.get('startDate') || '',
         endDate: searchParams.get('endDate') || ''
-    });
+    }), [searchParams]);
+
+    // createQueryString 함수를 useCallback으로 최적화
+    const createQueryString = useCallback((updates: Record<string, string>) => {
+        const current = new URLSearchParams(Array.from(searchParams.entries()));
+        
+        Object.entries(updates).forEach(([key, value]) => {
+            if (value) {
+                current.set(key, value);
+            } else {
+                current.delete(key);
+            }
+        });
+
+        return current.toString();
+    }, [searchParams]);
 
     // 로컬 상태도 URL 파라미터에서 초기값을 가져오도록 수정
     const [localSort, setLocalSort] = useState(searchParams.get('sortBy') || 'createdAt');
@@ -36,27 +51,25 @@ export default function Post() {
     const [localEndDate, setLocalEndDate] = useState(searchParams.get('endDate') || '');
     const [localSearch, setLocalSearch] = useState(searchParams.get('search') || '');
 
+    // 두 번째 useEffect 최적화 - 한 번에 모든 로컬 상태 업데이트. 개별 상태를 객체로 묶어서 비교하여 불필요한 렌더링 방지
     useEffect(() => {
-        setSearchState({
-            page: Number(searchParams.get('page')) || 1,
-            search: searchParams.get('search') || '',
-            category: searchParams.get('category') || '',
-            sort: searchParams.get('sortBy') || 'createdAt',
-            order: searchParams.get('order') || 'DESC',
-            startDate: searchParams.get('startDate') || '',
-            endDate: searchParams.get('endDate') || ''
-        });
-    }, [searchParams]);
+        const updates = {
+            sort: searchState.sort,
+            order: searchState.order,
+            startDate: searchState.startDate,
+            endDate: searchState.endDate,
+            search: searchState.search
+        };
 
-    // useEffect를 사용하여 로컬 상태 업데이트
-    useEffect(() => {
-        setLocalSort(searchState.sort);
-        setLocalOrder(searchState.order);
-        setLocalStartDate(searchState.startDate);
-        setLocalEndDate(searchState.endDate);
-        setLocalSearch(searchState.search);
+        // 실제 변경사항이 있을 때만 상태 업데이트
+        if (localSort !== updates.sort) setLocalSort(updates.sort);
+        if (localOrder !== updates.order) setLocalOrder(updates.order);
+        if (localStartDate !== updates.startDate) setLocalStartDate(updates.startDate);
+        if (localEndDate !== updates.endDate) setLocalEndDate(updates.endDate);
+        if (localSearch !== updates.search) setLocalSearch(updates.search);
     }, [searchState]);
 
+    // useGetPostList 직접 호출
     const { data, isLoading, error } = useGetPostList({
         page: searchState.page,
         limit: 10,
@@ -68,22 +81,17 @@ export default function Post() {
         endDate: searchState.endDate,
     });
 
-    const createQueryString = (updates: Record<string, string>) => {
-        const current = new URLSearchParams(Array.from(searchParams.entries()));
-        
-        // 업데이트할 파라미터 적용
-        Object.entries(updates).forEach(([key, value]) => {
-            if (value) {
-                current.set(key, value);
-            } else {
-                current.delete(key);
-            }
-        });
+    // 데이터 처리 결과를 useMemo로 최적화
+    const processedData = useMemo(() => {
+        if (!data) return null;
+        return {
+            data: data.data,
+            meta: data.meta
+        };
+    }, [data]);
 
-        return current.toString();
-    };
-
-    const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
+    // 핸들러 함수들을 useCallback으로 최적화
+    const handleSearch = useCallback((e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         
         // 모든 필터 옵션을 한 번에 적용
@@ -95,17 +103,17 @@ export default function Post() {
             endDate: localEndDate,
             page: '1'
         })}`);
-    };
+    }, [router, createQueryString, localSearch, localSort, localOrder, localStartDate, localEndDate]);
 
     const handleCategoryChange = (category: string) => {
         router.push(`/posts?${createQueryString({ category, page: '1' })}`);
     };
 
-    const handleSortChange = (sortBy: string) => {
+    const handleSortChange = useCallback((sortBy: string) => {
         const newOrder = sortBy === localSort && localOrder === 'DESC' ? 'ASC' : 'DESC';
         setLocalSort(sortBy);
         setLocalOrder(newOrder);
-    };
+    }, [localSort, localOrder]);
 
     const handlePageChange = (page: number) => {
         // 스크롤 위치 초기화가 필요한 경우
@@ -120,10 +128,13 @@ export default function Post() {
 
     const [isFilterOpen, setIsFilterOpen] = useState(false);
 
-    console.log('방명록 데이터:', data);
-    console.log('로딩 상태:', isLoading);
-    console.log('에러:', error);
-    
+    // useEffect를 사용하여 데이터가 실제로 변경될 때만 로그 출력
+    useEffect(() => {
+        console.log('포스팅 데이터 업데이트:', data);
+        console.log('로딩 상태 변경:', isLoading);
+        console.log('에러 상태:', error);
+    }, [data, isLoading, error]);
+
     if (isLoading) {
         return <PostListSkeleton />;
     }

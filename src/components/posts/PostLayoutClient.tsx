@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { Menu } from 'lucide-react';
@@ -45,6 +45,16 @@ export default function PostLayoutClient({
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
     const pathname = usePathname();
     const { isMobile, isTablet, isDesktop } = useWindowSize();
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
+    // 초기 렌더링 시에는 아무것도 보여주지 않음
+    if (!mounted) {
+        return <div className='min-h-screen bg-[#ffffff]'>{children}</div>;
+    }
 
     const showDrawer = isMobile || isTablet;
 

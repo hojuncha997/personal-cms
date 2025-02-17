@@ -236,15 +236,12 @@ const Tiptap = ({
       >
         <EditorContent 
           editor={editor} 
+          // immediatelyRender={false}
           // className={contentStyle}
           // className={`prose prose-sm sm:prose lg:prose-lg xl:prose-2xl mx-auto ${contentStyle}`}
           // className={`prose prose-sm sm:prose lg:prose-lg xl:prose-2xl w-full max-w-none ${contentStyle}`}
           // className={`prose ${proseSizeClass} w-full max-w-none ${contentStyle}`}
           className={`prose w-full max-w-none ${contentStyle}`}
-
-
-
-
         />
       </div>
     </div>

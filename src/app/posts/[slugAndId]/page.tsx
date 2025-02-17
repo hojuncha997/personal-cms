@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Container } from '@/components/layouts/Container';
 import { colors } from '@/constants/styles/colors';
 import { useParams } from 'next/navigation';
@@ -12,6 +12,8 @@ import { notFound } from 'next/navigation';
 import { PostNavigation } from '@/components/posts/PostNavigation';
 import { RelatedPosts } from '@/components/posts/RelatedPosts';
 import PostDetailSkeleton from '@/components/posts/skeletons/PostDetailSkeleton';
+import { useGetRelatedPosts } from '@/hooks/posts/useGetRelatedPosts';
+import { useGetPostNavigation } from '@/hooks/posts/useGetPostNavigation';
 
 interface Comment {
     id: string;
@@ -28,17 +30,28 @@ const PostDetail: React.FC = () => {
     
     console.log('publicId:', publicId); // 디버깅용
     
-    const { data: post, isLoading, error } = useGetPostDetail(publicId);
+    const { data: post, isLoading: postLoading, error: postError } = useGetPostDetail(publicId);
+    const { data: relatedPosts, isLoading: relatedLoading } = useGetRelatedPosts(publicId);
+    const { data: navigationPosts, isLoading: navigationLoading } = useGetPostNavigation(publicId);
     const [isLiked, setIsLiked] = useState(false);
     const [newComment, setNewComment] = useState('');
     const [replyTo, setReplyTo] = useState<Comment | null>(null);
     const [replyContent, setReplyContent] = useState('');
+    const [showRelated, setShowRelated] = useState(false);
 
-    if (isLoading) {
+    useEffect(() => {
+        if (post) {
+            // 메인 컨텐츠가 로드된 후 일정 시간 뒤에 관련 컨텐츠 표시
+            const timer = setTimeout(() => setShowRelated(true), 100);
+            return () => clearTimeout(timer);
+        }
+    }, [post]);
+
+    if (postLoading) {
         return <PostDetailSkeleton />;
     }
 
-    if (error || !post) {
+    if (postError || !post) {
         notFound();
     }
 
@@ -105,19 +118,24 @@ const PostDetail: React.FC = () => {
                             </div>
                         </div> */}
 
-                        {/* 관련 포스트 섹션 */}
-                        <div className="bg-white border border-gray-300 rounded-lg">
-                            <div className="p-4 sm:p-6">
-                                <RelatedPosts publicId={publicId} />
-                            </div>
-                        </div>
+                        {/* 관련 포스트와 네비게이션 섹션 */}
+                        {showRelated && (
+                            <>
+                                {/* 관련 포스트 */}
+                                <div className="bg-white border border-gray-300 rounded-lg">
+                                    <div className="p-4 sm:p-6">
+                                        <RelatedPosts publicId={publicId} />
+                                    </div>
+                                </div>
 
-                        {/* 네비게이션 섹션 */}
-                        <div className="bg-white border border-gray-300 rounded-lg">
-                            <div className="p-4 sm:p-6">
-                                <PostNavigation publicId={publicId} />
-                            </div>
-                        </div>
+                                {/* 이전/다음 포스트 네비게이션 */}
+                                <div className="bg-white border border-gray-300 rounded-lg">
+                                    <div className="p-4 sm:p-6">
+                                        <PostNavigation publicId={publicId} />
+                                    </div>
+                                </div>
+                            </>
+                        )}
 
                         {/* 목록으로 버튼 */}
                         <div className="px-4 sm:px-0">
