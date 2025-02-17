@@ -1,6 +1,6 @@
 'use client'
 
-import React from 'react';
+import React, { Suspense } from 'react';
 import { Container } from '@/components/layouts/Container';
 import { useRouter } from 'next/navigation';
 import Tiptap from '@/components/editor/tiptap/Tiptap';
@@ -28,7 +28,7 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
-const GuestbookWrite: React.FC = () => {
+const GuestbookWriteContent = () => {
     const router = useRouter();
     const categories = ['일반', '문의', '칭찬', '제안'];
     const [tagInput, setTagInput] = React.useState('');
@@ -217,6 +217,14 @@ const GuestbookWrite: React.FC = () => {
             </div>
         </Container>
         </div>
+    );
+};
+
+const GuestbookWrite: React.FC = () => {
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+            <GuestbookWriteContent />
+        </Suspense>
     );
 };
 

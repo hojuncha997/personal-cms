@@ -3,12 +3,13 @@
 
 'use client'
 
+import React, { Suspense } from 'react';
 import Link from 'next/link';
 import { useGetGuestbookList } from '@/hooks/guestbooks/useGetGuestbookList';
 import { format, subMonths } from 'date-fns';
 import { useSearchParams, useRouter } from 'next/navigation';
 
-export default function Guestbook() {
+const GuestbookContent = () => {
     const router = useRouter();
     const searchParams = useSearchParams();
     const currentPage = Number(searchParams.get('page')) || 1;
@@ -280,3 +281,13 @@ export default function Guestbook() {
         </div>
     )
 }
+
+const Guestbook: React.FC = () => {
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+            <GuestbookContent />
+        </Suspense>
+    );
+};
+
+export default Guestbook;

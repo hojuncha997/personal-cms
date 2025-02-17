@@ -3,6 +3,7 @@
 
 'use client'
 
+import React, { Suspense } from 'react';
 import { useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
@@ -12,13 +13,12 @@ const ERROR_MESSAGES = {
     // ... 다른 에러 케이스들
   };
 
-export default function AuthErrorPage() {
+const AuthErrorContent = () => {
     const router = useRouter();
     const searchParams = useSearchParams();
 
     const code = searchParams.get('code');
     const errorMessage = code ? ERROR_MESSAGES[code as keyof typeof ERROR_MESSAGES] : undefined;
-
 
     return (
         <div className="flex flex-col justify-center items-center h-screen bg-white">
@@ -32,4 +32,15 @@ export default function AuthErrorPage() {
             홈으로 가기
           </button>
         </div>
-      );}   
+    );
+};
+
+const AuthError: React.FC = () => {
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+            <AuthErrorContent />
+        </Suspense>
+    );
+};
+
+export default AuthError;   

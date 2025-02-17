@@ -8,13 +8,13 @@ import { GuestbookData } from '@/types/guestbooks/guestbookTypes';
 // export default async function useCreateGuestbook( data: GuestbookData ) {
     // const response = await fetchClient('/guestbooks', { method: 'POST' });
     // return response;
-export function useCreatePost() {
-    const { mutateAsync: createPost } = useMutation({
-        mutationFn: (data: GuestbookData) => fetchClient('/posts', { 
+export function useCreateGuestbook() {
+    const { mutateAsync: createGuestbook } = useMutation({
+        mutationFn: (data: GuestbookData) => fetchClient('/guestbooks', { 
             method: 'POST', 
             body: data  // 여기서는 stringify 하지 않음
         }),
     });
     // return { createGuestbook };
-    return { createPost };
+    return { createGuestbook };
 }

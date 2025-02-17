@@ -61,10 +61,10 @@ export const useProfileStore = create<ProfileStore>((set) => ({
   uploadProfileImage: async (file: File) => {
     set({ isUploading: true });
     try {
-      const imageUrl = await uploadImage(file);
-      set((state) => ({
-        profile: state.profile ? { ...state.profile, avatarUrl: imageUrl } : null,
-      }));
+      // const imageUrl = await uploadImage(file);
+      // set((state) => ({
+      //   profile: state.profile ? { ...state.profile, avatarUrl: imageUrl } : null,
+      // }));
     } catch (error) {
       set({ error: '이미지 업로드에 실패했습니다.' });
     } finally {

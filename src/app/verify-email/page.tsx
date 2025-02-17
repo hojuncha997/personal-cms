@@ -1,6 +1,6 @@
 'use client';
 
-
+import React, { Suspense } from 'react';
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Container } from '@/components/layouts/Container';
@@ -13,7 +13,7 @@ interface ApiError {
   message: string;
 }
 
-export default function VerifyEmailPage() {
+const VerifyEmailContent = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [verificationStatus, setVerificationStatus] = useState<'loading' | 'success' | 'error'>('loading');
@@ -107,3 +107,13 @@ export default function VerifyEmailPage() {
    
   );
 }
+
+const VerifyEmail: React.FC = () => {
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+            <VerifyEmailContent />
+        </Suspense>
+    );
+};
+
+export default VerifyEmail;

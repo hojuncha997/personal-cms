@@ -3,6 +3,7 @@
 
 'use client'
 
+import React, { Suspense } from 'react';
 import Link from 'next/link';
 import { useGetPostList } from '@/hooks/posts/useGetPostList';
 import { format, subMonths } from 'date-fns';
@@ -14,7 +15,7 @@ import { PostForList, PostListResponse } from '@/types/posts/postTypes';
 import PostListSkeleton from '@/components/posts/skeletons/PostListSkeleton';
 import Image from 'next/image';
 
-export default function Post() {
+const PostContent = () => {
     const router = useRouter();
     const searchParams = useSearchParams();
     
@@ -320,3 +321,13 @@ export default function Post() {
         </div>
     )
 }
+
+const Post: React.FC = () => {
+    return (
+        <Suspense fallback={<PostListSkeleton />}>
+            <PostContent />
+        </Suspense>
+    );
+};
+
+export default Post;

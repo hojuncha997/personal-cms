@@ -75,6 +75,7 @@ const PostDetail: React.FC = () => {
                                         <span>작성자: {post.author_display_name.includes('@') ? post.author_display_name.split('@')[0] : post.author_display_name}</span>
                                         <span>조회수: {post.viewCount}</span>
                                         <span>작성일: {format(new Date(post.createdAt), 'yyyy-MM-dd')}</span>
+                                        <span>작성자 여부: {post.isAuthor===true ? '작성자' : '비작성자'}</span>
                                     </div>
                                 </div>
 
@@ -119,23 +120,22 @@ const PostDetail: React.FC = () => {
                         </div> */}
 
                         {/* 관련 포스트와 네비게이션 섹션 */}
-                        {showRelated && (
+                        {/* {showRelated && (
                             <>
-                                {/* 관련 포스트 */}
+                                
                                 <div className="bg-white border border-gray-300 rounded-lg">
                                     <div className="p-4 sm:p-6">
                                         <RelatedPosts publicId={publicId} />
                                     </div>
                                 </div>
 
-                                {/* 이전/다음 포스트 네비게이션 */}
                                 <div className="bg-white border border-gray-300 rounded-lg">
                                     <div className="p-4 sm:p-6">
                                         <PostNavigation publicId={publicId} />
                                     </div>
                                 </div>
                             </>
-                        )}
+                        )} */}
 
                         {/* 목록으로 버튼 */}
                         <div className="px-4 sm:px-0">
