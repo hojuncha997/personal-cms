@@ -1,3 +1,4 @@
+// src/app/posts/[slugAndId]/PostDetailClient.tsx
 'use client'
 
 import React, { useState, useEffect } from 'react';
@@ -17,10 +18,11 @@ import { useGetPostNavigation } from '@/hooks/posts/useGetPostNavigation';
 
 interface PostDetailClientProps {
     publicId: string;
+    prefetch?: boolean;
 }
 
-const PostDetailClient: React.FC<PostDetailClientProps> = ({ publicId }) => {
-    const { data: post, isLoading: postLoading, error: postError } = useGetPostDetail(publicId);
+const PostDetailClient: React.FC<PostDetailClientProps> = ({ publicId, prefetch = true }) => {
+    const { data: post, isLoading: postLoading, error: postError } = useGetPostDetail(publicId, {enabled: prefetch}); // prefetch가 false일 경우 쿼리 실행
     const { data: relatedPosts, isLoading: relatedLoading } = useGetRelatedPosts(publicId);
     const { data: navigationPosts, isLoading: navigationLoading } = useGetPostNavigation(publicId);
     const [isLiked, setIsLiked] = useState(false);

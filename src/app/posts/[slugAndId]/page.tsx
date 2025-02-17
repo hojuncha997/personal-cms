@@ -14,7 +14,8 @@ export default async function PostPage({ params }: PageProps) {
 
     return (
         <Suspense fallback={<PostDetailSkeleton />}>
-            <PostDetailClient publicId={publicId} />
+            {/* true -> useGetPostDetail 쿼리 실행. 추후 코드 변경 예정 */}
+            <PostDetailClient publicId={publicId} prefetch={true} /> 
         </Suspense>
     );
 } 
