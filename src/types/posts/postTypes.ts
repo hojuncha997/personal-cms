@@ -35,6 +35,7 @@ export interface PostDetail {
     author_display_name: string;
     current_author_name: string;
     isSecret: boolean;
+    isAuthor: boolean;
     category: string;
     slug: string;
     tags: string[];
