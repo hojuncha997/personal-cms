@@ -1,32 +1,23 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { fetchClient } from "@/lib/fetchClient";
-import { PostDetailResponse } from "@/types/posts/postTypes";
-
-// interface GuestbookDetailResponse {
-//     public_id: string;
-//     title: string;
-//     content: {
-//         type: string;
-//         content: any[];
-//     };
-//     author_display_name: string;
-//     current_author_name: string;
-//     isSecret: boolean;
-//     category: string;
-//     tags: string[];
-//     viewCount: number;
-//     likeCount: number;
-//     commentCount: number;
-//     createdAt: string;
-//     updatedAt: string;
-// }
+// import { PostDetailResponse } from "@/types/posts/postTypes";
+import { PostDetail } from "@/types/posts/postTypes";
+import { useAuthStore } from "@/store/useAuthStore";
 
 export const useGetPostDetail = (public_id: string) => {
-    const { data, isLoading, error } = useQuery<PostDetailResponse>({
+    const { isAuthenticated } = useAuthStore();
+    
+    return useQuery<PostDetail>({
         queryKey: ['posts', public_id],
         queryFn: async () => {
-            const data = await fetchClient(`/posts/${public_id}`, {skipAuth: true});
-            return await data.json() as PostDetailResponse;
+            // 로그인 여부에 따라 토큰 사용 여부 결정. 로그인 한 경우 토큰 전송(회원 확인용)
+            const requestConfig = isAuthenticated ? {skipAuth: false} : {skipAuth: true};
+            const data = await fetchClient(`/posts/${public_id}`, requestConfig);
+
+            // .json()은 기본적으로 any타입을 반환한다. any에 직접 타입 캐스팅을 하는 것은 안전하지 않을 수 있다.
+            // 따라서 먼저 unknown으로 타입 추론 후 그 다음 타입 캐스팅을 적용하였다.
+            const postData = await data.json();
+            return postData as unknown as PostDetail;
         },
         staleTime: 1000 * 60 * 30, // 30분 동안 데이터를 "신선한" 상태로 유지(30분 동안은 서버에 재요청하지 않고 캐시된 데이터를 사용)
         gcTime: 1000 * 60 * 24,    // cacheTime 대신 gcTime 사용(컴포넌트가 언마운트되더라도 24시간 동안은 캐시를 유지)
@@ -40,5 +31,4 @@ export const useGetPostDetail = (public_id: string) => {
         // refetchIntervalInBackground: true, // 백그라운드에서도 재요청(브라우저 탭이 비활성화 되어 있어도 재요청- 현재 불필요)
         enabled: !!public_id, // public_id가 있을 때만 쿼리 실행
     });
-    return { data, isLoading, error };
 }; 

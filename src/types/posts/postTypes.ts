@@ -1,5 +1,6 @@
 // 포스팅 타입
 
+//포스팅 작성 시 사용되는 타입
 export type PostData = {
     title: string;
     category: string;
@@ -13,7 +14,7 @@ export type PostData = {
     status: string | 'published';
 }
 
-// 개별 포스팅 상세 페이지를 위한 타입
+// 개별 포스팅 상세 페이지를 가져오기 위한 타입
 export interface PostDetail {
     public_id: string;
     title: string;

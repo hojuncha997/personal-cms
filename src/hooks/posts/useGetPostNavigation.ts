@@ -17,7 +17,7 @@ export const useGetPostNavigation = (public_id: string, limit: number = 2) => {
                 limit: String(limit)
             }).toString();
             
-            const response = await fetchClient(`/posts/${public_id}/navigation?${queryString}`);
+            const response = await fetchClient(`/posts/${public_id}/navigation?${queryString}`, {skipAuth: true});
             return response.json() as Promise<PostNavigationResponse>;
         },
     })

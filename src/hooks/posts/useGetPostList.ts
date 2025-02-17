@@ -29,7 +29,7 @@ export const useGetPostList = (params: PostQueryParams = {}) => {
                 // ... 기타 파라미터
             }).toString();
 
-            const response = await fetchClient(`/posts?${queryString}`);
+            const response = await fetchClient(`/posts?${queryString}`, {skipAuth: true});
             return response.json() as Promise<PostListResponse>;
         }
     });
