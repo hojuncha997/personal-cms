@@ -1,3 +1,5 @@
+// src/utils/jwtUtils.ts
+
 // JWT 토큰 관련 사용자 정의 에러 클래스
 export class TokenError extends Error {
   constructor(

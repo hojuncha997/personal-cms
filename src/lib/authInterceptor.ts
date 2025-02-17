@@ -1,3 +1,5 @@
+// src/lib/authInterceptor.ts
+
 import { useAuthStore } from '@/store/useAuthStore'
 import { refreshTokenRequest } from '@/utils/refreshTokenRequest'
 import { getTokenPayload } from '@/utils/jwtUtils'
@@ -5,6 +7,7 @@ import { TokenError } from '@/types/authTypes'
 
 let isRefreshing = false
 let refreshSubscribers: ((token: string) => void)[] = []
+let refreshPromise: Promise<string> | null = null;  // 토큰 갱신 Promise 저장용
 
 // 토큰 갱신 관련 핵심 로직
 // - 토큰 갱신 상태 관리 (isRefreshing)
@@ -18,22 +21,41 @@ let refreshSubscribers: ((token: string) => void)[] = []
 // 3. shouldRefreshToken: 갱신 필요 여부 확인
 
 export async function handleTokenRefresh() {
-  try {
-    const newToken = await refreshTokenRequest()
-    setAuthToken(newToken)
-    refreshSubscribers.forEach(callback => callback(newToken))
-    return newToken
-  } catch (error) {
-    if (error instanceof TokenError) {
-      // 토큰 관련 에러는 그대로 전파
-      throw error;
-    }
-    // 기타 에러는 TokenError로 변환
-    throw new TokenError('토큰 갱신에 실패했습니다.');
-  } finally {
-    isRefreshing = false
-    refreshSubscribers = []
+  console.log('[handleTokenRefresh] 토큰 갱신 시작');
+  
+  // 이미 진행 중인 갱신 요청이 있다면 해당 Promise 반환
+  if (refreshPromise) {
+    console.log('[handleTokenRefresh] 이미 진행 중인 갱신 요청 재사용');
+    return refreshPromise;
   }
+
+  isRefreshing = true;
+  
+  // 새로운 갱신 요청 생성
+  refreshPromise = (async () => {
+    try {
+      console.log('[handleTokenRefresh] refresh_token으로 새 토큰 요청');
+      const newToken = await refreshTokenRequest();
+      
+      console.log('[handleTokenRefresh] 새 토큰 검증 및 저장 시작');
+      setAuthToken(newToken);
+      
+      // 대기 중인 요청들 처리
+      refreshSubscribers.forEach(callback => callback(newToken));
+      
+      console.log('[handleTokenRefresh] 토큰 갱신 성공');
+      return newToken;
+    } catch (error) {
+      console.error('[handleTokenRefresh] 토큰 갱신 실패:', error);
+      throw error;
+    } finally {
+      isRefreshing = false;
+      refreshSubscribers = [];
+      refreshPromise = null;  // Promise 초기화
+    }
+  })();
+
+  return refreshPromise;
 }
 
 export function addRefreshSubscriber(callback: (token: string) => void) {
@@ -73,27 +95,33 @@ export { isRefreshing }
 
 export function setAuthToken(token: string | null) {
 
-  console.log('setAuthToken 호출:', token);
 
-   // 현재 상태 확인
-   const currentState = useAuthStore.getState();
+  // console.log('setAuthToken 호출:', token);
+
+  //  // 현재 상태 확인
+  //  const currentState = useAuthStore.getState();
   
-   // 토큰이 이미 설정되어 있고, 같은 토큰으로 다시 설정하려는 경우 스킵
-   if (currentState.accessToken === token) {
-     console.log('Token already set, skipping...');
-     return;
-   }
+  //  // 토큰이 이미 설정되어 있고, 같은 토큰으로 다시 설정하려는 경우 스킵
+  //  if (currentState.accessToken === token) {
+  //    console.log('Token already set, skipping...');
+  //    return;
+  //  }
  
-   console.log('Setting new auth token...');
+  //  console.log('Setting new auth token...');
 
+  console.log('[setAuthToken] 토큰 설정 시작');
 
   if (!token) {
+    console.log('[setAuthToken] 토큰이 null, 인증 상태 초기화');
     useAuthStore.getState().resetAuthState();
     return;
   }
 
   try {
+    console.log('[setAuthToken] 토큰 유효성 검증');
     const payload = getTokenPayload(token);
+    
+    console.log('[setAuthToken] store에 토큰 정보 저장');
     useAuthStore.getState().updateAuthState({
       accessToken: token,
       tokenExpiry: payload.exp * 1000,
@@ -102,42 +130,10 @@ export function setAuthToken(token: string | null) {
       sub: payload.sub,
       isAuthenticated: true,
     });
-
-    console.log('setAuthToken 호출 후:', useAuthStore.getState());
-
-    // useAuthStore에서 Partial을 사용했기 때문에 아래와 같이 개별 필드를 업데이트할 수 있다.
-    // useAuthStore.getState().updateAuthState({
-    //   email: "new@email.com",
-    //   role: "ADMIN"
-    // });
-
-    /* 추후 이렇게 처리하자.
-try {
-  const decodedToken = getTokenPayload(token);
-  
-  if (isTokenExpired(decodedToken.exp)) {
-    throw new TokenError('Token has expired', 'EXPIRED');
-  }
-
-  const remainingTime = getRemainingTime(decodedToken.exp);
-  console.log(`Token will expire in ${remainingTime}ms`);
-
-  useAuthStore.getState().updateAuthState({
-    accessToken: token,
-    tokenExpiry: getTokenExpiryTime(decodedToken.exp),
-    ...decodedToken
-  });
-} catch (error) {
-  if (error instanceof TokenError) {
-    // 특정 에러 타입에 따른 처리
-  }
-  useAuthStore.getState().resetAuthState();
-}
-    */
-
-    console.log('토큰 설정 완료:', useAuthStore.getState());
+    
+    console.log('[setAuthToken] 토큰 설정 완료');
   } catch (error) {
-    console.error('토큰 처리 실패:', error);
+    console.error('[setAuthToken] 토큰 검증 실패:', error);
     useAuthStore.getState().resetAuthState();
     throw new TokenError('유효하지 않은 토큰 형식입니다.');
   }

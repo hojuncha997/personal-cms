@@ -26,8 +26,19 @@ export interface FetchOptions extends RequestInit {
   skipAuth?: boolean
 }
 
-export async function fetchClient(url: string, options: FetchOptions = {}): Promise<Response> {
+export async function fetchClient(url: string, options: FetchOptions = {skipAuth: false}): Promise<Response> {
   const { skipAuth, ...fetchOptions } = options
+
+  // console.log('Request:', {
+  //   url: `${process.env.NEXT_PUBLIC_API_URL}${url}`,
+
+  console.log('[fetchClient] 요청 시작:', {
+    url,
+    method: options.method || 'GET',
+    skipAuth,
+    headers: fetchOptions.headers,
+    body: options.body
+  });
 
   // 제외할 엔드포인트 체크
   const isExcludedEndpoint = ['/auth/access-token', '/auth/google/callback', '/auth/kakao/callback', '/auth/naver/callback'].some(
@@ -35,26 +46,31 @@ export async function fetchClient(url: string, options: FetchOptions = {}): Prom
   );
 
   // 요청 전 인터셉터
-  if (!skipAuth && !isExcludedEndpoint) {  // 제외 엔드포인트 체크 추가
-    // 토큰 만료 임박 체크
-    if (shouldRefreshToken()) {
-      console.log('토큰 만료 임박 체크')
-      if (isRefreshing) {
-        // 진행 중인 갱신 작업이 있다면 대기
-        await new Promise(resolve => addRefreshSubscriber(() => resolve(null)))
-      } else {
-        // 토큰 갱신 시도
-        await handleTokenRefresh()
+  if (!skipAuth && !isExcludedEndpoint) {
+    const accessToken = useAuthStore.getState().accessToken;
+    
+    if (!accessToken || shouldRefreshToken()) {
+      console.log('[fetchClient] 토큰 갱신 필요');
+      
+      try {
+        const newToken = await handleTokenRefresh();
+        console.log('[fetchClient] 토큰 갱신 완료');
+        
+        // 헤더에 새 토큰 추가
+        fetchOptions.headers = {
+          ...fetchOptions.headers,
+          'Authorization': `Bearer ${newToken}`
+        };
+      } catch (error) {
+        console.error('[fetchClient] 토큰 갱신 실패:', error);
+        throw error;
       }
-    }
-
-    // 헤더에 토큰 추가
-    const token = useAuthStore.getState().accessToken
-    if (token) {
+    } else {
+      // 유효한 토큰이 있는 경우
       fetchOptions.headers = {
         ...fetchOptions.headers,
-        'Authorization': `Bearer ${token}`
-      }
+        'Authorization': `Bearer ${accessToken}`
+      };
     }
   }
 
@@ -77,46 +93,61 @@ export async function fetchClient(url: string, options: FetchOptions = {}): Prom
       : JSON.stringify(config.body);
   }
 
-  // 요청 실행
+  // 요청 실행 전
+  console.log('Final request config:', {
+    url: `${process.env.NEXT_PUBLIC_API_URL}${url}`,
+    method: config.method,
+    headers: config.headers,
+    body: config.body
+  });
+
   const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}${url}`, config);
 
-  // 응답 인터셉터
-  if (response.status === 401 && !skipAuth) {
-    if (isRefreshing) {
-      return new Promise(resolve => {
-        addRefreshSubscriber(() => {
-          resolve(fetchClient(url, { ...options, skipAuth: true }))
-        })
-      })
-    }
+  // 응답 로깅
+  console.log('Response:', {
+    status: response.status,
+    statusText: response.statusText,
+    headers: Object.fromEntries(response.headers.entries())
+  });
 
-    const newToken = await handleTokenRefresh()
-    return fetchClient(url, { 
-      ...options, 
-      skipAuth: true,
-      headers: {
-        ...fetchOptions.headers,
-        'Authorization': `Bearer ${newToken}`
-      }
-    })
+  // 401 에러 처리 로직 단순화
+  if (response.status === 401 && !skipAuth && !isExcludedEndpoint) {
+    console.log('[fetchClient] 401 응답 감지, 토큰 갱신 후 재시도');
+    
+    try {
+      const newToken = await handleTokenRefresh();
+      
+      // 갱신된 토큰으로 재요청
+      return fetchClient(url, {
+        ...options,
+        skipAuth: true,
+        headers: {
+          ...fetchOptions.headers,
+          'Authorization': `Bearer ${newToken}`
+        }
+      });
+    } catch (error) {
+      console.error('[fetchClient] 토큰 갱신 실패:', error);
+      throw error;
+    }
   }
 
   if (!response.ok) {
-    // 서버로부터 더 자세한 에러 정보 가져오기
-    let errorDetails;
+    const error = new Error() as any;
+    error.status = response.status;
+    
     try {
-      errorDetails = await response.json();
-    } catch (jsonError) {
+      error.details = await response.json();
+    } catch {
       try {
-        errorDetails = await response.text();
-      } catch (textError) {
-        errorDetails = "서버에서 제공된 에러 메시지가 없습니다.";
+        error.details = await response.text();
+      } catch {
+        error.details = "서버에서 제공된 에러 메시지가 없습니다.";
       }
     }
-
-    throw new Error(
-      `HTTP error! status: ${response.status} - ${JSON.stringify(errorDetails)}`
-    );
+    
+    error.message = `HTTP error! status: ${response.status} - ${JSON.stringify(error.details)}`;
+    throw error;
   }
   // return response.json();  // response를 JSON으로 파싱하여 반환
   return response;  // response.json() 대신 Response 객체 반환: 개별 엔드포인트에서 변환하여 사용
