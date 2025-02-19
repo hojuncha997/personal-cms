@@ -1,74 +1,145 @@
 'use client'
 
-import Carousel from '@/components/Carousel'
-import PostSection from '@/components/PostSection'
 import { Container } from '@/components/layouts/Container'
+import { useGetPostList } from '@/hooks/posts/useGetPostList'
+import { useGetPostDetail } from '@/hooks/posts/useGetPostDetail'
+import Link from 'next/link'
+import { PostForList } from '@/types/posts/postTypes'
 
 export default function Home() {
+  const { data: latestPosts } = useGetPostList({ 
+    limit: 1, 
+    sortBy: 'createdAt', 
+    order: 'DESC' 
+  });
+  
+  const latestPost = latestPosts?.data[0];
+  const { data: featuredPost } = useGetPostDetail(
+    latestPost?.public_id || '', 
+    { enabled: !!latestPost }
+  );
+
+  const { data: recentPosts } = useGetPostList({
+    limit: 7,
+    page: 1,
+    sortBy: 'createdAt',
+    order: 'DESC'
+  });
+
   return (
-    <div className="bg-white">
-      {/* <Carousel /> */}
-      <Container>
-        {/* <div className="mx-auto px-4 sm:px-6 lg:px-8 py-6"> */}
-        <div className="mx-auto  py-6">
-
-          {/* TODAY'S PICKS 전체 섹션 */}
-          <h2 className="text-sm font-bold tracking-wider uppercase mb-6">TODAY'S PICKS</h2>
-          
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-12">
-            {/* 메인 아티클 - 모바일에서는 최상단, 데스크탑에서는 중앙 */}
-            <div className="lg:col-span-6 lg:order-2 order-first group cursor-pointer">
-              <div className="h-full flex flex-col">
-                <div className="aspect-[16/10] bg-gray-100 rounded-lg relative overflow-hidden mb-4">
-                  <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/60 to-transparent"></div>
-                </div>
-                <div className="flex-grow">
-                  <span className="text-sm text-blue-600 font-medium">인터뷰</span>
-                  <h1 className="text-3xl font-semibold mt-2 group-hover:text-blue-600">"AI 시대, 인문학의 가치는 더욱 빛날 것"</h1>
-                  <p className="text-lg text-gray-600 mt-2">김철수 서울대 철학과 교수 인터뷰</p>
-                  <p className="text-gray-600 mt-3 line-clamp-3">4차 산업혁명과 AI 시대를 맞아 인문학의 역할이 더욱 중요해지고 있다. 20년간 인문학과 기술의 접점을 연구해온 김철수 교수를 만나 미래 교육의 방향성에 대해 이야기를 나눴다.</p>
-                </div>
-              </div>
-            </div>
-
-            {/* 좌측 2개 아티클 - 모바일에서는 메인 아래, 데스크탑에서는 왼쪽 */}
-            <div className="lg:col-span-3 lg:order-1 space-y-6">
-              <div className="group cursor-pointer">
-                <div className="aspect-[4/3] bg-gray-100 rounded-lg mb-3"></div>
-                <span className="text-sm text-blue-600 font-medium">프로그래밍</span>
-                <h3 className="text-lg font-semibold mt-1 group-hover:text-blue-600">TypeScript 5.0의 새로운 기능들</h3>
-                <p className="text-sm text-gray-600 mt-1">김태크 에디터</p>
-              </div>
-              <div className="group cursor-pointer">
-                <div className="aspect-[4/3] bg-gray-100 rounded-lg mb-3"></div>
-                <span className="text-sm text-blue-600 font-medium">리뷰</span>
-                <h3 className="text-lg font-semibold mt-1 group-hover:text-blue-600">VS Code 필수 익스텐션 TOP 10</h3>
-                <p className="text-sm text-gray-600 mt-1">박코드 에디터</p>
-              </div>
-            </div>
-
-            {/* 최신 포스팅 - 우측, 모바일에서는 가장 아래 */}
-            <div className="lg:col-span-3 lg:order-3">
-              <h3 className="text-sm font-bold tracking-wider uppercase mb-4">최신 포스팅</h3>
-              <div className="space-y-6">
-                {[1, 2, 3, 4].map((_, i) => (
-                  <div key={i} className="group cursor-pointer">
-                    <div className="flex gap-4">
-                      <div className="w-20 h-20 bg-gray-100 rounded-lg flex-shrink-0"></div>
-                      <div>
-                        <span className="text-xs text-gray-500">2024.03.{14 + i}</span>
-                        <h3 className="text-base font-medium mt-1 group-hover:text-blue-600">Docker 컨테이너 보안 강화하기</h3>
-                        <p className="text-xs text-gray-600">최컨테이너</p>
+    <div className="bg-white text-black ">
+      <Container className="">
+        <div className="py-6">
+          {/* 메인 섹션 */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-6  border-black">
+            {/* 메인 뉴스 영역 */}
+            {featuredPost && (
+              <div className="lg:col-span-8 lg:border-r lg:border-black lg:pr-8">
+                <Link href={`/posts/${featuredPost.slug}-${featuredPost.public_id}`}>
+                  <div className="group cursor-pointer">
+                    <h1 className="text-3xl font-bold mb-4 group-hover:text-blue-600 leading-tight">
+                      {featuredPost.title}
+                    </h1>
+                    <div className="grid grid-cols-12 gap-6">
+                      <div className="col-span-6">
+                        <p className="text-gray-700 text-base leading-relaxed line-clamp-4 mb-3">
+                          {featuredPost.description || featuredPost.excerpt}
+                        </p>
+                        <div className="text-sm text-gray-500">
+                          {featuredPost.current_author_name} • {featuredPost.readingTime}분 읽기
+                        </div>
                       </div>
+                      {featuredPost.thumbnail ? (
+                        <div className="col-span-6">
+                          <div className="aspect-[4/3] bg-gray-100 rounded-sm overflow-hidden">
+                            <img 
+                              src={featuredPost.thumbnail} 
+                              alt={featuredPost.title}
+                              className="object-cover w-full h-full"
+                            />
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="col-span-6">
+                          <div className="aspect-[4/3] bg-gray-100 rounded-sm" />
+                        </div>
+                      )}
                     </div>
                   </div>
+                </Link>
+              </div>
+            )}
+
+            {/* 우측 서브 뉴스 영역 */}
+            <div className="lg:col-span-4">
+              <h2 className="text-lg font-bold mb-4 pb-2 border-b border-black">최신 포스트</h2>
+              <div className="space-y-6">
+                {recentPosts?.data.slice(1, 3).map((post: PostForList) => (
+                  <Link key={post.public_id} href={`/posts/${post.slug}-${post.public_id}`}>
+                    <div className="group cursor-pointer pb-6 border-b border-black last:border-0">
+                      <div className="flex gap-4">
+                        <div className="flex-1">
+                          <h3 className="text-base font-bold group-hover:text-blue-600 line-clamp-2 mb-2">
+                            {post.title}
+                          </h3>
+                          <p className="text-sm text-gray-600 line-clamp-2 mb-1">
+                            {post.excerpt}
+                          </p>
+                          <span className="text-xs text-gray-500">{post.current_author_name}</span>
+                        </div>
+                        {post.thumbnail ? (
+                          <div className="w-20 h-20 flex-shrink-0 bg-gray-100 rounded-sm overflow-hidden">
+                            <img 
+                              src={post.thumbnail} 
+                              alt={post.title}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                        ) : (
+                          <div className="w-20 h-20 flex-shrink-0 bg-gray-100 rounded-sm" />
+                        )}
+                      </div>
+                    </div>
+                  </Link>
                 ))}
               </div>
             </div>
           </div>
 
-          {/* 기존 PostSection */}
-          <PostSection />
+          {/* 하단 뉴스 그리드 */}
+          <div>
+            <h2 className="text-lg font-bold mb-6 pb-2 border-b border-black">추천 포스트</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {recentPosts?.data.slice(4).map((post: PostForList, index) => (
+                <Link key={post.public_id} href={`/posts/${post.slug}-${post.public_id}`}>
+                  <div className="group cursor-pointer">
+                    {post.thumbnail ? (
+                      <div className="aspect-[16/10] bg-gray-100 rounded-sm overflow-hidden mb-3">
+                        <img 
+                          src={post.thumbnail} 
+                          alt={post.title}
+                          className="object-cover w-full h-full"
+                        />
+                      </div>
+                    ) : (
+                      <div className="aspect-[16/10] bg-gray-100 rounded-sm mb-3" />
+                    )}
+                    <h3 className="text-base font-bold group-hover:text-blue-600 line-clamp-2 mb-2">
+                      {post.title}
+                    </h3>
+                    <p className="text-sm text-gray-600 line-clamp-2 mb-1">
+                      {post.excerpt}
+                    </p>
+                    <span className="text-xs text-gray-500">{post.current_author_name}</span>
+                    {/* 마지막 아이템이 아닐 경우에만 우측 구분선 추가 */}
+                    {index !== recentPosts.data.slice(4).length - 1 && (
+                      <div className="hidden md:block absolute top-0 right-0 h-full border-r border-black" />
+                    )}
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
         </div>
       </Container>
     </div>
