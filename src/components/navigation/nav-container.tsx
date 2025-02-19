@@ -104,21 +104,21 @@ export function NavContainer({
     // <nav className={`fixed w-full bg-white shadow-md z-10 transition-transform duration-200 ${
     //   isScrollingDown ? '-translate-y-full' : 'translate-y-0'
     // }`}>
-    <nav style={{backgroundColor: colors.primary.main}} className={`fixed w-full bg-[${colors.primary.main}] border-b-[1px] border-gray-300 z-10 transition-transform duration-200 ${
+    <nav style={{backgroundColor: colors.primary.main}} className={`fixed w-full bg-[${colors.primary.main}] border-b-[1px] border-black z-10 transition-transform duration-200 ${
       isScrollingDown ? '-translate-y-full' : 'translate-y-0'
     }`}>
-      <Container>
+      <Container className="">
         <div className="flex justify-between h-16 items-center">
           {/* 로고 */}
           <div className="flex items-center">
-            <Link href="/" className="text-xl text-gray-500">차호준의 블로그</Link>
+            <Link href="/" className="text-xl text-black">차호준의 블로그</Link>
           </div>
 
           {/* 데스크탑 메뉴 */}
-          <div className="hidden lg:flex lg:items-center lg:space-x-8">
+          <div className="hidden lg:flex lg:items-center lg:space-x-6">
            {NavMenuContent.map((item) => {
              return (
-              <Link href={item.path} key={item.id} className="text-gray-500 hover:text-blue-500">
+              <Link href={item.path} key={item.id} className="text-sm text-black hover:text-blue-500">
                 {item.label}
               </Link>
              )

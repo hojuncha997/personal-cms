@@ -79,7 +79,7 @@ export function NavProfile() {
 
     // 프로필 메뉴 컨텐츠 컴포넌트
     const ProfileMenuContent = ({ inDrawer = false }) => (
-        <div className={`min-h-[12rem] text-gray-700 text-sm ${!inDrawer && 'w-[14rem]'}`}>
+        <div className={`min-h-[12rem] text-black text-sm ${!inDrawer && 'w-[14rem]'}`}>
             {/* 프로필 정보 섹션 */}
             <div className="px-3 py-3 hover:bg-gray-100 hover:text-blue-500 rounded-t-xl">
                 {profileMenuItems

@@ -5,8 +5,8 @@ export const colors = {
       // main: '#c3e0e5', // light baby blue
       // main: '#b1d8b7',
       main: '#ffffff',
-      light: '#ffe3d4',
-      dark: '#c9a08e'
+      light: '#ffffff',
+      dark: '#000000'
     },
     background: {
       default: '#ffffff',

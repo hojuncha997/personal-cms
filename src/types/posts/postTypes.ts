@@ -59,6 +59,7 @@ export interface PostDetail {
         curationOrder: number;
         curationType: string[];
     };
+    excerpt?: string;
 }
 
 // 포스팅 목록 페이지를 위한 개별 포스팅 타입
