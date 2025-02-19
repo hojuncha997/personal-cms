@@ -15,6 +15,8 @@ import { PostNavigation } from '@/components/posts/PostNavigation';
 import { RelatedPosts } from '@/components/posts/RelatedPosts';
 import { useGetRelatedPosts } from '@/hooks/posts/useGetRelatedPosts';
 import { useGetPostNavigation } from '@/hooks/posts/useGetPostNavigation';
+import { CommonPopover } from '@/components/common/common-popover';
+import { MoreVertical } from 'lucide-react';
 
 interface PostDetailClientProps {
     publicId: string;
@@ -31,6 +33,7 @@ const PostDetailClient: React.FC<PostDetailClientProps> = ({ publicId, prefetch 
     useEffect(() => {
         if (post) {
             const timer = setTimeout(() => setShowRelated(true), 100);
+            alert(post.isAuthor)
             return () => clearTimeout(timer);
         }
     }, [post]);
@@ -53,15 +56,50 @@ const PostDetailClient: React.FC<PostDetailClientProps> = ({ publicId, prefetch 
                             <div className="p-0 sm:p-6">
                                 {/* 헤더 */}
                                 <div className="border-b border-gray-300 pb-4">
-                                    <div className="flex items-center gap-2 mb-2">
-                                        <h1 className="text-2xl font-bold">{post.title}</h1>
+                                    <div className="mb-2">
+                                        <span className="px-2 py-1 bg-gray-100 text-xs rounded-md">{post.category}</span>
                                     </div>
-                                    <div className="flex gap-4 text-sm text-gray-600">
-                                        <span className="px-2 py-1 bg-gray-100 text-sm rounded-md">{post.category}</span>
-                                        <span>작성자: {post.author_display_name.includes('@') ? post.author_display_name.split('@')[0] : post.author_display_name}</span>
-                                        <span>조회수: {post.viewCount}</span>
-                                        <span>작성일: {format(new Date(post.createdAt), 'yyyy-MM-dd')}</span>
-                                        <span>작성자 여부: {post.isAuthor===true ? '작성자' : '비작성자'}</span>
+                                    <h1 className="text-xl sm:text-2xl font-bold mb-2">{post.title}</h1>
+                                    <div className="flex justify-between items-center">
+                                        <div className="flex flex-wrap gap-2 sm:gap-4 text-xs sm:text-sm text-gray-600">
+                                            <span>작성자: {post.author_display_name.includes('@') ? post.author_display_name.split('@')[0] : post.author_display_name}</span>
+                                            <span>조회수: {post.viewCount}</span>
+                                            <span>작성일: {format(new Date(post.createdAt), 'yyyy-MM-dd')}</span>
+                                        </div>
+                                        {post.isAuthor && (
+                                            <CommonPopover
+                                                trigger={
+                                                    <button className="p-1 hover:bg-gray-100 rounded-full">
+                                                        <MoreVertical className="w-5 h-5 text-gray-500" />
+                                                    </button>
+                                                }
+                                                placement="bottom"
+                                                className="w-32"
+                                                offset={4}
+                                                placementOffset="0"
+                                            >
+                                                <div className="py-1 text-black">
+                                                    <button 
+                                                        className="w-full px-4 py-2 text-xs text-left hover:bg-gray-50"
+                                                        onClick={() => {/* 수정 로직 */}}
+                                                    >
+                                                        수정하기
+                                                    </button>
+                                                    <button 
+                                                        className="w-full px-4 py-2 text-xs text-left hover:bg-gray-50"
+                                                        onClick={() => {/* 비공개 로직 */}}
+                                                    >
+                                                        비공개로 전환
+                                                    </button>
+                                                    <button 
+                                                        className="w-full px-4 py-2 text-xs text-left text-red-500 hover:bg-red-50"
+                                                        onClick={() => {/* 삭제 로직 */}}
+                                                    >
+                                                        삭제하기
+                                                    </button>
+                                                </div>
+                                            </CommonPopover>
+                                        )}
                                     </div>
                                 </div>
 
