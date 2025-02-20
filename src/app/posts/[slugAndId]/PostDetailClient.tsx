@@ -17,6 +17,8 @@ import { useGetRelatedPosts } from '@/hooks/posts/useGetRelatedPosts';
 import { useGetPostNavigation } from '@/hooks/posts/useGetPostNavigation';
 import { CommonPopover } from '@/components/common/common-popover';
 import { MoreVertical } from 'lucide-react';
+import { useDeletePost } from '@/hooks/posts/useDeletePost';
+import { useRouter } from 'next/navigation';
 
 interface PostDetailClientProps {
     publicId: string;
@@ -29,6 +31,9 @@ const PostDetailClient: React.FC<PostDetailClientProps> = ({ publicId, prefetch 
     const { data: navigationPosts, isLoading: navigationLoading } = useGetPostNavigation(publicId);
     const [isLiked, setIsLiked] = useState(false);
     const [showRelated, setShowRelated] = useState(false);
+    // const deletePost = useDeletePost();
+    const { mutate: deletePost, mutateAsync: deletePostAsync, isPending, isError } = useDeletePost();
+    const router = useRouter();
 
     useEffect(() => {
         if (post) {
@@ -37,6 +42,37 @@ const PostDetailClient: React.FC<PostDetailClientProps> = ({ publicId, prefetch 
             return () => clearTimeout(timer);
         }
     }, [post]);
+
+    const handleDeletePost = async () => {
+        if (window.confirm('정말로 이 게시글을 삭제하시겠습니까?')) {
+            try {
+                // await deletePost.mutateAsync(publicId);
+                // deletePost.isPending
+                // await deletePostAsync(publicId); 프로미스를 반환함. 성공하면 then 또는 await 이후 다음 코드로 진행.
+                // router.push('/posts');  // 삭제 성공 후 목록 페이지로 이동
+                // 실패하면 catch로 이동. 따라서 이걸로도 괜찮지만, 아래처럼 명시적으로 써주는 게 좋음. 더욱 안전하고 명확함
+
+                // const result = await deletePostAsync(publicId);
+                // 서버 응답 구조에 따라 결과 형식이 다를 수 있음. 예를 들어 다음과 같은 형식이 가능함.
+                // { success: true }
+                // { success: false, error: '게시글 삭제에 실패했습니다.' }
+
+                // if(result.success) {
+                //     router.push('/posts');  // 삭제 성공 후 목록 페이지로 이동
+                 // } else {
+                //     alert('게시글 삭제에 실패했습니다.');
+                // }
+                // 우선은 간편한 방법을 써서 삭제 후 목록 페이지로 이동. 추후 서버 응답 구조에 따라 수정 필요.
+                const result = await deletePostAsync(publicId);
+                console.log(result);
+                router.push('/posts');
+               
+            } catch (error) {
+                console.error('게시글 삭제 실패:', error);
+                alert('게시글 삭제에 실패했습니다.');
+            }
+        }
+    };
 
     if (postLoading) {
         return <PostDetailSkeleton />;
@@ -93,7 +129,7 @@ const PostDetailClient: React.FC<PostDetailClientProps> = ({ publicId, prefetch 
                                                     </button>
                                                     <button 
                                                         className="w-full px-4 py-2 text-xs text-left text-red-500 hover:bg-red-50"
-                                                        onClick={() => {/* 삭제 로직 */}}
+                                                        onClick={handleDeletePost}
                                                     >
                                                         삭제하기
                                                     </button>

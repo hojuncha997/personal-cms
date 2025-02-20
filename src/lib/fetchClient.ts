@@ -152,3 +152,15 @@ export async function fetchClient(url: string, options: FetchOptions = {skipAuth
   // return response.json();  // response를 JSON으로 파싱하여 반환
   return response;  // response.json() 대신 Response 객체 반환: 개별 엔드포인트에서 변환하여 사용
 }
+
+
+/*
+// 이렇게 사용하면 훅에서 호출할 때 편리함: 추후 고려해볼 필요 있음
+export const fetchClient = {
+    get: (url: string, options?: FetchOptions) => fetchClient(url, options),
+    post: (url: string, options?: FetchOptions) => fetchClient(url, options),
+    put: (url: string, options?: FetchOptions) => fetchClient(url, options),
+    patch: (url: string, options?: FetchOptions) => fetchClient(url, options),
+    delete: (url: string, options?: FetchOptions) => fetchClient(url, options),
+};
+*/
