@@ -117,7 +117,7 @@ const PostDetailClient: React.FC<PostDetailClientProps> = ({ publicId, prefetch 
                                                 <div className="py-1 text-black">
                                                     <button 
                                                         className="w-full px-4 py-2 text-xs text-left hover:bg-gray-50"
-                                                        onClick={() => {/* 수정 로직 */}}
+                                                        onClick={() => router.push(`/posts/${post.slug}-${publicId}/edit`)}
                                                     >
                                                         수정하기
                                                     </button>
