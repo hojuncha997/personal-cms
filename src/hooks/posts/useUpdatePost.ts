@@ -8,6 +8,8 @@ interface UpdatePostData {
     title: string;
     content: JSONContent;
     category: string;
+    tags?: string[];
+    thumbnail?: string;
 }
 
 export const useUpdatePost = () => {
