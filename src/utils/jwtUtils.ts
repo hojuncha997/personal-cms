@@ -14,7 +14,7 @@ export class TokenError extends Error {
  // 토큰 관련 상수 정의
  export const TOKEN_CONSTANTS = {
   EXPIRY_THRESHOLD: 60 * 1000, // 만료 1분 전 경고를 위한 임계값
-  REQUIRED_CLAIMS: ['sub', 'email', 'role', 'exp'] as const, // 필수 클레임 목록
+  REQUIRED_CLAIMS: ['sub', 'email', 'role', 'nickname', 'exp'] as const, // 필수 클레임 목록
   ALLOWED_ROLES: ['USER', 'ADMIN'] as const // 허용된 역할 목록
  } as const;
  
@@ -23,6 +23,7 @@ export class TokenError extends Error {
   email: string;
   sub: string;
   role: string;
+  nickname: string;
   preferences: {
     theme: string;
     language: string;
@@ -59,9 +60,20 @@ export class TokenError extends Error {
         ).join('')
       )
     );
+
+    console.log('=== Token Payload Debug ===');
+    console.log('Raw token:', token);
+    console.log('Decoded payload:', decodedPayload);
+    console.log('Required fields check:');
+    console.log('- exp:', decodedPayload.exp);
+    console.log('- sub:', decodedPayload.sub);
+    console.log('- email:', decodedPayload.email);
+    console.log('- nickname:', decodedPayload.nickname);
+    console.log('- role:', decodedPayload.role);
+    console.log('========================');
  
     // 필수 클레임 존재 여부 검증
-    if (!decodedPayload.exp || !decodedPayload.sub || !decodedPayload.email) {
+    if (!decodedPayload.exp || !decodedPayload.sub || !decodedPayload.email || !decodedPayload.nickname) {
       throw new TokenError('Missing required token claims', 'INVALID_PAYLOAD');
     }
  
@@ -82,17 +94,27 @@ export class TokenError extends Error {
  * @throws Error 페이로드 구조가 유효하지 않을 경우
  */
  function validateTokenPayload(payload: any): asserts payload is DecodedToken {
+  // 필수 필드만 엄격하게 체크
   if (
     typeof payload.email !== 'string' ||
     typeof payload.sub !== 'string' ||
     typeof payload.role !== 'string' ||
-    typeof payload.exp !== 'number' ||
-    !payload.preferences ||
-    typeof payload.preferences.theme !== 'string' ||
-    typeof payload.preferences.language !== 'string' ||
-    typeof payload.preferences.timezone !== 'string'
+    typeof payload.nickname !== 'string' ||
+    typeof payload.exp !== 'number'
   ) {
     throw new TokenError('Invalid token payload structure', 'INVALID_PAYLOAD');
+  }
+
+  // preferences는 선택적으로 체크
+  if (payload.preferences) {
+    if (
+      typeof payload.preferences !== 'object' ||
+      (payload.preferences.theme && typeof payload.preferences.theme !== 'string') ||
+      (payload.preferences.language && typeof payload.preferences.language !== 'string') ||
+      (payload.preferences.timezone && typeof payload.preferences.timezone !== 'string')
+    ) {
+      throw new TokenError('Invalid preferences structure', 'INVALID_PAYLOAD');
+    }
   }
  }
  

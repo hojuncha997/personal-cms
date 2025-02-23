@@ -17,6 +17,7 @@ export function NavProfile() {
     
     const email = useAuthStore(state => state.email)
     const role = useAuthStore(state => state.role)
+    const nickname = useAuthStore(state => state.nickname)
     const {isMobile, isTablet} = useWindowSize()
     const router = useRouter()
     const roleType: { [key: string]: string } = {
@@ -49,7 +50,7 @@ export function NavProfile() {
             id: 'profile',
             section: 'info',
             label: email,
-            subLabel: role ? roleType[role] : '게스트',
+            subLabel: nickname ? nickname : '게스트',
             onClick: () => {
                 router.push('/mypage')
             },
@@ -86,12 +87,12 @@ export function NavProfile() {
                     .filter(item => item.section === 'info')
                     .map(item => (
                         <div key={item.id} className="pb-1 cursor-pointer p-1" onClick={item.onClick}>
-                            <span className="">{item.label}</span>
-                            {/* {item.subLabel && (
+                            <span className="font-bold">{item.label}</span>
+                            {item.subLabel && (
                                 <div className="pb-1">
                                     <span>{item.subLabel}</span>
                                 </div>
-                            )} */}
+                            )}
                         </div>
                     ))}
             </div>

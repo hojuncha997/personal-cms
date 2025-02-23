@@ -5,9 +5,12 @@ import { useAuthStore } from '@/store/useAuthStore';
 import { useProfileStore } from '@/store/useProfileStore';
 import { colors } from '@/constants/styles';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import { User } from 'lucide-react';
 
 export default function MyPage() {
-  const { isAuthenticated, email, role } = useAuthStore();
+  const { isAuthenticated, email, nickname } = useAuthStore();
+  const router = useRouter();
   const { 
     profile, 
     isLoading, 
@@ -17,10 +20,18 @@ export default function MyPage() {
     updateProfile 
   } = useProfileStore();
 
+
+
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
         <p className="text-lg font-medium text-gray-600">로그인이 필요한 페이지입니다.</p>
+        <button
+          onClick={() => router.push('/')}
+          className="mt-4 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+        >
+          홈으로 이동
+        </button>
       </div>
     );
   }
@@ -55,13 +66,19 @@ export default function MyPage() {
                   {/* 프로필 이미지 */}
                   <div className="flex flex-col items-center">
                     <div className="w-40 h-40 rounded-full overflow-hidden border-4 border-gray-100 shadow-md">
-                      <Image
-                        src={profile?.avatarUrl || '/images/default-avatar.png'}
-                        alt="프로필 이미지"
-                        width={160}
-                        height={160}
-                        className="w-full h-full object-cover"
-                      />
+                      {profile?.avatarUrl ? (
+                        <Image
+                          src={profile.avatarUrl}
+                          alt="프로필 이미지"
+                          width={160}
+                          height={160}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-gray-100">
+                          <User className="w-20 h-20 text-gray-400" />
+                        </div>
+                      )}
                     </div>
                     {isEditMode && (
                       <button className="mt-4 px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
@@ -79,27 +96,23 @@ export default function MyPage() {
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">권한</label>
-                        <p className="text-gray-900">{role}</p>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">닉네임</label>
+                        {isEditMode ? (
+                          <input
+                            type="text"
+                            value={profile?.nickname || ''}
+                            onChange={(e) => updateProfile({ nickname: e.target.value })}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                          />
+                        ) : (
+                          // <p className="text-gray-900">{profile?.nickname}</p>
+                          <p className="text-gray-900">{nickname}</p>
+                        )}
                       </div>
                     </div>
 
                     {profile && (
                       <>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">닉네임</label>
-                          {isEditMode ? (
-                            <input
-                              type="text"
-                              value={profile.nickname}
-                              onChange={(e) => updateProfile({ nickname: e.target.value })}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                            />
-                          ) : (
-                            <p className="text-gray-900">{profile.nickname}</p>
-                          )}
-                        </div>
-
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1">자기소개</label>
                           {isEditMode ? (

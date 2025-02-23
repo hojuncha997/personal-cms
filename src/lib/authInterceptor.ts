@@ -125,6 +125,7 @@ export function setAuthToken(token: string | null) {
     useAuthStore.getState().updateAuthState({
       accessToken: token,
       tokenExpiry: payload.exp * 1000,
+      nickname: payload.nickname || null, // nickname이 없을 경우 null 처리
       role: payload.role,
       email: payload.email,
       sub: payload.sub,
@@ -138,3 +139,12 @@ export function setAuthToken(token: string | null) {
     throw new TokenError('유효하지 않은 토큰 형식입니다.');
   }
 } 
+
+// 다른 탭의 로그아웃 이벤트 감지
+// window.addEventListener('storage', (event) => {
+//   if (event.key === 'logout-event') {
+//     setAuthToken(null);
+//     useAuthStore.getState().resetLoginForm();
+//     // 필요한 경우 로그인 페이지로 리다이렉트
+//   }
+// }); 

@@ -19,6 +19,7 @@ interface AuthStore {
   role: string | null;
   email: string | null;
   sub: string | null;
+  nickname: string | null;
   isAuthenticated: boolean;
 
   // 로그인 폼 상태 추가
@@ -29,6 +30,7 @@ interface AuthStore {
     accessToken: string | null;
     tokenExpiry: number | null;
     role: string | null;
+    nickname: string | null;
     email: string | null;
     sub: string | null;
     isAuthenticated: boolean;
@@ -49,6 +51,7 @@ const initialState = {
   role: null,
   email: null,
   sub: null,
+  nickname: null,
   isAuthenticated: false,
 
   // 로그인 폼 초기 상태
