@@ -1,14 +1,15 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
-import Providers from '@/providers'
-import ClientLayout from '@/components/layouts/ClientLayout'
 import '../styles/editor.css'
+import ClientRootLayout from '@/components/layouts/ClientRootLayout';
+
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
   variable: "--font-geist-sans",
   weight: "100 900",
 });
+
 const geistMono = localFont({
   src: "./fonts/GeistMonoVF.woff",
   variable: "--font-geist-mono",
@@ -26,24 +27,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    /*
-    scrollbar-gutter-stable :
-    스크롤이 필요할 때만 스크롤바가 출현
-    다만, 스크롤바가 나타날 수 있는 공간을 미리 확보해
-    이를 통해 스크롤바가 갑자기 나타날 때 레이아웃이 밀리는 현상을 방지
-    */
-    // scrollbar-gutter-stable: 스크롤바 유무에 따른 레이아웃 변화 방지
-    // scrollBehavior: 스크롤 위치 이동 방식
-    // auto: 자동으로 스크롤 위치 즉시 이동, smooth: 스크롤 위치 부드럽게 이동
     <html lang="en" className="scrollbar-gutter-stable" style={{ scrollBehavior:'auto' }}> 
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        <Providers>
-          <ClientLayout>
-            {children}
-          </ClientLayout>
-        </Providers>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        <ClientRootLayout>
+          {children}
+        </ClientRootLayout>
       </body>
     </html>
   );

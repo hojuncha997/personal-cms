@@ -3,6 +3,7 @@ import { useMutation } from "@tanstack/react-query";
 import { fetchClient } from '@/lib/fetchClient';
 import { setAuthToken } from '@/lib/authInterceptor';
 import { useAuthStore } from '@/store/useAuthStore';
+import { CrossTabAuth } from '@/lib/auth/crossTabAuth';
 
 interface LogoutOptions {
   onSuccess?: () => void;
@@ -17,9 +18,8 @@ export const useLogout = (options: LogoutOptions = {}) => {
 
   return useMutation({
     mutationFn: async () => {
-      resetLoginForm(); // 로그인 폼 상태 초기화
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
+      resetLoginForm();
+      // 백엔드 로그아웃 API 호출
       const response = await fetchClient('/auth/logout', {
         method: 'POST',
         credentials: 'include',
@@ -29,12 +29,14 @@ export const useLogout = (options: LogoutOptions = {}) => {
         const error = await response.json();
         throw new Error(error.message ?? '로그아웃 실패');
       }
-
-      setAuthToken(null);
-      setLoading(false);
       return true;
     },
     onSuccess: () => {
+      // API 호출 성공 후에만 크로스 탭 로그아웃 처리
+      setAuthToken(null);
+      setLoading(false);
+      CrossTabAuth.logout(); // 모든 탭에 로그아웃 이벤트 전파
+
       if (showAlert) {
         alert('로그아웃이 완료되었습니다.');
       }
