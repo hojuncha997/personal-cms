@@ -7,6 +7,7 @@ import useSocialSignUp from '@/hooks/auth/useSocialSignup';
 import { SOCIAL_CONFIG } from '@/constants/auth/social-config';
 import Link from 'next/link';
 import { colors } from '@/constants/styles';
+import useGetPasswordResetToken from '@/hooks/auth/useGetPasswordResetToken';
 
 interface LoginModalProps {
   isOpen: boolean
@@ -28,6 +29,9 @@ export default function LoginModal({
 }: LoginModalProps) {
   const { mutateAsync: login, isPending } = useLogin()
   const { mutateAsync: logoutMutation } = useLogout();
+  const { getPasswordResetToken, isPending: isPasswordResetPending } = useGetPasswordResetToken();
+  const [email, setEmail] = useState("");
+  const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
 
   // 스토어에서 상태와 액션 가져오기
   const loginForm = useAuthStore(state => state.loginForm);
@@ -63,12 +67,6 @@ export default function LoginModal({
     e.preventDefault()
     // ID 찾기 로직 구현
     console.log('Find ID')
-  }
-
-  const handleFindPassword = async (e: React.FormEvent) => {
-    e.preventDefault()
-    // 비밀번호 찾기 로직 구현
-    console.log('Find Password')
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -254,32 +252,82 @@ export default function LoginModal({
     </form>
   )
 
-  const renderFindPasswordView = () => (
-    <form onSubmit={handleFindPassword} className="space-y-4">
-      <p className="text-sm text-gray-600 mb-4">
-        가입한 아이디(이메일)를 입력하시면 비밀번호 재설정 링크를 보내드립니다.
-      </p>
-      <input
-        type="email"
-        placeholder="이메일"
-        className="w-full px-4 py-3 text-gray-700 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-        required
-      />
-      <button
-        type="submit"
-        className="w-full py-3 px-4 bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white rounded-lg transition-all duration-200 font-medium"
-      >
-        비밀번호 재설정 링크 받기
-      </button>
-      <button
-        type="button"
-        onClick={() => updateLoginForm({ view: 'login' })}
-        className="w-full text-sm text-gray-600 hover:text-gray-800 transition-colors duration-200"
-      >
-        로그인으로 돌아가기
-      </button>
-    </form>
-  )
+  const renderFindPasswordView = () => {
+    const handleFindPassword = async (e: React.FormEvent) => {
+      e.preventDefault();
+      setMessage(null);
+      
+      try {
+        await getPasswordResetToken(
+          { email },
+          {
+            onSuccess: (data) => {
+              setMessage({ type: 'success', text: data.message });
+            },
+            onError: (error) => {
+              setMessage({ type: 'error', text: error.message });
+            }
+          }
+        );
+      } catch (error) {
+        setMessage({ type: 'error', text: '비밀번호 재설정 요청 중 오류가 발생했습니다.' });
+      }
+    };
+
+    return (
+      <form onSubmit={handleFindPassword} className="space-y-4">
+        <p className="text-sm text-gray-600 mb-4">
+          가입한 아이디(이메일)를 입력하시면 비밀번호 재설정 링크를 보내드립니다.
+        </p>
+        
+        {message && (
+          <div className={`flex items-center p-3 ${
+            message.type === 'success' ? 'bg-green-50 text-green-600 border-green-200' : 'bg-red-50 text-red-600 border-red-200'
+          } border text-sm rounded`}>
+            <AlertCircle className="w-4 h-4 mr-2" />
+            {message.text}
+          </div>
+        )}
+
+        <input
+          type="email"
+          placeholder="이메일"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          className="w-full px-4 py-3 text-gray-700 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+          required
+        />
+        <button
+          type="submit"
+          disabled={isPasswordResetPending}
+          className={`w-full py-3 px-4 rounded-lg transition-all duration-200 ${
+            isPasswordResetPending
+              ? 'bg-blue-300 cursor-not-allowed'
+              : 'bg-blue-500 hover:bg-blue-600 active:bg-blue-700'
+          } text-white font-medium`}
+        >
+          {isPasswordResetPending ? (
+            <span className="flex items-center justify-center">
+              <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              처리 중...
+            </span>
+          ) : (
+            '비밀번호 재설정 링크 받기'
+          )}
+        </button>
+        <button
+          type="button"
+          onClick={() => updateLoginForm({ view: 'login' })}
+          className="w-full text-sm text-gray-600 hover:text-gray-800 transition-colors duration-200"
+        >
+          로그인으로 돌아가기
+        </button>
+      </form>
+    );
+  };
 
 
   return (

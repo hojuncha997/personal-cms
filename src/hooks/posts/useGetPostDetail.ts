@@ -22,8 +22,8 @@ export const useGetPostDetail = (public_id: string, options?: {enabled?: boolean
         // ??: 왼쪽 값이 null 또는 undefined일 경우 오른쪽 값을 반환. 그 외(false, 0, 빈 문자열 등)일 경우 왼쪽 값을 반환
         enabled: options?.enabled ?? !!public_id, // enabled 옵션을 받아서 처리. enabled는 queryFn함수의 작동을 관장한다. 리액트 쿼리를 작동시키는 스위치와 같은 옵션
 
-        staleTime: 1000 * 60 * 30, // 30분 동안 데이터를 "신선한" 상태로 유지(30분 동안은 서버에 재요청하지 않고 캐시된 데이터를 사용)
-        gcTime: 1000 * 60 * 24,    // cacheTime 대신 gcTime 사용(컴포넌트가 언마운트되더라도 24시간 동안은 캐시를 유지)
+        // staleTime: 1000 * 60 * 30, // 30분 동안 데이터를 "신선한" 상태로 유지(30분 동안은 서버에 재요청하지 않고 캐시된 데이터를 사용)
+        // gcTime: 1000 * 60 * 24,    // cacheTime 대신 gcTime 사용(컴포넌트가 언마운트되더라도 24시간 동안은 캐시를 유지)
         retry: 1, // 에러 발생 시 1번 재요청
         retryDelay: 1000 * 10, // 재요청 간격 10초
         refetchOnWindowFocus: false, // 창 포커스 변경 시 재요청 안함(캐시 사용)

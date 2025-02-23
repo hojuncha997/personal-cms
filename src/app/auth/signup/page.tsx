@@ -13,6 +13,8 @@ import { fetchClient } from '@/lib/fetchClient';
 import { useWindowSize } from '@/hooks/layout';
 import { SocialProvider } from '@/types/authTypes';
 import useSocialSignUp from '@/hooks/auth/useSocialSignup';
+import { validatePassword } from '@/constants/auth/password-policy';
+
 export default function SignUpPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
@@ -72,10 +74,9 @@ export default function SignUpPage() {
     }
 
     // 비밀번호 검증
-    if (!formData.password) {
-      validationErrors.password = '비밀번호를 입력해주세요.';
-    } else if (formData.password.length < 8) {
-      validationErrors.password = '비밀번호는 8자 이상이어야 합니다.';
+    const passwordError = validatePassword(formData.password);
+    if (passwordError) {
+      validationErrors.password = passwordError;
     }
 
     // 비밀번호 확인 검증
