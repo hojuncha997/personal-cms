@@ -51,13 +51,11 @@ const VerifyEmailContent = () => {
         return;
       }
 
-      if (data.verified && data.status === 'active') {
-        setVerificationStatus('success');
-        setMessage("이메일 인증이 완료되었습니다.");
-        setTimeout(() => {
-          router.push('/');
-        }, 3000);
-      }
+      setVerificationStatus('success');
+      setMessage(data.message || "이메일 인증이 완료되었습니다.");
+      setTimeout(() => {
+        router.push('/');
+      }, 3000);
       
     } catch (error) {
       const apiError = error as ApiError;
@@ -94,13 +92,14 @@ const VerifyEmailContent = () => {
         <Container>
           <div className='flex flex-col items-center justify-center h-screen'>
             <h1 className='text-2xl font-bold text-gray-700'>이메일 인증</h1>
-            <p className='text-sm text-gray-500'>
+            <div className='text-sm text-gray-500'>
               {message}
-              {verificationStatus !== 'loading' 
-              && <p className='text-sm text-gray-500'>
-                3초 뒤 메인 페이지로 이동합니다.
-              </p>}
-            </p>
+              {verificationStatus !== 'loading' && (
+                <span className='block text-sm text-gray-500'>
+                  3초 뒤 메인 페이지로 이동합니다.
+                </span>
+              )}
+            </div>
           </div>
         </Container>
       </div>

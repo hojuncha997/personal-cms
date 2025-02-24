@@ -1,12 +1,14 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useProfileStore } from '@/store/useProfileStore';
 import { colors } from '@/constants/styles';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { User } from 'lucide-react';
+import { useWithdraw } from '@/hooks/auth/useWithdraw';
+import { WithdrawalReason, WithdrawalReasonLabel } from '@/types/member';
 
 export default function MyPage() {
   const { isAuthenticated, email, nickname } = useAuthStore();
@@ -19,8 +21,29 @@ export default function MyPage() {
     toggleEditMode,
     updateProfile 
   } = useProfileStore();
+  const [isWithdrawModalOpen, setIsWithdrawModalOpen] = useState(false);
+  const [withdrawReason, setWithdrawReason] = useState('');
+  const [withdrawDetail, setWithdrawDetail] = useState('');
+  
+  const { mutate: withdraw, isPending } = useWithdraw();
 
+  const handleWithdraw = () => {
+    if (!withdrawReason) {
+      alert('탈퇴 사유를 선택해주세요.');
+      return;
+    }
 
+    if (confirm('정말로 탈퇴하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) {
+      withdraw(
+        { reason: withdrawReason, detail: withdrawDetail },
+        {
+          onError: (error) => {
+            alert(error.message || '회원 탈퇴 중 오류가 발생했습니다.');
+          }
+        }
+      );
+    }
+  };
 
   if (!isAuthenticated) {
     return (
@@ -174,6 +197,73 @@ export default function MyPage() {
             </section>
           </div>
         )}
+
+        <div className="mt-8">
+          <button
+            onClick={() => setIsWithdrawModalOpen(true)}
+            className="px-4 py-2 text-red-600 border border-red-600 rounded-lg hover:bg-red-50 transition-colors"
+          >
+            회원 탈퇴
+          </button>
+
+          {isWithdrawModalOpen && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+              <div className="bg-white rounded-lg w-full max-w-md p-6 space-y-4">
+                <div className="space-y-2">
+                  <h3 className="text-lg font-medium text-black">회원 탈퇴</h3>
+                  <p className="text-sm text-red-600">
+                    회원 탈퇴 시 모든 개인정보가 삭제되며, 이 작업은 되돌릴 수 없습니다.
+                  </p>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <label className="block text-sm font-medium text-black">탈퇴 사유 *</label>
+                    <select
+                      value={withdrawReason}
+                      onChange={(e) => setWithdrawReason(e.target.value)}
+                      className="text-gray-500 w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    >
+                      <option value="">선택해주세요</option>
+                      {Object.entries(WithdrawalReasonLabel).map(([key, label]) => (
+                        <option key={key} value={key}>
+                          {label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="block text-sm font-medium text-black">상세 사유 (선택사항)</label>
+                    <textarea
+                      value={withdrawDetail}
+                      onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setWithdrawDetail(e.target.value)}
+                      placeholder="상세 사유를 입력해주세요"
+                      rows={3}
+                      className="text-black w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex justify-end space-x-3 pt-4">
+                  <button
+                    onClick={() => setIsWithdrawModalOpen(false)}
+                    className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                  >
+                    취소
+                  </button>
+                  <button
+                    onClick={handleWithdraw}
+                    disabled={isPending}
+                    className="px-4 py-2 text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50"
+                  >
+                    {isPending ? '처리중...' : '탈퇴하기'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
