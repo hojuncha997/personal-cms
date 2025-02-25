@@ -9,6 +9,7 @@ import { useRouter } from 'next/navigation';
 import { User } from 'lucide-react';
 import { useWithdraw } from '@/hooks/auth/useWithdraw';
 import { WithdrawalReason, WithdrawalReasonLabel } from '@/types/member';
+import { useUpdatePassword } from '@/hooks/auth/useUpdatePassword';
 
 export default function MyPage() {
   const { isAuthenticated, email, nickname } = useAuthStore();
@@ -27,6 +28,25 @@ export default function MyPage() {
   
   const { mutate: withdraw, isPending } = useWithdraw();
 
+  const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
+  const [passwordForm, setPasswordForm] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: ''
+  });
+  
+  const { mutate: updatePassword, isPending: isUpdatingPassword } = useUpdatePassword();
+
+  // 디버깅을 위한 useEffect 추가
+  useEffect(() => {
+    console.log('Profile Data:', {
+      isLoading,
+      error,
+      profile,
+      isAuthenticated
+    });
+  }, [isLoading, error, profile, isAuthenticated]);
+
   const handleWithdraw = () => {
     if (!withdrawReason) {
       alert('탈퇴 사유를 선택해주세요.');
@@ -43,6 +63,33 @@ export default function MyPage() {
         }
       );
     }
+  };
+
+  const handlePasswordUpdate = () => {
+    if (!passwordForm.currentPassword || !passwordForm.newPassword || !passwordForm.confirmPassword) {
+      alert('모든 필드를 입력해주세요.');
+      return;
+    }
+
+    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+      alert('새 비밀번호가 일치하지 않습니다.');
+      return;
+    }
+
+    updatePassword(passwordForm, {
+      onSuccess: () => {
+        alert('비밀번호가 성공적으로 변경되었습니다.');
+        setIsPasswordModalOpen(false);
+        setPasswordForm({
+          currentPassword: '',
+          newPassword: '',
+          confirmPassword: ''
+        });
+      },
+      onError: (error: any) => {
+        alert(error.message || '비밀번호 변경 중 오류가 발생했습니다.');
+      }
+    });
   };
 
   if (!isAuthenticated) {
@@ -160,39 +207,52 @@ export default function MyPage() {
             <section className="bg-white rounded-xl shadow-sm overflow-hidden">
               <div className="p-6 sm:p-8">
                 <h2 className="text-xl font-semibold text-gray-900 mb-6">설정</h2>
-                {profile && (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">테마</label>
-                      <select
-                        value={profile.preferences.theme}
-                        onChange={(e) => updateProfile({
-                          preferences: { ...profile.preferences, theme: e.target.value as 'light' | 'dark' }
-                        })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                        disabled={!isEditMode}
-                      >
-                        <option value="light">라이트</option>
-                        <option value="dark">다크</option>
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">언어</label>
-                      <select
-                        value={profile.preferences.language}
-                        onChange={(e) => updateProfile({
-                          preferences: { ...profile.preferences, language: e.target.value }
-                        })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                        disabled={!isEditMode}
-                      >
-                        <option value="ko">한국어</option>
-                        <option value="en">English</option>
-                      </select>
-                    </div>
+                <div className="space-y-6">
+                  {/* 비밀번호 변경 버튼은 profile 여부와 관계없이 표시 */}
+                  <div className="pt-4 border-t border-gray-200">
+                    <button
+                      onClick={() => setIsPasswordModalOpen(true)}
+                      className="px-4 py-2 text-green-600 border border-green-600 rounded-lg hover:bg-green-50 transition-colors"
+                    >
+                      비밀번호 변경
+                    </button>
                   </div>
-                )}
+
+                  {/* 테마와 언어 설정은 profile이 있을 때만 표시 */}
+                  {profile && (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">테마</label>
+                        <select
+                          value={profile.preferences.theme}
+                          onChange={(e) => updateProfile({
+                            preferences: { ...profile.preferences, theme: e.target.value as 'light' | 'dark' }
+                          })}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                          disabled={!isEditMode}
+                        >
+                          <option value="light">라이트</option>
+                          <option value="dark">다크</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">언어</label>
+                        <select
+                          value={profile.preferences.language}
+                          onChange={(e) => updateProfile({
+                            preferences: { ...profile.preferences, language: e.target.value }
+                          })}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                          disabled={!isEditMode}
+                        >
+                          <option value="ko">한국어</option>
+                          <option value="en">English</option>
+                        </select>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             </section>
           </div>
@@ -264,6 +324,78 @@ export default function MyPage() {
             </div>
           )}
         </div>
+
+        {/* 비밀번호 변경 모달 */}
+        {isPasswordModalOpen && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg w-full max-w-md p-6 space-y-4">
+              <h3 className="text-lg font-medium text-gray-900">비밀번호 변경</h3>
+              
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    현재 비밀번호
+                  </label>
+                  <input
+                    type="password"
+                    value={passwordForm.currentPassword}
+                    onChange={(e) => setPasswordForm({
+                      ...passwordForm,
+                      currentPassword: e.target.value
+                    })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    새 비밀번호
+                  </label>
+                  <input
+                    type="password"
+                    value={passwordForm.newPassword}
+                    onChange={(e) => setPasswordForm({
+                      ...passwordForm,
+                      newPassword: e.target.value
+                    })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    새 비밀번호 확인
+                  </label>
+                  <input
+                    type="password"
+                    value={passwordForm.confirmPassword}
+                    onChange={(e) => setPasswordForm({
+                      ...passwordForm,
+                      confirmPassword: e.target.value
+                    })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  />
+                </div>
+              </div>
+
+              <div className="flex justify-end space-x-3 pt-4">
+                <button
+                  onClick={() => setIsPasswordModalOpen(false)}
+                  className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                >
+                  취소
+                </button>
+                <button
+                  onClick={handlePasswordUpdate}
+                  disabled={isUpdatingPassword}
+                  className="px-4 py-2 text-white bg-green-600 rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50"
+                >
+                  {isUpdatingPassword ? '변경 중...' : '변경하기'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
