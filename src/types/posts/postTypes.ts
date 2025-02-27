@@ -1,9 +1,9 @@
 // 포스팅 타입
 
 //포스팅 작성 시 사용되는 타입
-export type PostData = {
+export interface PostData {
     title: string;
-    category: string;
+    categorySlug?: string;
     isSecret: boolean | false;
     // password: string;
     content: Record<string, any>;
@@ -36,7 +36,7 @@ export interface PostDetail {
     current_author_name: string;
     isSecret: boolean;
     isAuthor: boolean;
-    category: string;
+    categorySlug: string;
     slug: string;
     tags: string[];
     thumbnail: string | null;
@@ -69,7 +69,7 @@ export interface PostForList {
     excerpt: string | null;
     author_display_name: string;
     current_author_name: string;
-    category: string;
+    categorySlug: string;
     slug: string;
     tags: string[];
     thumbnail: string | null;
@@ -109,7 +109,7 @@ export interface PostQueryParams {
     page?: number;
     limit?: number;
     search?: string;
-    category?: string;
+    categorySlug?: string;
     status?: string;
     sortBy?: 'createdAt' | 'viewCount' | 'likeCount';
     order?: 'ASC' | 'DESC';

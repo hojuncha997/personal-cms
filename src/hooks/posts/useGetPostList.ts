@@ -19,7 +19,7 @@ export const useGetPostList = (params: PostQueryParams = {}) => {
                 page: String(params.page || 1),
                 limit: String(params.limit || 10),
                 ...(params.search && { search: params.search }),
-                ...(params.category && { categorySlug: params.category }),
+                ...(params.categorySlug && { categorySlug: params.categorySlug }),
                 ...(params.status && { status: params.status }),
                 ...(params.sortBy && { sortBy: params.sortBy }),
                 ...(params.order && { order: params.order }),

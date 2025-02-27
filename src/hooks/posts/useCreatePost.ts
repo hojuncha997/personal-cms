@@ -12,7 +12,7 @@ export function useCreatePost() {
     const { mutateAsync: createPost } = useMutation({
         mutationFn: (data: PostData) => fetchClient('/posts', { 
             method: 'POST', 
-            body: data  // 여기서는 stringify 하지 않음
+            body: data  // 원래대로 돌리고 category 매핑 제거
         }),
     });
     // return { createGuestbook };

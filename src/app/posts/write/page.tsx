@@ -12,13 +12,14 @@ import { colors } from '@/constants/styles';
 import { useCreatePost } from '@/hooks/posts/useCreatePost';
 import { PostData } from '@/types/posts/postTypes';
 import { supabase } from '@/lib/supabase';
+import { useGetPostCategories, type PostCategory } from '@/hooks/posts/useGetPostCategories';
 
 const formSchema = z.object({
   title: z.string()
     .min(1, { message: '제목은 필수 입력 항목입니다.' })
     .max(50, { message: '제목은 최대 50자까지 입력 가능합니다.' }),
   content: z.any(),
-  category: z.string().min(1, { message: '카테고리는 필수 입력 항목입니다.' }),
+  categorySlug: z.string().optional(),
   isSecret: z.boolean(),
   isFeatured: z.boolean(),
   status: z.enum(['draft', 'published']).default('published'),
@@ -31,7 +32,7 @@ type FormValues = z.infer<typeof formSchema>;
 
 export default function PostWrite() {
     const router = useRouter();
-    const categories = ['일반', '문의', '칭찬', '제안'];
+    const { data: categories, isLoading: isCategoriesLoading } = useGetPostCategories();
     const [tagInput, setTagInput] = React.useState('');
     const { createPost } = useCreatePost();
     const [selectedThumbnails, setSelectedThumbnails] = React.useState<string[]>([]);
@@ -45,7 +46,7 @@ export default function PostWrite() {
                 type: 'doc',
                 content: [{ type: 'paragraph' }]
             },
-            category: '일반',
+            categorySlug: '',
             isSecret: false,
             isFeatured: false,
             status: 'published',
@@ -199,6 +200,18 @@ export default function PostWrite() {
         setValue('tags', currentTags.filter(tag => tag !== tagToRemove));
     };
 
+    // 카테고리 옵션 렌더링 함수 추가
+    const renderCategoryOptions = (categories: PostCategory[] = [], depth = 0) => {
+        return categories.map(category => (
+            <React.Fragment key={category.slug}>
+                <option value={category.slug}>
+                    {'\u00A0'.repeat(depth * 2)}{category.name}
+                </option>
+                {category.children && renderCategoryOptions(category.children, depth + 1)}
+            </React.Fragment>
+        ));
+    };
+
     return (
         <div className="bg-gray-100 text-black" style={{ backgroundColor: colors.primary.main }}>
         <Container>
@@ -213,15 +226,15 @@ export default function PostWrite() {
                         <div className="w-1/4">
                             <label className="block text-sm font-medium mb-2">카테고리</label>
                             <select
-                                {...register('category')}
+                                {...register('categorySlug')}
                                 className="w-full px-4 py-2 border rounded-md"
+                                disabled={isCategoriesLoading}
                             >
-                                {categories.map(category => (
-                                    <option key={category} value={category}>{category}</option>
-                                ))}
+                                <option value="">카테고리 선택</option>
+                                {categories && renderCategoryOptions(categories)}
                             </select>
-                            {errors.category && (
-                                <p className="text-red-500 text-sm mt-1">{errors.category.message}</p>
+                            {errors.categorySlug && (
+                                <p className="text-red-500 text-sm mt-1">{errors.categorySlug.message}</p>
                             )}
                         </div>
                         <div className="flex-1">

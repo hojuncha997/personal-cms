@@ -23,7 +23,7 @@ const PostContent = () => {
     const searchState = useMemo(() => ({
         page: Number(searchParams.get('page')) || 1,
         search: searchParams.get('search') || '',
-        category: searchParams.get('categorySlug') || '',
+        categorySlug: searchParams.get('categorySlug') || '',
         sort: searchParams.get('sortBy') || 'createdAt',
         order: searchParams.get('order') || 'DESC',
         startDate: searchParams.get('startDate') || '',
@@ -70,12 +70,28 @@ const PostContent = () => {
         if (localSearch !== updates.search) setLocalSearch(updates.search);
     }, [searchState]);
 
+    // useGetPostList 호출 전에 searchState 값 확인
+    useEffect(() => {
+        console.log('searchState:', searchState);
+    }, [searchState]);
+
+    console.log('useGetPostList params:', {
+        page: searchState.page,
+        limit: 10,
+        search: searchState.search,
+        categorySlug: searchState.categorySlug,
+        sortBy: searchState.sort,
+        order: searchState.order,
+        startDate: searchState.startDate,
+        endDate: searchState.endDate,
+    });
+
     // useGetPostList 직접 호출
     const { data, isLoading, error } = useGetPostList({
         page: searchState.page,
         limit: 10,
         search: searchState.search,
-        category: searchState.category,
+        categorySlug: searchState.categorySlug,
         sortBy: searchState.sort as 'createdAt' | 'viewCount' | 'likeCount',
         order: searchState.order as 'ASC' | 'DESC',
         startDate: searchState.startDate,
@@ -259,7 +275,7 @@ const PostContent = () => {
                                                 </div>
                                             )}
                                             <div className='text-sm text-gray-500 flex flex-wrap gap-4'>
-                                                <span className='px-2 py-1 bg-gray-100 text-sm rounded-md'>{post.category}</span>
+                                                <span className='px-2 py-1 bg-gray-100 text-sm rounded-md'>{post.categorySlug || 'no category'}</span>
                                                 <span>{post.author_display_name.includes('@') ? post.author_display_name.split('@')[0] : post.author_display_name}</span>
                                                 <span>조회 {post.viewCount}</span>
                                                 <span>좋아요 {post.likeCount}</span>

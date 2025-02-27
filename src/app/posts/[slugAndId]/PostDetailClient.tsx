@@ -93,7 +93,7 @@ const PostDetailClient: React.FC<PostDetailClientProps> = ({ publicId, prefetch 
                                 {/* 헤더 */}
                                 <div className="border-b border-gray-300 pb-4">
                                     <div className="mb-2">
-                                        <span className="px-2 py-1 bg-gray-100 text-xs rounded-md">{post.category}</span>
+                                        <span className="px-2 py-1 bg-gray-100 text-xs rounded-md">{post.categorySlug || 'no category'}</span>
                                     </div>
                                     <h1 className="text-xl sm:text-2xl font-bold mb-2">{post.title}</h1>
                                     <div className="flex justify-between items-center">
