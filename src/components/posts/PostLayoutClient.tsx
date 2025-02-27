@@ -1,41 +1,98 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { usePathname } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { Menu } from 'lucide-react';
+import { Menu, ChevronRight } from 'lucide-react';
 import { Container } from '@/components/layouts/Container';
 import { CommonDrawer } from '@components/common/common-drawer'
 import { useWindowSize } from '@/hooks/layout';
+import { useGetPostCategories, PostCategory } from '@/hooks/posts/useGetPostCategories';
 
-const categories = [
-    { name: '전체', id: '' },
-    { name: '프로그래밍', id: '프로그래밍' },
-    { name: '일반', id: '일반' },
-    { name: '리뷰', id: '리뷰' },
-    { name: '여행', id: '여행' },
-    { name: '취미', id: '취미' }
-];
+// CategoryNav 컴포넌트 수정
+const CategoryNav = ({ pathname, onItemClick }: { pathname: string, onItemClick?: () => void }) => {
+    const { data: categories, isLoading } = useGetPostCategories();
+    const searchParams = useSearchParams();
+    const currentCategory = searchParams.get('categorySlug');
+    const [expandedCategories, setExpandedCategories] = useState<number[]>([]);
+    
+    if (isLoading) {
+        return <div className="p-6">category loading...</div>;
+    }
 
-// 카테고리 네비게이션 컴포넌트
-const CategoryNav = ({ pathname, onItemClick }: { pathname: string, onItemClick?: () => void }) => (
-    <nav className="p-6">
-        <ul className="space-y-3">
-            {categories.map((category) => (
-                <li key={category.id} onClick={onItemClick}>
+    // 최상위 카테고리만 필터링 (depth가 0인 것들)
+    const rootCategories = categories?.filter(cat => cat.depth === 0) || [];
+
+    const toggleCategory = (categoryId: number) => {
+        setExpandedCategories(prev => 
+            prev.includes(categoryId) 
+                ? prev.filter(id => id !== categoryId)
+                : [...prev, categoryId]
+        );
+    };
+
+    const renderCategory = (category: PostCategory) => {
+        const hasChildren = category.children && category.children.length > 0;
+        const isExpanded = expandedCategories.includes(category.id);
+
+        return (
+            <li key={category.id}>
+                <div className="flex items-center">
                     <Link
-                        href={`/posts${category.id ? `?category=${category.id}` : ''}`}
+                        href={`/posts?categorySlug=${category.slug}`}
+                        className={`flex-1 block p-2 rounded-md transition-colors
+                            ${currentCategory === category.slug ? 'bg-blue-100 text-blue-600' : 'hover:bg-gray-100'}
+                        `}
+                        onClick={onItemClick}
+                    >
+                        <span className="flex items-center gap-2">
+                            {category.name}
+                            {hasChildren && (
+                                <button
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        toggleCategory(category.id);
+                                    }}
+                                    className="p-1 hover:bg-gray-200 rounded-full"
+                                >
+                                    <ChevronRight
+                                        size={16}
+                                        className={`transform transition-transform duration-200
+                                            ${isExpanded ? 'rotate-90' : ''}
+                                        `}
+                                    />
+                                </button>
+                            )}
+                        </span>
+                    </Link>
+                </div>
+                {hasChildren && isExpanded && (
+                    <ul className="ml-4 mt-1 space-y-1 border-l border-gray-200 pl-2">
+                        {category.children?.map((child: PostCategory) => renderCategory(child))}
+                    </ul>
+                )}
+            </li>
+        );
+    };
+    
+    return (
+        <nav className="p-6">
+            <ul className="space-y-3">
+                <li onClick={onItemClick}>
+                    <Link
+                        href="/posts"
                         className={`block p-2 rounded-md transition-colors
-                            ${pathname === '/posts' && !category.id ? 'bg-blue-100 text-blue-600' : 'hover:bg-gray-100'}
+                            ${!currentCategory ? 'bg-blue-100 text-blue-600' : 'hover:bg-gray-100'}
                         `}
                     >
-                        {category.name}
+                        all
                     </Link>
                 </li>
-            ))}
-        </ul>
-    </nav>
-);
+                {rootCategories.map(category => renderCategory(category))}
+            </ul>
+        </nav>
+    );
+};
 
 export default function PostLayoutClient({
     children,

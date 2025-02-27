@@ -23,7 +23,7 @@ const PostContent = () => {
     const searchState = useMemo(() => ({
         page: Number(searchParams.get('page')) || 1,
         search: searchParams.get('search') || '',
-        category: searchParams.get('category') || '',
+        category: searchParams.get('categorySlug') || '',
         sort: searchParams.get('sortBy') || 'createdAt',
         order: searchParams.get('order') || 'DESC',
         startDate: searchParams.get('startDate') || '',
@@ -107,7 +107,7 @@ const PostContent = () => {
     }, [router, createQueryString, localSearch, localSort, localOrder, localStartDate, localEndDate]);
 
     const handleCategoryChange = (category: string) => {
-        router.push(`/posts?${createQueryString({ category, page: '1' })}`);
+        router.push(`/posts?${createQueryString({ categorySlug: category, page: '1' })}`);
     };
 
     const handleSortChange = useCallback((sortBy: string) => {
