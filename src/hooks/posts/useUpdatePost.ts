@@ -1,16 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { fetchClient } from '@/lib/fetchClient';
-import { PostDetail } from '@/types/posts/postTypes';
+import { PostDetail, UpdatePostData } from '@/types/posts/postTypes';
 import { JSONContent } from '@tiptap/react';
-
-interface UpdatePostData {
-    publicId: string;
-    title: string;
-    content: JSONContent;
-    category: string;
-    tags?: string[];
-    thumbnail?: string;
-}
 
 export const useUpdatePost = () => {
     const queryClient = useQueryClient();

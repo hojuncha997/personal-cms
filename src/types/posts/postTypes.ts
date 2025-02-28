@@ -136,3 +136,15 @@ export interface PostQueryParams {
     "status": "published"
 }
 */
+
+export interface UpdatePostData {
+    publicId: string;
+    title: string;
+    categorySlug?: string;
+    content: Record<string, any>;
+    thumbnail?: string;
+    isSecret: boolean;
+    isFeatured: boolean;
+    status: 'draft' | 'published';
+    tags: string[];
+}

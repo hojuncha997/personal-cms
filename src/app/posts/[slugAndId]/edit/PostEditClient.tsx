@@ -13,15 +13,21 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { supabase } from '@/lib/supabase';
 import { createThumbnail } from '@/utils/image';
+import { useGetPostCategories, type PostCategory } from '@/hooks/posts/useGetPostCategories';
 
 interface PostEditClientProps {
     publicId: string;
 }
 
 const formSchema = z.object({
-    title: z.string().min(1, { message: '제목은 필수 입력 항목입니다.' }),
+    title: z.string()
+        .min(1, { message: '제목은 필수 입력 항목입니다.' })
+        .max(50, { message: '제목은 최대 50자까지 입력 가능합니다.' }),
     content: z.any(),
-    category: z.string().min(1, { message: '카테고리는 필수 입력 항목입니다.' }),
+    categorySlug: z.string().optional(),
+    isSecret: z.boolean(),
+    isFeatured: z.boolean(),
+    status: z.enum(['draft', 'published']).default('published'),
     tags: z.array(z.string()).default([]),
 });
 
@@ -34,6 +40,7 @@ const PostEditClient: React.FC<PostEditClientProps> = ({ publicId }) => {
     const [tagInput, setTagInput] = useState('');
     const [selectedThumbnails, setSelectedThumbnails] = useState<string[]>([]);
     const [isProcessing, setIsProcessing] = useState(false);
+    const { data: categories, isLoading: isCategoriesLoading } = useGetPostCategories();
     
     const { register, handleSubmit, setValue, watch, getValues } = useForm<FormValues>({
         resolver: zodResolver(formSchema),
@@ -43,7 +50,10 @@ const PostEditClient: React.FC<PostEditClientProps> = ({ publicId }) => {
                 type: 'doc',
                 content: [{ type: 'paragraph' }]
             },
-            category: '일반',
+            categorySlug: '',
+            isSecret: false,
+            isFeatured: false,
+            status: 'published',
             tags: []
         }
     });
@@ -52,7 +62,10 @@ const PostEditClient: React.FC<PostEditClientProps> = ({ publicId }) => {
         if (post) {
             setValue('title', post.title);
             setValue('content', post.content);
-            setValue('category', post.category);
+            setValue('categorySlug', post.categorySlug || '');
+            setValue('isSecret', post.isSecret);
+            setValue('isFeatured', post.isFeatured);
+            setValue('status', post.status as 'draft' | 'published');
             setValue('tags', post.tags || []);
             if (post.thumbnail) {
                 setSelectedThumbnails([post.thumbnail]);
@@ -124,6 +137,18 @@ const PostEditClient: React.FC<PostEditClientProps> = ({ publicId }) => {
         }
     };
 
+    // 카테고리 옵션 렌더링 함수 추가
+    const renderCategoryOptions = (categories: PostCategory[] = [], depth = 0) => {
+        return categories.map(category => (
+            <React.Fragment key={category.slug}>
+                <option value={category.slug}>
+                    {'\u00A0'.repeat(depth * 2)}{category.name}
+                </option>
+                {category.children && renderCategoryOptions(category.children, depth + 1)}
+            </React.Fragment>
+        ));
+    };
+
     if (isLoading) {
         return <div>로딩 중...</div>;
     }
@@ -146,12 +171,12 @@ const PostEditClient: React.FC<PostEditClientProps> = ({ publicId }) => {
                         <div className="bg-white rounded-lg p-6">
                             <div className="mb-4">
                                 <select
-                                    {...register('category')}
+                                    {...register('categorySlug')}
                                     className="w-full p-2 border rounded"
+                                    disabled={isCategoriesLoading}
                                 >
-                                    <option value="일반">일반</option>
-                                    <option value="기술">기술</option>
-                                    <option value="생활">생활</option>
+                                    <option value="">카테고리 선택</option>
+                                    {categories && renderCategoryOptions(categories)}
                                 </select>
                             </div>
 
