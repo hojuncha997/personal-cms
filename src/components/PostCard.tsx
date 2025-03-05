@@ -5,7 +5,7 @@ interface PostCardProps {
   title: string
   description: string
   date: string
-  category: string
+  categorySlug: string
   imageUrl?: string
   slug: string
 }
@@ -14,7 +14,7 @@ export default function PostCard({
   title,
   description,
   date,
-  category,
+  categorySlug,
   imageUrl,
   slug
 }: PostCardProps) {
@@ -43,7 +43,7 @@ export default function PostCard({
           )}
           <p className="text-gray-600 mb-2 line-clamp-2">{description}</p>
           <div className="flex items-center justify-between text-sm text-gray-500">
-            <span>{category}</span>
+            <span>{categorySlug}</span>
             <span>{date}</span>
           </div>
         </div>

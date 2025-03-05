@@ -45,7 +45,7 @@ export default function PostSection() {
               title={post.title}
               description={post.excerpt || ''}
               date={new Date(post.createdAt).toLocaleDateString()}
-              category={post.category || '일반'}
+              categorySlug={post.categorySlug || '일반'}
               imageUrl={post.thumbnail || ''}
               slug={`${post.slug}-${post.public_id}`}
             />
