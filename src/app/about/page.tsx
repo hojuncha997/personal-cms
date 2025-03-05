@@ -3,7 +3,7 @@
 import { Container } from '@/components/layouts/Container'          
 import Link from 'next/link'
 import { colors } from '@/constants/styles'
-import me from '@images/about/me.png'
+const ME_IMAGE_URL = 'https://xtcxqpiwwmtcfaqimzea.supabase.co/storage/v1/object/public/media-storage/images/project-images/1739875903567-89smburkkwm.webp'
 import Image from 'next/image'
 import { useWindowSize } from '@/hooks/layout'
 import { useState, useEffect } from 'react'
@@ -34,7 +34,7 @@ export default function AboutPage() {
                                 <div className={`${isMobile ? 'w-full' : 'w-[200px]'}`}>
                                     <div className="border-[1px] border-black rounded-xl">
                                         <Image 
-                                            src={me} 
+                                            src={ME_IMAGE_URL} 
                                             alt="me" 
                                             width={300} 
                                             height={300}
