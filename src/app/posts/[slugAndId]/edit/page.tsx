@@ -5,6 +5,7 @@ interface PageProps {
     params: {
         slugAndId: string;
     };
+    searchParams: { [key: string]: string | string[] | undefined };
 }
 
 export default function Page({ params }: PageProps) {
