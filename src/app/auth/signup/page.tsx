@@ -27,7 +27,7 @@ export default function SignUpPage() {
   // const { isMobile, isTablet, isDesktop } = useWindowSize();
   // const { handleSignupSuccess } = useSignupNavigation();
 
- 
+
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -44,19 +44,16 @@ export default function SignUpPage() {
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const { signUp, isLoading: isSocialLoading, error: socialError } = useSocialSignUp();
 
   const handleSocialSignUp = async (provider: SocialProvider) => {
     try {
-      setIsLoading(true);
-      await useSocialSignUp(provider);
+      await signUp(provider);
     } catch (error) {
-      console.error(`${provider} sign up failed:`, error);
       setErrors(prev => ({ 
         ...prev, 
         social: '소셜 로그인 연동 중 오류가 발생했습니다.' 
       }));
-    } finally {
-      setIsLoading(false);
     }
   };
 

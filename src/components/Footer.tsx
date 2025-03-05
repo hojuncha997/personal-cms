@@ -3,10 +3,9 @@ import Link from 'next/link';
 export default function Footer() {
   return (
     <footer className="bg-gray-900 text-gray-300">
-      <Container>
+      {/* <Container>
         <div className="py-12">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
-            {/* 회사 정보 */}
             <div className="space-y-4">
               <h3 className="text-white text-lg font-bold">Company</h3>
               <p className="text-sm">
@@ -19,7 +18,6 @@ export default function Footer() {
               </p>
             </div>
 
-            {/* 고객 지원 */}
             <div className="space-y-4">
               <h3 className="text-white text-lg font-bold">고객지원</h3>
               <ul className="space-y-2">
@@ -30,7 +28,6 @@ export default function Footer() {
               </ul>
             </div>
 
-            {/* 소셜 미디어 */}
             <div className="space-y-4">
               <h3 className="text-white text-lg font-bold">Follow Us</h3>
               <div className="flex space-x-4">
@@ -52,7 +49,6 @@ export default function Footer() {
               </div>
             </div>
 
-            {/* 고객센터 */}
             <div className="space-y-4">
               <h3 className="text-white text-lg font-bold">고객센터</h3>
               <p className="text-2xl font-bold text-white">1234-5678</p>
@@ -66,7 +62,6 @@ export default function Footer() {
         </div>
       </Container>
 
-      {/* 카피라이트 */}
       <div className="border-t border-gray-800">
         <Container>
           <div className="py-6">
@@ -75,7 +70,7 @@ export default function Footer() {
             </p>
           </div>
         </Container>
-      </div>
+      </div> */}
     </footer>
   )
 } 

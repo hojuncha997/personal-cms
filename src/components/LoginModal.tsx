@@ -8,6 +8,7 @@ import { SOCIAL_CONFIG } from '@/constants/auth/social-config';
 import Link from 'next/link';
 import { colors } from '@/constants/styles';
 import useGetPasswordResetToken from '@/hooks/auth/useGetPasswordResetToken';
+import { SocialProvider } from '@/types/authTypes';
 
 interface LoginModalProps {
   isOpen: boolean
@@ -30,6 +31,7 @@ export default function LoginModal({
   const { mutateAsync: login, isPending } = useLogin()
   const { mutateAsync: logoutMutation } = useLogout();
   const { getPasswordResetToken, isPending: isPasswordResetPending } = useGetPasswordResetToken();
+  const { signUp: socialSignUp } = useSocialSignUp();
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
 
@@ -98,6 +100,14 @@ export default function LoginModal({
       alert('로그아웃 중 오류가 발생했습니다.');
     } finally {
       updateLoginForm({ isLogoutLoading: false });
+    }
+  };
+
+  const handleSocialLogin = async (provider: SocialProvider) => {
+    try {
+      await socialSignUp(provider);
+    } catch (error) {
+      console.error('Social login failed:', error);
     }
   };
 
@@ -193,7 +203,7 @@ export default function LoginModal({
       <div className="grid grid-cols-1 gap-3">
         <button
           type="button"
-          onClick={() => useSocialSignUp('google')}
+          onClick={() => handleSocialLogin('google')}
           className="flex items-center justify-center px-4 py-2 border border-gray-300 rounded-lg shadow-sm bg-white hover:bg-gray-50 transition-colors duration-200"
         >
           {SOCIAL_CONFIG.google.icon}

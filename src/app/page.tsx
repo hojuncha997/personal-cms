@@ -5,6 +5,7 @@ import { useGetPostList } from '@/hooks/posts/useGetPostList'
 import { useGetPostDetail } from '@/hooks/posts/useGetPostDetail'
 import Link from 'next/link'
 import { PostForList } from '@/types/posts/postTypes'
+import Image from 'next/image'
 
 export default function Home() {
   const { data: latestPosts } = useGetPostList({ 
@@ -52,9 +53,11 @@ export default function Home() {
                       {featuredPost.thumbnail ? (
                         <div className="col-span-6">
                           <div className="aspect-[4/3] bg-gray-100 rounded-sm overflow-hidden">
-                            <img 
+                            <Image 
                               src={featuredPost.thumbnail} 
                               alt={featuredPost.title}
+                              width={800}
+                              height={600}
                               className="object-cover w-full h-full"
                             />
                           </div>
@@ -89,9 +92,11 @@ export default function Home() {
                         </div>
                         {post.thumbnail ? (
                           <div className="w-20 h-20 flex-shrink-0 bg-gray-100 rounded-sm overflow-hidden">
-                            <img 
+                            <Image 
                               src={post.thumbnail} 
                               alt={post.title}
+                              width={80}
+                              height={80}
                               className="w-full h-full object-cover"
                             />
                           </div>
@@ -115,9 +120,11 @@ export default function Home() {
                   <div className="group cursor-pointer">
                     {post.thumbnail ? (
                       <div className="aspect-[16/10] bg-gray-100 rounded-sm overflow-hidden mb-3">
-                        <img 
+                        <Image 
                           src={post.thumbnail} 
                           alt={post.title}
+                          width={400}
+                          height={250}
                           className="object-cover w-full h-full"
                         />
                       </div>

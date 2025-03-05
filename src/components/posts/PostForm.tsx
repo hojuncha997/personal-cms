@@ -11,7 +11,7 @@ import { supabase } from '@/lib/supabase';
 import { createThumbnail } from '@/utils/image';
 import { useGetPostCategories, type PostCategory } from '@/hooks/posts/useGetPostCategories';
 import { PostData } from '@/types/posts/postTypes';
-
+import Image from 'next/image';
 const formSchema = z.object({
     title: z.string()
         .min(1, { message: '제목은 필수 입력 항목입니다.' })
@@ -129,7 +129,7 @@ export const PostForm: React.FC<PostFormProps> = ({
                     .toLowerCase()
                     .replace(/ /g, '-')
                     .replace(/[^\w-]+/g, '') : initialData?.slug || '',
-                thumbnail: thumbnailUrl === null ? undefined : thumbnailUrl,
+                thumbnail: thumbnailUrl || null,
             };
 
             await onSubmit(postData);
@@ -213,7 +213,7 @@ export const PostForm: React.FC<PostFormProps> = ({
                                 <label className="block text-sm font-medium mb-2">선택된 썸네일</label>
                                 <div className="flex gap-2 overflow-x-auto">
                                     {selectedThumbnails.map((url) => (
-                                        <img
+                                        <Image
                                             key={url}
                                             src={url}
                                             alt="썸네일 미리보기"

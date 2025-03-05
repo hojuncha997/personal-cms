@@ -3,7 +3,7 @@ import { ReactNodeViewRenderer, NodeViewWrapper, NodeViewProps } from '@tiptap/r
 import React, { useRef, useState } from 'react'
 import { Image as ImageIcon, Loader2 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
-
+import Image from 'next/image'
 interface ImagePlaceholderProps extends NodeViewProps {
   editor: any;
   updateAttributes: (attrs: Record<string, any>) => void;
@@ -56,7 +56,7 @@ const ImagePlaceholderComponent = ({ node, updateAttributes, editor }: ImagePlac
   if (!node.attrs.isPlaceholder) {
     return (
       <NodeViewWrapper>
-        <img 
+        <Image 
           src={node.attrs.src} 
           alt={node.attrs.alt} 
           className="max-w-full h-auto"

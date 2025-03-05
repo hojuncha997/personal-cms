@@ -18,13 +18,13 @@ import {
   ListOrdered,
   CheckSquare,
   Image as ImageIcon,
-  Link,
+  Link as LinkIcon,
   Palette
 } from "lucide-react"
 import { addImagePlaceholder } from "../ImagePlaceholder"
 
 interface ToolbarProps {
-    editor: Editor
+    editor: Editor  // null을 허용하지 않음
     toolbarStyle?: string
 }
 
@@ -45,9 +45,21 @@ export default function Toolbar({
   editor, 
   toolbarStyle = "border-b bg-gray-50 p-2 flex flex-wrap gap-1"
 }: ToolbarProps) {
-    if (!editor) return null
+    const [showColorPicker, setShowColorPicker] = useState(false);
+    const colorPickerRef = useRef<HTMLDivElement>(null);
 
-    // console.log('editor: ', editor)
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (colorPickerRef.current && !colorPickerRef.current.contains(event.target as Node)) {
+                setShowColorPicker(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
 
     const addImage = useCallback(() => {
         const url = window.prompt('URL 입력:')
@@ -69,65 +81,48 @@ export default function Toolbar({
     }, [editor])
 
     const addLink = useCallback(() => {
-        // 현재 선택된 텍스트 가져오기
-        const previousUrl = editor.getAttributes('link').href
-        const url = window.prompt('URL을 입력하세요:', previousUrl)
+        if (!editor) return;
         
-        // 취소를 누른 경우
-        if (url === null) {
-            return
-        }
+        const previousUrl = editor.getAttributes('link').href;
+        const url = window.prompt('URL을 입력하세요:', previousUrl);
+        
+        if (url === null) return;
 
-        // URL이 비어있는 경우 링크 제거
         if (url === '') {
-            editor.chain().focus().unsetLink().run()
-            return
+            editor.chain().focus().unsetLink().run();
+            return;
         }
 
-        // URL 유효성 검사
         try {
-            new URL(url.startsWith('http') ? url : `https://${url}`)
+            new URL(url.startsWith('http') ? url : `https://${url}`);
         } catch {
-            alert('유효하지 않은 URL입니다.')
-            return
+            alert('유효하지 않은 URL입니다.');
+            return;
         }
 
-        // 링크 설정
         editor.chain().focus().setLink({ 
             href: url.startsWith('http') ? url : `https://${url}`,
             target: '_blank' 
-        }).run()
-    }, [editor])
+        }).run();
+    }, [editor]);
 
-    // 링크 제거 버튼 추가
     const removeLink = useCallback(() => {
-        editor.chain().focus().unsetLink().run()
-    }, [editor])
+        if (!editor) return;
+        editor.chain().focus().unsetLink().run();
+    }, [editor]);
 
-    // 색상 선택 상태 관리
-    const [showColorPicker, setShowColorPicker] = useState(false)
+    if (!editor) return null;
 
-    const colorPickerRef = useRef<HTMLDivElement>(null)
-
-    useEffect(() => {
-        function handleClickOutside(event: MouseEvent) {
-            if (colorPickerRef.current && !colorPickerRef.current.contains(event.target as Node)) {
-                setShowColorPicker(false)
-            }
-        }
-
-        document.addEventListener('mousedown', handleClickOutside)
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside)
-        }
-    }, [])
+    const handleBoldClick = () => {
+        editor.chain().focus().toggleBold().run();
+    };
 
     return (
         <div className={toolbarStyle}>
             {/* Text Style */}
             <button
                 type="button"
-                onClick={() => editor.chain().focus().toggleBold().run()}
+                onClick={handleBoldClick}
                 className={`p-2 rounded hover:bg-gray-200 ${editor.isActive('bold') ? 'bg-gray-200' : ''}`}
                 title="굵게"
             >
@@ -319,7 +314,7 @@ export default function Toolbar({
                 className={`p-2 rounded hover:bg-gray-200 ${editor.isActive('link') ? 'bg-gray-200' : ''}`}
                 title="링크"
             >
-                <Link size={20} />
+                <LinkIcon size={20} />
             </button>
             {editor.isActive('link') && (
                 <button
@@ -328,7 +323,7 @@ export default function Toolbar({
                     className="p-2 rounded hover:bg-gray-200"
                     title="링크 제거"
                 >
-                    <Link size={20} className="text-red-500" />
+                    <LinkIcon size={20} className="text-red-500" />
                 </button>
             )}
         </div>

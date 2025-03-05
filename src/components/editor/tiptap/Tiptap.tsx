@@ -61,7 +61,7 @@ const Tiptap = ({
         }
     },
 
-    renderHTML({ HTMLAttributes, node }) {
+    renderHTML({ HTMLAttributes }) {
         const { src } = HTMLAttributes;
         const isSelected = selectedImages.includes(src as string);
         
@@ -155,17 +155,19 @@ const Tiptap = ({
     editable,
     onUpdate: ({ editor }) => {
       // 디버깅을 위한 콘솔 로그 추가
-      console.log('Editor content updated:', editor.getJSON())
-      onChange && onChange(editor.getJSON())
+      console.log('Editor content updated:', editor.getJSON());
+      if (onChange) {
+        onChange(editor.getJSON());
+      }
     },
     editorProps: {
         handleClick: (view, pos, event) => {
             const target = event.target as HTMLElement;
             if (target.matches('img[data-image-select]')) {
                 const src = target.getAttribute('src');
-                if (src) {
+                if (src && onImageClick) {
                     event.preventDefault();
-                    onImageClick?.(src);
+                    onImageClick(src);
                 }
                 return true;
             }
