@@ -19,7 +19,7 @@ const PostList = ({ posts, title }: { posts: PostForList[], title: string }) => 
                 <div className="p-3 sm:p-4">
                     <div className="flex items-center gap-2 mb-1.5">
                         <span className="px-2 py-0.5 bg-gray-100 text-xs rounded">
-                            {post.category}
+                            {post.categorySlug}
                         </span>
                         <span className="text-xs text-gray-500">
                             {format(new Date(post.createdAt), 'yyyy.MM.dd')}
