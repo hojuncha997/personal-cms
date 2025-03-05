@@ -60,7 +60,8 @@ export function NavContainer({
   onOpenLogin, 
   hideOnScroll = false
 }: NavContainerProps) {
-  const isScrollingDown = hideOnScroll ? useScrollDirection() : false
+  const scrollDirection = useScrollDirection()
+  const isScrollingDown = hideOnScroll && scrollDirection
   const isAuthenticated = useAuthStore(state => state.isAuthenticated)
   const email = useAuthStore(state => state.email)
   const loading = useAuthStore(state => state.loading)
