@@ -28,7 +28,7 @@ export const PostNavigation = ({ publicId }: PostNavigationProps) => {
                         >
                             <div className="flex items-center gap-2 mb-2">
                                 <span className="px-2 py-1 bg-gray-100 text-xs rounded-md">
-                                    {post.category}
+                                    {post.categorySlug}
                                 </span>
                                 <span className="text-sm text-gray-500">
                                     {format(new Date(post.createdAt), 'yyyy.MM.dd')}
@@ -50,7 +50,7 @@ export const PostNavigation = ({ publicId }: PostNavigationProps) => {
                         >
                             <div className="flex items-center gap-2 mb-2">
                                 <span className="px-2 py-1 bg-gray-100 text-xs rounded-md">
-                                    {post.category}
+                                    {post.categorySlug}
                                 </span>
                                 <span className="text-sm text-gray-500">
                                     {format(new Date(post.createdAt), 'yyyy.MM.dd')}
