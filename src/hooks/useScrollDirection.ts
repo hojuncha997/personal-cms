@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 
 export function useScrollDirection() {
   const [isScrollingDown, setIsScrollingDown] = useState(false)
-  const [lastScrollY, setLastScrollY] = useState(0)
+  const lastScrollY = useRef(0)
 
   useEffect(() => {
     const handleScroll = () => {
@@ -13,13 +13,13 @@ export function useScrollDirection() {
         return
       }
 
-      setIsScrollingDown(currentScrollY > lastScrollY && currentScrollY > 64)
-      setLastScrollY(currentScrollY)
+      setIsScrollingDown(currentScrollY > lastScrollY.current && currentScrollY > 64)
+      lastScrollY.current = currentScrollY
     }
 
     window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
-  }, [lastScrollY])
+  }, [])
 
   return isScrollingDown
 } 
