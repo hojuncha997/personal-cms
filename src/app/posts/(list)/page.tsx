@@ -14,10 +14,13 @@ import { extractTextFromContent } from '@/utils/postUtils'
 import { PostForList, PostListResponse } from '@/types/posts/postTypes';
 import PostListSkeleton from '@/components/posts/skeletons/PostListSkeleton';
 import Image from 'next/image';
+import { useAuthStore } from '@/store/useAuthStore'
+import { AdminGuard } from '@/components/auth/AdminGuard';
 
 const PostContent = () => {
     const router = useRouter();
     const searchParams = useSearchParams();
+    const { isAuthenticated, role } = useAuthStore();
     
     // searchState를 useMemo로 최적화
     const searchState = useMemo(() => ({
@@ -326,11 +329,13 @@ const PostContent = () => {
                     )}
 
                     <div className="mt-4 flex justify-end">
-                        <Link href="/posts/write">
-                            <button className="px-4 py-2 bg-black text-white rounded-md hover:bg-blue-600 transition-colors">
-                                게시글 작성
-                            </button>
-                        </Link>
+                        <AdminGuard>
+                            <Link href="/posts/write">
+                                <button className="px-4 py-2 bg-black text-white rounded-md hover:bg-blue-600 transition-colors">
+                                    게시글 작성
+                                </button>
+                            </Link>
+                        </AdminGuard>
                     </div>
                 </div>
             </div>

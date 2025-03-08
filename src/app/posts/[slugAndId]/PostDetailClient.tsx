@@ -38,7 +38,6 @@ const PostDetailClient: React.FC<PostDetailClientProps> = ({ publicId, prefetch 
     useEffect(() => {
         if (post) {
             const timer = setTimeout(() => setShowRelated(true), 100);
-            alert(post.isAuthor)
             return () => clearTimeout(timer);
         }
     }, [post]);
