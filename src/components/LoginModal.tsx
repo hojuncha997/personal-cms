@@ -47,13 +47,18 @@ export default function LoginModal({
     updateLoginForm({ isLocalLoading: true })
     try {
       await new Promise(resolve => setTimeout(resolve, 2000))
-      await login({ 
+      const loginResult = await login({ 
         email: loginForm.email, 
         password: loginForm.password, 
         clientType: 'web', 
         keepLoggedIn: loginForm.keepLoggedIn 
       })
-      onClose()
+      
+      // 상태가 완전히 업데이트될 때까지 기다림
+      const state = useAuthStore.getState();
+      if (state.isAuthenticated && state.role) {
+        onClose();
+      }
     } catch (error) {
       if (error instanceof LoginError) {
         updateLoginForm({ error: error.message })

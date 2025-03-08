@@ -93,27 +93,13 @@ export { isRefreshing }
  */
 
 
-export function setAuthToken(token: string | null) {
-
-
-  // console.log('setAuthToken 호출:', token);
-
-  //  // 현재 상태 확인
-  //  const currentState = useAuthStore.getState();
-  
-  //  // 토큰이 이미 설정되어 있고, 같은 토큰으로 다시 설정하려는 경우 스킵
-  //  if (currentState.accessToken === token) {
-  //    console.log('Token already set, skipping...');
-  //    return;
-  //  }
- 
-  //  console.log('Setting new auth token...');
-
+export async function setAuthToken(token: string | null) {
   console.log('[setAuthToken] 토큰 설정 시작');
 
   if (!token) {
     console.log('[setAuthToken] 토큰이 null, 인증 상태 초기화');
     useAuthStore.getState().resetAuthState();
+    useAuthStore.getState().setLoading(false);
     return;
   }
 
@@ -122,20 +108,33 @@ export function setAuthToken(token: string | null) {
     const payload = getTokenPayload(token);
     
     console.log('[setAuthToken] store에 토큰 정보 저장');
-    useAuthStore.getState().updateAuthState({
-      accessToken: token,
-      tokenExpiry: payload.exp * 1000,
-      nickname: payload.nickname || null, // nickname이 없을 경우 null 처리
-      role: payload.role,
-      email: payload.email,
-      sub: payload.sub,
-      isAuthenticated: true,
+    // 상태 업데이트를 Promise로 감싸서 완료를 보장
+    await new Promise<void>((resolve) => {
+      useAuthStore.getState().updateAuthState({
+        accessToken: token,
+        tokenExpiry: payload.exp * 1000,
+        nickname: payload.nickname || null,
+        role: payload.role,
+        email: payload.email,
+        sub: payload.sub,
+        isAuthenticated: true,
+      });
+      
+      // 다음 렌더 사이클에서 상태가 실제로 업데이트되었는지 확인
+      requestAnimationFrame(() => {
+        const state = useAuthStore.getState();
+        if (state.isAuthenticated && state.role === payload.role) {
+          useAuthStore.getState().setLoading(false);
+          resolve();
+        }
+      });
     });
     
     console.log('[setAuthToken] 토큰 설정 완료');
   } catch (error) {
     console.error('[setAuthToken] 토큰 검증 실패:', error);
     useAuthStore.getState().resetAuthState();
+    useAuthStore.getState().setLoading(false);
     throw new TokenError('유효하지 않은 토큰 형식입니다.');
   }
 } 
