@@ -20,7 +20,7 @@ import { AdminGuard } from '@/components/auth/AdminGuard';
 const PostContent = () => {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const { isAuthenticated, role } = useAuthStore();
+    const { isAuthenticated, role, loading } = useAuthStore();
     
     // searchState를 useMemo로 최적화
     const searchState = useMemo(() => ({
@@ -329,13 +329,15 @@ const PostContent = () => {
                     )}
 
                     <div className="mt-4 flex justify-end">
-                        <AdminGuard>
-                            <Link href="/posts/write">
-                                <button className="px-4 py-2 bg-black text-white rounded-md hover:bg-blue-600 transition-colors">
-                                    게시글 작성
-                                </button>
-                            </Link>
-                        </AdminGuard>
+                        {!loading && (  // 로딩이 완료된 후에만 AdminGuard를 렌더링
+                            <AdminGuard>
+                                <Link href="/posts/write">
+                                    <button className="px-4 py-2 bg-black text-white rounded-md hover:bg-blue-600 transition-colors">
+                                        게시글 작성
+                                    </button>
+                                </Link>
+                            </AdminGuard>
+                        )}
                     </div>
                 </div>
             </div>
