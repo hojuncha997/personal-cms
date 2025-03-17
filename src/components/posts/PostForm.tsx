@@ -77,10 +77,10 @@ export const PostForm: React.FC<PostFormProps> = ({
 
     const handleImageSelect = (imageUrl: string) => {
         setSelectedThumbnails(prev => {
-            const newSelection = prev.includes(imageUrl)
-                ? prev.filter(url => url !== imageUrl)
-                : [...prev, imageUrl];
-            return newSelection;
+            if (prev.includes(imageUrl)) {
+                return [];
+            }
+            return [imageUrl];
         });
     };
 
@@ -105,7 +105,30 @@ export const PostForm: React.FC<PostFormProps> = ({
             setIsProcessing(true);
             let thumbnailUrl = mode === 'edit' ? initialData?.thumbnail : null;
 
-            if (selectedThumbnails.length > 0 && selectedThumbnails[0] !== thumbnailUrl) {
+            // content에서 첫 번째 이미지 URL 추출
+            const extractFirstImageUrl = (content: any): string | null => {
+                if (!content?.content) return null;
+                for (const node of content.content) {
+                    if (node.type === 'image' && node.attrs?.src) {
+                        return node.attrs.src;
+                    }
+                    if (node.content) {
+                        const found = extractFirstImageUrl(node);
+                        if (found) return found;
+                    }
+                }
+                return null;
+            };
+
+            // 썸네일이 선택되지 않은 경우 첫 번째 이미지를 썸네일로 사용
+            if (selectedThumbnails.length === 0) {
+                const firstImageUrl = extractFirstImageUrl(data.content);
+                if (firstImageUrl) {
+                    selectedThumbnails.push(firstImageUrl);
+                }
+            }
+
+            if (selectedThumbnails.length > 0) {
                 const thumbnailBlob = await createThumbnail(selectedThumbnails[0]);
                 const fileName = `images/thumbnails/${Date.now()}-${Math.random().toString(36).substring(2)}.jpg`;
                 
@@ -217,6 +240,8 @@ export const PostForm: React.FC<PostFormProps> = ({
                                             key={url}
                                             src={url}
                                             alt="썸네일 미리보기"
+                                            width={80}
+                                            height={80}
                                             className="w-20 h-20 object-cover rounded border-2 border-blue-500"
                                         />
                                     ))}
@@ -243,14 +268,27 @@ export const PostForm: React.FC<PostFormProps> = ({
                                     </span>
                                 ))}
                             </div>
-                            <input
-                                type="text"
-                                value={tagInput}
-                                onChange={(e) => setTagInput(e.target.value)}
-                                onKeyDown={handleAddTag}
-                                className="w-full px-4 py-2 border rounded-md"
-                                placeholder="태그를 입력하고 Enter를 누르세요"
-                            />
+                            <div onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                    e.preventDefault();
+                                    const trimmedInput = tagInput.trim();
+                                    if (trimmedInput) {
+                                        const currentTags = getValues('tags');
+                                        if (!currentTags.includes(trimmedInput)) {
+                                            setValue('tags', [...currentTags, trimmedInput]);
+                                        }
+                                        setTagInput('');
+                                    }
+                                }
+                            }}>
+                                <input
+                                    type="text"
+                                    value={tagInput}
+                                    onChange={(e) => setTagInput(e.target.value)}
+                                    className="w-full px-4 py-2 border rounded-md"
+                                    placeholder="태그를 입력하고 Enter를 누르세요"
+                                />
+                            </div>
                         </div>
 
                         <div className="flex items-center gap-4">
