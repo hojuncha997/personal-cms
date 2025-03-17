@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Container } from '@/components/layouts/Container';
 import { colors } from '@/constants/styles/colors';
 import Tiptap from '@/components/editor/tiptap/Tiptap';
@@ -43,6 +43,8 @@ export const PostForm: React.FC<PostFormProps> = ({
     const [tagInput, setTagInput] = useState('');
     const [selectedThumbnails, setSelectedThumbnails] = useState<string[]>([]);
     const [isProcessing, setIsProcessing] = useState(false);
+    const [tagError, setTagError] = useState<string>('');
+    const tagInputRef = useRef<HTMLInputElement>(null);
 
     const { register, handleSubmit, watch, setValue, getValues, formState: { errors } } = useForm<FormValues>({
         resolver: zodResolver(formSchema),
@@ -84,21 +86,55 @@ export const PostForm: React.FC<PostFormProps> = ({
         });
     };
 
-    const handleAddTag = (e: React.KeyboardEvent<HTMLInputElement>) => {
-        if (e.key === 'Enter' && tagInput.trim()) {
-            e.preventDefault();
-            const currentTags = getValues('tags');
-            if (!currentTags.includes(tagInput.trim())) {
-                setValue('tags', [...currentTags, tagInput.trim()]);
-            }
-            setTagInput('');
+    const validateTag = (tag: string): boolean => {
+        if (tag.length > 10) {
+            setTagError('태그는 10자 이하여야 합니다.');
+            return false;
         }
+        if (tag.includes(' ')) {
+            setTagError('태그에 공백을 포함할 수 없습니다.');
+            return false;
+        }
+        if (!/^[a-zA-Z0-9가-힣]+$/.test(tag)) {
+            setTagError('태그는 영문, 숫자, 한글만 사용 가능합니다.');
+            return false;
+        }
+        setTagError('');
+        return true;
     };
 
-    const handleRemoveTag = (tagToRemove: string) => {
+    const addTag = useCallback((tag: string) => {
+        const trimmedTag = tag.trim();
+        if (trimmedTag && validateTag(trimmedTag)) {
+            const currentTags = getValues('tags');
+            if (!currentTags.includes(trimmedTag)) {
+                setValue('tags', [...currentTags, trimmedTag]);
+            }
+            setTagInput('');
+            tagInputRef.current?.focus();
+        }
+    }, [getValues, setValue]);
+
+    const handleRemoveTag = useCallback((tagToRemove: string) => {
         const currentTags = getValues('tags');
         setValue('tags', currentTags.filter(tag => tag !== tagToRemove));
-    };
+    }, [getValues, setValue]);
+
+    const handleTagInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+        setTagInput(e.target.value);
+        setTagError('');
+    }, []);
+
+    const handleTagKeyPress = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            e.stopPropagation();
+            const value = e.currentTarget.value.trim();
+            if (value) {
+                addTag(value);
+            }
+        }
+    }, [addTag]);
 
     const handleFormSubmit = async (data: FormValues) => {
         try {
@@ -184,11 +220,7 @@ export const PostForm: React.FC<PostFormProps> = ({
                     <h1 className="text-3xl font-bold mb-8">
                         {mode === 'create' ? '게시글 작성' : '게시글 수정'}
                     </h1>
-                    <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-6" onKeyDown={(e) => {
-                        if (e.key === 'Enter' && e.target instanceof HTMLInputElement) {
-                            e.preventDefault();
-                        }
-                    }}>
+                    <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-6">
                         <div className="flex gap-4">
                             <div className="w-1/4">
                                 <label className="block text-sm font-medium mb-2">카테고리</label>
@@ -268,26 +300,18 @@ export const PostForm: React.FC<PostFormProps> = ({
                                     </span>
                                 ))}
                             </div>
-                            <div onKeyDown={(e) => {
-                                if (e.key === 'Enter') {
-                                    e.preventDefault();
-                                    const trimmedInput = tagInput.trim();
-                                    if (trimmedInput) {
-                                        const currentTags = getValues('tags');
-                                        if (!currentTags.includes(trimmedInput)) {
-                                            setValue('tags', [...currentTags, trimmedInput]);
-                                        }
-                                        setTagInput('');
-                                    }
-                                }
-                            }}>
+                            <div>
                                 <input
                                     type="text"
                                     value={tagInput}
-                                    onChange={(e) => setTagInput(e.target.value)}
+                                    onChange={handleTagInputChange}
+                                    onKeyPress={handleTagKeyPress}
                                     className="w-full px-4 py-2 border rounded-md"
                                     placeholder="태그를 입력하고 Enter를 누르세요"
                                 />
+                                {tagError && (
+                                    <p className="text-red-500 text-sm mt-1">{tagError}</p>
+                                )}
                             </div>
                         </div>
 
