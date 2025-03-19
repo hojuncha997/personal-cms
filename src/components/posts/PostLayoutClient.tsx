@@ -8,63 +8,80 @@ import { Container } from '@/components/layouts/Container';
 import { CommonDrawer } from '@components/common/common-drawer'
 import { useWindowSize } from '@/hooks/layout';
 import { useGetPostCategories, PostCategory } from '@/hooks/posts/useGetPostCategories';
+import { useCategoryStore } from '@/store/useCategoryStore';
 
 // CategoryNav 컴포넌트 수정
 const CategoryNav = ({ pathname, onItemClick }: { pathname: string, onItemClick?: () => void }) => {
     const { data: categories, isLoading } = useGetPostCategories();
     const searchParams = useSearchParams();
     const currentCategory = searchParams.get('categorySlug');
-    const [expandedCategories, setExpandedCategories] = useState<number[]>([]);
+    const { expandedCategories, toggleCategory } = useCategoryStore();
     
     if (isLoading) {
         return <div className="p-6">category loading...</div>;
     }
 
-    // 최상위 카테고리만 필터링 (depth가 0인 것들)
-    const rootCategories = categories?.filter(cat => cat.depth === 0) || [];
-
-    const toggleCategory = (categoryId: number) => {
-        setExpandedCategories(prev => 
-            prev.includes(categoryId) 
-                ? prev.filter(id => id !== categoryId)
-                : [...prev, categoryId]
-        );
-    };
+    // path 길이가 1인 것이 최상위 카테고리 (예: "1", "4", "5" 등)
+    const rootCategories = categories?.filter(cat => cat.path.split('.').length === 1) || [];
 
     const renderCategory = (category: PostCategory) => {
         const hasChildren = category.children && category.children.length > 0;
         const isExpanded = expandedCategories.includes(category.id);
+        const isRootCategory = category.path.split('.').length === 1;
 
         return (
             <li key={category.id}>
                 <div className="flex items-center">
-                    <Link
-                        href={`/posts?categorySlug=${category.slug}`}
-                        className={`flex-1 block p-2 rounded-md transition-colors
-                            ${currentCategory === category.slug ? 'bg-blue-100 text-blue-600' : 'hover:bg-gray-100'}
-                        `}
-                        onClick={onItemClick}
-                    >
-                        <span className="flex items-center gap-2">
-                            {category.name}
-                            {hasChildren && (
-                                <button
-                                    onClick={(e) => {
-                                        e.preventDefault();
-                                        toggleCategory(category.id);
-                                    }}
-                                    className="p-1 hover:bg-gray-200 rounded-full"
-                                >
+                    {isRootCategory ? (
+                        // 최상위 카테고리는 버튼으로 처리
+                        <button
+                            onClick={() => hasChildren && toggleCategory(category.id)}
+                            className={`flex-1 block p-2 rounded-md transition-colors text-left
+                                ${currentCategory === category.slug ? 'bg-blue-100 text-blue-600' : 'hover:bg-gray-100'}
+                            `}
+                        >
+                            <span className="flex items-center gap-2">
+                                {category.name}
+                                {hasChildren && (
                                     <ChevronRight
                                         size={16}
                                         className={`transform transition-transform duration-200
                                             ${isExpanded ? 'rotate-90' : ''}
                                         `}
                                     />
-                                </button>
-                            )}
-                        </span>
-                    </Link>
+                                )}
+                            </span>
+                        </button>
+                    ) : (
+                        // 하위 카테고리는 Link로 처리
+                        <Link
+                            href={`/posts?categorySlug=${category.slug}`}
+                            className={`flex-1 block p-2 rounded-md transition-colors
+                                ${currentCategory === category.slug ? 'bg-blue-100 text-blue-600' : 'hover:bg-gray-100'}
+                            `}
+                            onClick={onItemClick}
+                        >
+                            <span className="flex items-center gap-2">
+                                {category.name}
+                                {hasChildren && (
+                                    <button
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            toggleCategory(category.id);
+                                        }}
+                                        className="p-1 hover:bg-gray-200 rounded-full"
+                                    >
+                                        <ChevronRight
+                                            size={16}
+                                            className={`transform transition-transform duration-200
+                                                ${isExpanded ? 'rotate-90' : ''}
+                                            `}
+                                        />
+                                    </button>
+                                )}
+                            </span>
+                        </Link>
+                    )}
                 </div>
                 {hasChildren && isExpanded && (
                     <ul className="ml-4 mt-1 space-y-1 border-l border-gray-200 pl-2">

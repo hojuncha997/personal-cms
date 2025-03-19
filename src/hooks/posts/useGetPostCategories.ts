@@ -9,6 +9,7 @@ export interface PostCategory {
     depth: number;
     displayOrder: number;
     isActive: boolean;
+    path: string;
     children?: PostCategory[];
 }
 
