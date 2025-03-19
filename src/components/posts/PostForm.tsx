@@ -86,6 +86,49 @@ export const PostForm: React.FC<PostFormProps> = ({
         });
     };
 
+    const checkAndUpdateThumbnails = useCallback((content: any) => {
+        const extractFirstImageUrl = (content: any): string | null => {
+            if (!content?.content) return null;
+            for (const node of content.content) {
+                if (node.type === 'image' && node.attrs?.src) {
+                    return node.attrs.src;
+                }
+                if (node.content) {
+                    const found = extractFirstImageUrl(node);
+                    if (found) return found;
+                }
+            }
+            return null;
+        };
+
+        const firstImageUrl = extractFirstImageUrl(content);
+        
+        // 본문에 이미지가 없는 경우
+        if (!firstImageUrl) {
+            setSelectedThumbnails([]);
+            return;
+        }
+
+        // 현재 선택된 썸네일이 본문에 없는 경우
+        if (selectedThumbnails.length > 0 && !firstImageUrl.includes(selectedThumbnails[0])) {
+            setSelectedThumbnails([]);
+            return;
+        }
+
+        // 본문에 이미지가 있고, 썸네일이 선택되지 않은 경우
+        if (selectedThumbnails.length === 0) {
+            setSelectedThumbnails([firstImageUrl]);
+        }
+    }, []);
+
+    const handleContentChange = useCallback((content: any) => {
+        setValue('content', content);
+        // 약간의 지연을 주어 상태 업데이트가 완료된 후 썸네일 체크
+        setTimeout(() => {
+            checkAndUpdateThumbnails(content);
+        }, 0);
+    }, [setValue, checkAndUpdateThumbnails]);
+
     const validateTag = (tag: string): boolean => {
         if (tag.length > 10) {
             setTagError('태그는 10자 이하여야 합니다.');
@@ -139,7 +182,7 @@ export const PostForm: React.FC<PostFormProps> = ({
     const handleFormSubmit = async (data: FormValues) => {
         try {
             setIsProcessing(true);
-            let thumbnailUrl = mode === 'edit' ? initialData?.thumbnail : null;
+            let thumbnailUrl: string | null = null;
 
             // content에서 첫 번째 이미지 URL 추출
             const extractFirstImageUrl = (content: any): string | null => {
@@ -156,15 +199,11 @@ export const PostForm: React.FC<PostFormProps> = ({
                 return null;
             };
 
-            // 썸네일이 선택되지 않은 경우 첫 번째 이미지를 썸네일로 사용
-            if (selectedThumbnails.length === 0) {
-                const firstImageUrl = extractFirstImageUrl(data.content);
-                if (firstImageUrl) {
-                    selectedThumbnails.push(firstImageUrl);
-                }
-            }
+            // 본문에서 이미지 URL 추출
+            const firstImageUrl = extractFirstImageUrl(data.content);
 
-            if (selectedThumbnails.length > 0) {
+            // 본문에 이미지가 있고, 선택된 썸네일이 본문에 있는 경우에만 썸네일 처리
+            if (firstImageUrl && selectedThumbnails.length > 0 && firstImageUrl.includes(selectedThumbnails[0])) {
                 const thumbnailBlob = await createThumbnail(selectedThumbnails[0]);
                 const fileName = `images/thumbnails/${Date.now()}-${Math.random().toString(36).substring(2)}.jpg`;
                 
@@ -188,7 +227,7 @@ export const PostForm: React.FC<PostFormProps> = ({
                     .toLowerCase()
                     .replace(/ /g, '-')
                     .replace(/[^\w-]+/g, '') : initialData?.slug || '',
-                thumbnail: thumbnailUrl || null,
+                thumbnail: thumbnailUrl,
             };
 
             await onSubmit(postData);
@@ -254,7 +293,7 @@ export const PostForm: React.FC<PostFormProps> = ({
                             <label className="block text-sm font-medium mb-2">내용</label>
                             <Tiptap
                                 initialContent={watch('content')}
-                                onChange={(content) => setValue('content', content)}
+                                onChange={handleContentChange}
                                 onImageClick={handleImageSelect}
                                 selectedImages={selectedThumbnails}
                                 toolbarStyle="border-b bg-gray-50 p-2 flex flex-wrap gap-1"

@@ -112,7 +112,7 @@ export function NavContainer({
         <div className="flex justify-between h-16 items-center">
           {/* 로고 */}
           <div className="flex items-center">
-            <Link href="/" className="text-xl text-black">차호준의 블로그</Link>
+            <Link href="/" className="text-xl text-black">notes&nodes</Link>
           </div>
 
           {/* 데스크탑 메뉴 */}
