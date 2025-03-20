@@ -7,26 +7,29 @@ import { Menu, ChevronRight } from 'lucide-react';
 import { Container } from '@/components/layouts/Container';
 import { CommonDrawer } from '@components/common/common-drawer'
 import { useWindowSize } from '@/hooks/layout';
-import { useGetPostCategories, PostCategory } from '@/hooks/posts/useGetPostCategories';
+import { useGetProjectCategories, ProjectCategory } from '@/hooks/projects/useGetProjectCategories';
 import { useCategoryStore } from '@/store/useCategoryStore';
+import { useRouter } from 'next/navigation';
 
 // CategoryNav 컴포넌트 수정
 const CategoryNav = ({ pathname, onItemClick }: { pathname: string, onItemClick?: () => void }) => {
-    const { data: categories, isLoading } = useGetPostCategories();
+    const { data: categories, isLoading } = useGetProjectCategories();
     const searchParams = useSearchParams();
     const currentCategory = searchParams.get('categorySlug');
     const { expandedCategories, toggleCategory } = useCategoryStore();
+    const router = useRouter();
     
     if (isLoading) {
         return <div className="p-6">category loading...</div>;
     }
 
     // path 길이가 1인 것이 최상위 카테고리 (예: "1", "4", "5" 등)
-    const rootCategories = categories?.filter(cat => cat.path.split('/').length === 1) || [];
+    const rootCategories = categories?.filter(cat => cat.path?.split('/').length === 1) || [];
 
-    const renderCategory = (category: PostCategory) => {
-        const hasChildren = category.children && category.children.length > 0;
-        const isExpanded = expandedCategories.includes(category.id);
+    const renderCategory = (category: ProjectCategory) => {
+        const hasChildren = category?.children && category.children.length > 0;
+        const isExpanded = expandedCategories.includes(category?.id);
+        const isRootCategory = category.path?.split('/').length === 1;
 
         return (
             <li key={category.id}>
@@ -52,7 +55,7 @@ const CategoryNav = ({ pathname, onItemClick }: { pathname: string, onItemClick?
                     ) : (
                         // 하위 카테고리가 없는 경우: 링크로 처리
                         <Link
-                            href={`/posts?categorySlug=${category.slug}`}
+                            href={`/projects?categorySlug=${category.slug}`}
                             className={`flex-1 block p-2 rounded-md transition-colors
                                 ${currentCategory === category.slug ? 'bg-blue-100 text-blue-600' : 'hover:bg-gray-100'}
                             `}
@@ -64,7 +67,7 @@ const CategoryNav = ({ pathname, onItemClick }: { pathname: string, onItemClick?
                 </div>
                 {hasChildren && isExpanded && (
                     <ul className="ml-4 mt-1 space-y-1 border-l border-gray-200 pl-2">
-                        {category.children?.map((child: PostCategory) => renderCategory(child))}
+                        {category.children?.map((child: ProjectCategory) => renderCategory(child))}
                     </ul>
                 )}
             </li>
@@ -76,7 +79,7 @@ const CategoryNav = ({ pathname, onItemClick }: { pathname: string, onItemClick?
             <ul className="space-y-3">
                 <li onClick={onItemClick}>
                     <Link
-                        href="/posts"
+                        href="/projects"
                         className={`block p-2 rounded-md transition-colors
                             ${!currentCategory ? 'bg-blue-100 text-blue-600' : 'hover:bg-gray-100'}
                         `}
@@ -90,7 +93,7 @@ const CategoryNav = ({ pathname, onItemClick }: { pathname: string, onItemClick?
     );
 };
 
-export default function PostLayoutClient({
+export default function ProjectLayoutClient({
     children,
 }: {
     children: React.ReactNode
@@ -148,7 +151,7 @@ export default function PostLayoutClient({
                         duration-300
                         ${showDrawer ? 'w-full py-6' : 'w-[calc(100%-16rem)] p-6'}
                     `}>
-                        <div id="posts-root" />
+                        <div id="projects-root" />
                         <div className="max-w-4xl mx-auto">
                             {children}
                         </div>
@@ -162,7 +165,7 @@ export default function PostLayoutClient({
             */}
             {showDrawer && (
                 <CommonDrawer
-                    portalTo='posts-root'
+                    portalTo='projects-root'
                     drawerWidth='100vw'
                     drawerHeight='100vh'
                     position='left'

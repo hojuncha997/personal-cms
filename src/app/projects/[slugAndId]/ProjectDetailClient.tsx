@@ -1,4 +1,4 @@
-// src/app/posts/[slugAndId]/PostDetailClient.tsx
+// src/app/projects/[slugAndId]/ProjectDetailClient.tsx
 'use client'
 
 import React, { useState, useEffect } from 'react';
@@ -21,12 +21,12 @@ import { useDeletePost } from '@/hooks/posts/useDeletePost';
 import { useRouter } from 'next/navigation';
 import { useIsAuthor } from '@/hooks/auth/useIsAuthor';
 
-interface PostDetailClientProps {
+interface ProjectDetailClientProps {
     publicId: string;
     prefetch?: boolean;
 }
 
-const PostDetailClient: React.FC<PostDetailClientProps> = ({ publicId, prefetch = true }) => {
+const ProjectDetailClient: React.FC<ProjectDetailClientProps> = ({ publicId, prefetch = true }) => {
     const { data: post, isLoading: postLoading, error: postError } = useGetPostDetail(publicId, {enabled: prefetch}); // prefetch가 false일 경우 쿼리 실행
     const { data: relatedPosts, isLoading: relatedLoading } = useGetRelatedPosts(publicId);
     const { data: navigationPosts, isLoading: navigationLoading } = useGetPostNavigation(publicId);
@@ -206,4 +206,4 @@ const PostDetailClient: React.FC<PostDetailClientProps> = ({ publicId, prefetch 
     );
 }
 
-export default PostDetailClient; 
+export default ProjectDetailClient; 

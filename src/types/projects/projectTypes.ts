@@ -1,7 +1,7 @@
-// 포스팅 타입
+// 프로젝트 타입
 
-//포스팅 작성 시 사용되는 타입
-export interface PostData {
+//프로젝트 작성 시 사용되는 타입
+export interface ProjectData {
     title: string;
     categorySlug?: string;
     isSecret: boolean | false;
@@ -14,8 +14,8 @@ export interface PostData {
     status: string | 'published';
 }
 
-// 개별 포스팅 상세 페이지를 가져오기 위한 타입
-export interface PostDetail {
+// 개별 프로젝트 상세 페이지를 가져오기 위한 타입
+export interface ProjectDetail {
     public_id: string;
     title: string;
     content: {
@@ -62,8 +62,8 @@ export interface PostDetail {
     excerpt?: string;
 }
 
-// 포스팅 목록 페이지를 위한 개별 포스팅 타입
-export interface PostForList {
+// 프로젝트 목록 페이지를 위한 개별 프로젝트 타입
+export interface ProjectForList {
     public_id: string;
     title: string;
     excerpt: string | null;
@@ -94,9 +94,9 @@ export interface PostForList {
     };
 }
 
-// 포스팅 목록 페이지를 위한 타입
-export interface PostListResponse {
-    data: PostForList[];
+// 프로젝트 목록 페이지를 위한 타입
+export interface ProjectListResponse {
+    data: ProjectForList[];
     meta: {
         total: number;
         page: number;
@@ -105,7 +105,7 @@ export interface PostListResponse {
     };
 }
 
-export interface PostQueryParams {
+export interface ProjectQueryParams {
     page?: number;
     limit?: number;
     search?: string;
@@ -118,9 +118,9 @@ export interface PostQueryParams {
     endDate?: string;
 }
 
-// export interface PostDetailResponse extends Post {}
+    // export interface ProjectDetailResponse extends Project {}
 
-// export interface PostDetailResponse {}
+// export interface ProjectDetailResponse {}
 /*
 {
     "title" : "test-guestbook1",
@@ -137,7 +137,7 @@ export interface PostQueryParams {
 }
 */
 
-export interface UpdatePostData {
+export interface UpdateProjectData {
     publicId: string;
     title: string;
     categorySlug?: string;

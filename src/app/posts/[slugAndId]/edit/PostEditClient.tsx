@@ -6,6 +6,7 @@ import { useGetPostDetail } from '@/hooks/posts/useGetPostDetail';
 import { useUpdatePost } from '@/hooks/posts/useUpdatePost';
 import PostForm from '@/components/posts/PostForm';
 import { PostData } from '@/types/posts/postTypes';
+import { useIsAuthor } from '@/hooks/auth/useIsAuthor';
 
 interface PostEditClientProps {
     publicId: string;
@@ -15,6 +16,7 @@ export default function PostEditClient({ publicId }: PostEditClientProps) {
     const router = useRouter();
     const { data: post, isLoading } = useGetPostDetail(publicId);
     const { mutateAsync: updatePost } = useUpdatePost();
+    const isAuthor = useIsAuthor(post?.author_uuid);
 
     const handleSubmit = async (data: PostData) => {
         await updatePost({
@@ -38,8 +40,8 @@ export default function PostEditClient({ publicId }: PostEditClientProps) {
         return <div>게시글을 찾을 수 없습니다.</div>;
     }
 
-    if (!post.isAuthor) {
-        router.push(`/posts/${publicId}`);
+    if (!isAuthor) {
+        router.push(`/posts/${post?.slug}-${publicId}`);
         return null;
     }
 
