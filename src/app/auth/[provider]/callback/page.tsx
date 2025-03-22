@@ -12,14 +12,6 @@ export default function SocialAuthCallback() {
   const searchParams = useSearchParams();
   const {isAuthenticated, updateAuthState} = useAuthStore()
   
-  // 인증 상태 변경 감지
-  useEffect(() => {
-    if (isProcessing) return;
-    if (isAuthenticated) {
-      router.replace('/');
-    }
-  }, [isAuthenticated, router, isProcessing]);
-
   useEffect(() => {
     const handleCallback = async () => {
       try {
@@ -50,6 +42,9 @@ export default function SocialAuthCallback() {
 
         // 상태 업데이트가 완료될 때까지 잠시 대기
         await new Promise(resolve => setTimeout(resolve, 100));
+
+        // 상태 업데이트 후 직접 라우팅
+        router.replace('/');
 
       } catch (error) {
         console.error('Social auth callback error:', error);
