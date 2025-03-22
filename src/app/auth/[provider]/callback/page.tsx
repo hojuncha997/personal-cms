@@ -48,6 +48,9 @@ export default function SocialAuthCallback() {
           nickname: data.nickname
         });
 
+        // 상태 업데이트가 완료될 때까지 잠시 대기
+        await new Promise(resolve => setTimeout(resolve, 100));
+
       } catch (error) {
         console.error('Social auth callback error:', error);
         setAuthToken(null);
