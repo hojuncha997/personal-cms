@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuthStore } from '@/store/useAuthStore'
 import { setAuthToken } from '@/lib/authInterceptor';
+import { fetchClient } from '@/lib/fetchClient';
 
 export default function SocialAuthCallback() {
   // const [isMounted, setIsMounted] = useState(false);
@@ -23,48 +24,32 @@ export default function SocialAuthCallback() {
     const handleCallback = async () => {
       try {
         setIsProcessing(true);
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/access-token`, {
+        const response = await fetchClient('/auth/access-token', {
           method: 'POST',
-          credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json',
-            'x-client-type': 'web'
-          },
+          skipAuth: true
         });
 
-        // 먼저 response.ok를 체크
-        if (!response.ok) {
-          throw new Error('소셜 로그인에 실패했습니다.');
-        }
-
         const data = await response.json();
-        console.log('Social auth response:', data); // 디버깅용
+        console.log('Social auth response:', data);
 
-        // accessToken이 있는지 확실히 체크
         if (!data.access_token) {
           throw new Error('토큰이 없습니다.');
         }
 
-        // 모든 체크가 통과한 후에만 상태 업데이트
-        // updateAuthState({
-        //   isAuthenticated: true, 
-        //   accessToken: data.access_token
-        // });
-        console.log("useAuthStore.getState() before setAuthToken: ", useAuthStore.getState());
         setAuthToken(data.access_token);
-        console.log("useAuthStore.getState() after setAuthToken: ", useAuthStore.getState());
-
         
-        // 상태 업데이트 후 리다이렉트
-        await router.replace('/');
+        updateAuthState({
+          isAuthenticated: true, 
+          accessToken: data.access_token,
+          email: data.email,
+          role: data.role,
+          nickname: data.nickname
+        });
+
+        router.replace('/');
 
       } catch (error) {
         console.error('Social auth callback error:', error);
-        // 에러 발생 시 인증 상태 리셋
-        // updateAuthState({
-        //   isAuthenticated: false,
-        //   accessToken: null
-        // });
         setAuthToken(null);
         router.push('/auth/signup');
       }
