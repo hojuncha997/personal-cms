@@ -7,31 +7,22 @@ import { setAuthToken } from '@/lib/authInterceptor';
 import { fetchClient } from '@/lib/fetchClient';
 
 export default function SocialAuthCallback() {
-  // const [isMounted, setIsMounted] = useState(false);
-  const [isProcessing, setIsProcessing] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(true);
   const router = useRouter();
   const searchParams = useSearchParams();
   const {isAuthenticated, updateAuthState} = useAuthStore()
   
-  // useEffect(() => {
-  //   setIsMounted(true);
-  // }, []);
-
   // 인증 상태 변경 감지
   useEffect(() => {
-    if (isProcessing) return; // 처리 중일 때는 라우팅하지 않음
+    if (isProcessing) return;
     if (isAuthenticated) {
       router.replace('/');
     }
   }, [isAuthenticated, router, isProcessing]);
 
   useEffect(() => {
-    // if (!isMounted) return;
-    if (isProcessing) return;
-
     const handleCallback = async () => {
       try {
-        setIsProcessing(true);
         const response = await fetchClient('/auth/access-token', {
           method: 'POST',
           skipAuth: true,
@@ -67,13 +58,7 @@ export default function SocialAuthCallback() {
     };
 
     handleCallback();
-  // }, [router, searchParams, isMounted, isAuthenticated]);
-  // }, [router, searchParams, isMounted,]);
-}, [router, searchParams, isProcessing,]);
-
-  // }, [ isMounted,]);
-
-  // }, []);
+  }, [router, searchParams]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-white">
