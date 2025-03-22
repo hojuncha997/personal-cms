@@ -69,7 +69,10 @@ const initialState = {
 export const useAuthStore = create<AuthStore>((set) => ({
   ...initialState,
   
-  updateAuthState: (payload) => set(payload),
+  updateAuthState: (payload) => set((state) => ({
+    ...state,  // 기존 상태 유지
+    ...payload // 새로운 값으로 업데이트
+  })),
   
   resetAuthState: () => set(initialState),
   
