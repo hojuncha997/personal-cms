@@ -40,12 +40,18 @@ export default function SocialAuthCallback() {
           const beforeState = useAuthStore.getState();
           console.log('상태 업데이트 전:', beforeState);
           
+          // 토큰 페이로드에서 사용자 정보 추출
+          const tokenPayload = JSON.parse(atob(data.access_token.split('.')[1]));
+          console.log('토큰 페이로드:', tokenPayload);
+          
           updateAuthState({
             isAuthenticated: true, 
             accessToken: data.access_token,
-            email: data.email || '',
-            role: data.role || 'USER',
-            nickname: data.nickname || '사용자'
+            // 토큰 페이로드의 값을 우선 사용하고, 없으면 서버 응답, 그것도 없으면 기본값 사용
+            email: tokenPayload.email || data.email || beforeState.email || '',
+            role: tokenPayload.role || data.role || beforeState.role || 'USER',
+            nickname: tokenPayload.nickname || data.nickname || beforeState.nickname || '사용자',
+            sub: tokenPayload.sub || data.sub || beforeState.sub
           });
           
           console.log('상태 업데이트 요청됨');
@@ -55,7 +61,7 @@ export default function SocialAuthCallback() {
             const state = useAuthStore.getState();
             console.log('현재 상태 체크:', state);
             
-            if (state.isAuthenticated && state.accessToken) {
+            if (state.isAuthenticated && state.accessToken && state.email && state.role) {
               console.log('상태 업데이트 완료 - 정상');
               resolve();
               return;
