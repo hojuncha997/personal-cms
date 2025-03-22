@@ -26,7 +26,10 @@ export default function SocialAuthCallback() {
         setIsProcessing(true);
         const response = await fetchClient('/auth/access-token', {
           method: 'POST',
-          skipAuth: true
+          skipAuth: true,
+          headers: {
+            'x-client-type': 'web'
+          }
         });
 
         const data = await response.json();
