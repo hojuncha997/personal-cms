@@ -31,19 +31,29 @@ export default function SocialAuthCallback() {
         // 토큰 설정
         setAuthToken(data.access_token);
         
-        // 상태 업데이트
-        updateAuthState({
-          isAuthenticated: true, 
-          accessToken: data.access_token,
-          email: data.email,
-          role: data.role,
-          nickname: data.nickname
+        // 상태 업데이트를 Promise로 감싸서 완료 보장
+        await new Promise<void>((resolve) => {
+          updateAuthState({
+            isAuthenticated: true, 
+            accessToken: data.access_token,
+            email: data.email || '',
+            role: data.role || 'USER',
+            nickname: data.nickname || '사용자'
+          });
+          
+          // 상태 업데이트가 완료될 때까지 대기
+          const checkState = () => {
+            const state = useAuthStore.getState();
+            if (state.isAuthenticated && state.email && state.role) {
+              resolve();
+            } else {
+              setTimeout(checkState, 50);
+            }
+          };
+          checkState();
         });
 
-        // 상태 업데이트가 완료될 때까지 잠시 대기
-        await new Promise(resolve => setTimeout(resolve, 100));
-
-        // 상태 업데이트 후 직접 라우팅
+        // 상태 업데이트 완료 후 라우팅
         router.replace('/');
 
       } catch (error) {
