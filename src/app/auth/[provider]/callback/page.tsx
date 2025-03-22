@@ -19,10 +19,11 @@ export default function SocialAuthCallback() {
 
   // 인증 상태 변경 감지
   useEffect(() => {
+    if (isProcessing) return; // 처리 중일 때는 라우팅하지 않음
     if (isAuthenticated) {
       router.replace('/');
     }
-  }, [isAuthenticated, router]);
+  }, [isAuthenticated, router, isProcessing]);
 
   useEffect(() => {
     // if (!isMounted) return;
