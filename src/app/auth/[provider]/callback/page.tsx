@@ -15,21 +15,34 @@ export default function SocialAuthCallback() {
   useEffect(() => {
     const handleCallback = async () => {
       try {
-        const response = await fetchClient('/auth/access-token', {
-          method: 'POST',
-          skipAuth: true,
-          headers: { 'x-client-type': 'web' }
-        });
+        // 현재 상태 확인
+        const currentState = useAuthStore.getState();
+        let tokenData;
 
-        const data = await response.json();
-        console.log('소셜 인증 응답 데이터:', data);
+        // 이미 토큰이 있는지 확인
+        if (currentState.accessToken) {
+          console.log('이미 토큰이 존재함, 기존 토큰 사용');
+          tokenData = {
+            access_token: currentState.accessToken
+          };
+        } else {
+          // 토큰이 없는 경우에만 새로 요청
+          const response = await fetchClient('/auth/access-token', {
+            method: 'POST',
+            skipAuth: true,
+            headers: { 'x-client-type': 'web' }
+          });
 
-        if (!data.access_token) {
-          throw new Error('토큰이 없습니다.');
+          tokenData = await response.json();
+          console.log('소셜 인증 응답 데이터:', tokenData);
+
+          if (!tokenData.access_token) {
+            throw new Error('토큰이 없습니다.');
+          }
         }
 
         // 토큰 설정
-        setAuthToken(data.access_token);
+        setAuthToken(tokenData.access_token);
         console.log('액세스 토큰 설정 완료');
         
         // 상태 업데이트를 Promise로 감싸서 완료 보장
@@ -41,17 +54,16 @@ export default function SocialAuthCallback() {
           console.log('상태 업데이트 전:', beforeState);
           
           // 토큰 페이로드에서 사용자 정보 추출
-          const tokenPayload = JSON.parse(atob(data.access_token.split('.')[1]));
+          const tokenPayload = JSON.parse(atob(tokenData.access_token.split('.')[1]));
           console.log('토큰 페이로드:', tokenPayload);
           
           updateAuthState({
             isAuthenticated: true, 
-            accessToken: data.access_token,
-            // 토큰 페이로드의 값을 우선 사용하고, 없으면 서버 응답, 그것도 없으면 기본값 사용
-            email: tokenPayload.email || data.email || beforeState.email || '',
-            role: tokenPayload.role || data.role || beforeState.role || 'USER',
-            nickname: tokenPayload.nickname || data.nickname || beforeState.nickname || '사용자',
-            sub: tokenPayload.sub || data.sub || beforeState.sub
+            accessToken: tokenData.access_token,
+            email: tokenPayload.email || beforeState.email || '',
+            role: tokenPayload.role || beforeState.role || 'USER',
+            nickname: tokenPayload.nickname || beforeState.nickname || '사용자',
+            sub: tokenPayload.sub || beforeState.sub
           });
           
           console.log('상태 업데이트 요청됨');
@@ -82,7 +94,6 @@ export default function SocialAuthCallback() {
         });
 
         console.log('상태 업데이트 프로세스 완료, 라우팅 시작');
-        // 상태 업데이트 완료 후 라우팅
         router.replace('/');
 
       } catch (error) {
