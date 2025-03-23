@@ -17,6 +17,7 @@ import TextStyle from '@tiptap/extension-text-style'
 import { useEffect } from 'react'
 import { Toolbar } from './index'
 import { ImagePlaceholder } from '../ImagePlaceholder'
+import { logger } from '@/utils/logger';
 
 interface TiptapProps {
   // 본문 기본값
@@ -155,7 +156,7 @@ const Tiptap = ({
     editable,
     onUpdate: ({ editor }) => {
       // 디버깅을 위한 콘솔 로그 추가
-      console.log('Editor content updated:', editor.getJSON());
+      logger.info('Editor content updated:', editor.getJSON());
       if (onChange) {
         onChange(editor.getJSON());
       }

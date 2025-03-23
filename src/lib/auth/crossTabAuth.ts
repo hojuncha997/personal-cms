@@ -1,6 +1,6 @@
 import { useAuthStore } from '@/store/useAuthStore';
 import { useRouter } from 'next/navigation';
-
+import { logger } from '@/utils/logger';
 export class CrossTabAuth {
   // 브라우저의 BroadcastChannel API를 사용하기 위한 채널 인스턴스
   private static channel: BroadcastChannel | null = null;
@@ -14,7 +14,7 @@ export class CrossTabAuth {
       this.channel.onmessage = this.handleAuthEvent.bind(this);
     } catch (e) {
       // BroadcastChannel을 지원하지 않는 브라우저를 위한 폴백
-      console.log('BroadcastChannel not supported, falling back to localStorage');
+      logger.info('BroadcastChannel not supported, falling back to localStorage');
       this.fallbackEnabled = true;
       window.addEventListener('storage', this.handleStorageEvent.bind(this));
     }

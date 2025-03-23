@@ -1,6 +1,7 @@
 // components/common/popover.tsx
 import React, { useState } from 'react'
 import * as PopoverPrimitive from '@radix-ui/react-popover'
+import { logger } from '@/utils/logger';
 
 interface CommonPopoverProps {
   trigger: React.ReactNode; // 팝오버를 열 트리거 요소
@@ -27,7 +28,7 @@ export function CommonPopover({
   //  minHeight = '10rem',
   //  padding = '3'
 }: CommonPopoverProps) {
-  console.log("placement : ", placement)
+  logger.info("placement : ", placement)
   const [open, setOpen] = useState(false)
 
   const handleOpenChange = (nextOpen: boolean) => {
@@ -51,7 +52,7 @@ export function CommonPopover({
     }
   }
 
-  console.log("getPlacementStyle(): ", getPlacementStyle())
+  logger.info("getPlacementStyle(): ", getPlacementStyle())
 
   return (
     // root는 팝오버의 최상위 컴포넌트

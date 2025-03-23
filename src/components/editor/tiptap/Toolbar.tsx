@@ -22,6 +22,7 @@ import {
   Palette
 } from "lucide-react"
 import { addImagePlaceholder } from "../ImagePlaceholder"
+import { logger } from "@/utils/logger"
 
 interface ToolbarProps {
     editor: Editor  // null을 허용하지 않음
@@ -243,9 +244,9 @@ export default function Toolbar({
             <button
     type="button"
     onClick={() => {
-      console.log('H1 button clicked')
+      logger.info('H1 button clicked')
       editor.chain().focus().toggleHeading({ level: 1 }).run()
-      console.log('After toggle:', editor.isActive('heading', { level: 1 }))
+      logger.info('After toggle:', editor.isActive('heading', { level: 1 }))
     }}
     className={`p-2 rounded hover:bg-gray-200 ${editor.isActive('heading', { level: 1 }) ? 'bg-gray-200' : ''}`}
     title="제목 1"

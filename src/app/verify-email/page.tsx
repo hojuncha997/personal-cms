@@ -4,7 +4,7 @@ import React, { Suspense } from 'react';
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Container } from '@/components/layouts/Container';
-
+import { logger } from '@/utils/logger';
 interface ApiError {
   response: {
     status: number;
@@ -40,7 +40,7 @@ const VerifyEmailContent = () => {
       });
 
       const data = await response.json();
-      console.log('Response:', response.status, data);
+      logger.info('Response:', response.status, data);
 
       if (!response.ok) {
         setVerificationStatus('error');

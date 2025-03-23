@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { useGetProjectNavigation } from '@/hooks/projects/useGetProjectNavigation';
 import { format } from 'date-fns';
+import { logger } from '@/utils/logger';
 
 interface ProjectNavigationProps {
     publicId: string;
@@ -9,7 +10,7 @@ interface ProjectNavigationProps {
 export const ProjectNavigation = ({ publicId }: ProjectNavigationProps) => {
     const { data: navigation, isLoading, error } = useGetProjectNavigation(publicId);
     
-    console.log('Navigation data:', { publicId, navigation, isLoading, error }); // 디버깅용
+    logger.info('Navigation data:', { publicId, navigation, isLoading, error }); // 디버깅용
     
     if (isLoading || !navigation) return null;
 

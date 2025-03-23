@@ -10,7 +10,7 @@ import { User } from 'lucide-react';
 import { useWithdraw } from '@/hooks/auth/useWithdraw';
 import { WithdrawalReason, WithdrawalReasonLabel } from '@/types/member';
 import { useUpdatePassword } from '@/hooks/auth/useUpdatePassword';
-
+import { logger } from '@/utils/logger';
 export default function MyPage() {
   const { isAuthenticated, email, nickname } = useAuthStore();
   const router = useRouter();
@@ -39,7 +39,7 @@ export default function MyPage() {
 
   // 디버깅을 위한 useEffect 추가
   useEffect(() => {
-    console.log('Profile Data:', {
+    logger.info('Profile Data:', {
       isLoading,
       error,
       profile,

@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { useGetPostNavigation } from '@/hooks/posts/useGetPostNavigation';
 import { format } from 'date-fns';
-
+import { logger } from '@/utils/logger';
 interface PostNavigationProps {
     publicId: string;
 }
@@ -9,7 +9,7 @@ interface PostNavigationProps {
 export const PostNavigation = ({ publicId }: PostNavigationProps) => {
     const { data: navigation, isLoading, error } = useGetPostNavigation(publicId);
     
-    console.log('Navigation data:', { publicId, navigation, isLoading, error }); // 디버깅용
+    logger.info('Navigation data:', { publicId, navigation, isLoading, error }); // 디버깅용
     
     if (isLoading || !navigation) return null;
 

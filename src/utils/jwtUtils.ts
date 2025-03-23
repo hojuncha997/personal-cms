@@ -1,5 +1,7 @@
 // src/utils/jwtUtils.ts
 
+import { logger } from '@/utils/logger';
+
 // JWT 토큰 관련 사용자 정의 에러 클래스
 export class TokenError extends Error {
   constructor(
@@ -61,16 +63,18 @@ export class TokenError extends Error {
       )
     );
 
-    console.log('=== Token Payload Debug ===');
-    console.log('Raw token:', token);
-    console.log('Decoded payload:', decodedPayload);
-    console.log('Required fields check:');
-    console.log('- exp:', decodedPayload.exp);
-    console.log('- sub:', decodedPayload.sub);
-    console.log('- email:', decodedPayload.email);
-    console.log('- nickname:', decodedPayload.nickname);
-    console.log('- role:', decodedPayload.role);
-    console.log('========================');
+    if (process.env.NODE_ENV === 'development') {
+      logger.info('=== Token Payload Debug ===');
+      logger.info('Raw token:', token);
+      logger.info('Decoded payload:', decodedPayload);
+      logger.info('Required fields check:');
+      logger.info('- exp:', decodedPayload.exp);
+      logger.info('- sub:', decodedPayload.sub);
+      logger.info('- email:', decodedPayload.email);
+      logger.info('- nickname:', decodedPayload.nickname);
+      logger.info('- role:', decodedPayload.role);
+      logger.info('========================');
+    }
  
     // 필수 클레임 존재 여부 검증
     if (!decodedPayload.exp || !decodedPayload.sub || !decodedPayload.email || !decodedPayload.nickname) {
@@ -80,10 +84,10 @@ export class TokenError extends Error {
     // 페이로드 타입 검증
     validateTokenPayload(decodedPayload);
  
-    console.log('Decoded token payload:', JSON.stringify(decodedPayload));
+    logger.info('Decoded token payload:', JSON.stringify(decodedPayload));
     return decodedPayload;
   } catch (error) {
-    console.error('Token decoding failed:', error);
+    logger.error('Token decoding failed:', error);
     throw error instanceof TokenError ? error : new TokenError('Invalid token', 'INVALID_FORMAT');
   }
  }

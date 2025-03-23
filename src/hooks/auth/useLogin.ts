@@ -3,6 +3,7 @@ import { useMutation } from "@tanstack/react-query";
 import { LoginCredentials } from "@/types/authTypes";
 import { fetchClient, FetchOptions } from '@/lib/fetchClient'
 import { setAuthToken } from '@/lib/authInterceptor';
+import { logger } from '@/utils/logger';
 
 export class LoginError extends Error {
  constructor(message: string, public status: number) {
@@ -32,17 +33,17 @@ export const useLogin = () => {
        } as FetchOptions);
 
        const data = await response.json();
-       console.log('서버 응답:', data);
+       logger.info('서버 응답:', data);
        
        if (data.access_token) {
-         console.log('로그인 성공');
+         logger.info('로그인 성공');
          setAuthToken(data.access_token);
          return data;
        } else {
          throw new LoginError('인증 토큰이 없습니다.', 500);
        }
      } catch (error) {
-       console.error('로그인 에러:', error);
+       logger.error('로그인 에러:', error);
        if (error instanceof LoginError) {
          throw error;
        }

@@ -19,6 +19,7 @@ import {
   addRefreshSubscriber,
   shouldRefreshToken 
 } from './authInterceptor'
+import { logger } from '@/utils/logger'
 
 export interface FetchOptions extends RequestInit {
   body?: any;
@@ -32,7 +33,7 @@ export async function fetchClient(url: string, options: FetchOptions = {skipAuth
   // console.log('Request:', {
   //   url: `${process.env.NEXT_PUBLIC_API_URL}${url}`,
 
-  console.log('[fetchClient] 요청 시작:', {
+  logger.info('[fetchClient] 요청 시작:', {
     url,
     method: options.method || 'GET',
     skipAuth,
@@ -50,11 +51,11 @@ export async function fetchClient(url: string, options: FetchOptions = {skipAuth
     const accessToken = useAuthStore.getState().accessToken;
     
     if (!accessToken || shouldRefreshToken()) {
-      console.log('[fetchClient] 토큰 갱신 필요');
+      logger.info('[fetchClient] 토큰 갱신 필요');
       
       try {
         const newToken = await handleTokenRefresh();
-        console.log('[fetchClient] 토큰 갱신 완료');
+        logger.info('[fetchClient] 토큰 갱신 완료');
         
         // 헤더에 새 토큰 추가
         fetchOptions.headers = {
@@ -62,7 +63,7 @@ export async function fetchClient(url: string, options: FetchOptions = {skipAuth
           'Authorization': `Bearer ${newToken}`
         };
       } catch (error) {
-        console.error('[fetchClient] 토큰 갱신 실패:', error);
+        logger.error('[fetchClient] 토큰 갱신 실패:', error);
         throw error;
       }
     } else {
@@ -94,7 +95,7 @@ export async function fetchClient(url: string, options: FetchOptions = {skipAuth
   }
 
   // 요청 실행 전
-  console.log('Final request config:', {
+  logger.info('Final request config:', {
     url: `${process.env.NEXT_PUBLIC_API_URL}${url}`,
     method: config.method,
     headers: config.headers,
@@ -104,7 +105,7 @@ export async function fetchClient(url: string, options: FetchOptions = {skipAuth
   const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}${url}`, config);
 
   // 응답 로깅
-  console.log('Response:', {
+  logger.info('Response:', {
     status: response.status,
     statusText: response.statusText,
     headers: Object.fromEntries(response.headers.entries())
@@ -112,7 +113,7 @@ export async function fetchClient(url: string, options: FetchOptions = {skipAuth
 
   // 401 에러 처리 로직 단순화
   if (response.status === 401 && !skipAuth && !isExcludedEndpoint) {
-    console.log('[fetchClient] 401 응답 감지, 토큰 갱신 후 재시도');
+    logger.info('[fetchClient] 401 응답 감지, 토큰 갱신 후 재시도');
     
     try {
       const newToken = await handleTokenRefresh();
@@ -127,7 +128,7 @@ export async function fetchClient(url: string, options: FetchOptions = {skipAuth
         }
       });
     } catch (error) {
-      console.error('[fetchClient] 토큰 갱신 실패:', error);
+      logger.error('[fetchClient] 토큰 갱신 실패:', error);
       throw error;
     }
   }

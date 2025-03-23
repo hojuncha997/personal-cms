@@ -16,6 +16,7 @@ import ProjectListSkeleton from '@/components/projects/skeletons/projectListSkel
 import Image from 'next/image';
 import { useAuthStore } from '@/store/useAuthStore'
 import { AdminGuard } from '@/components/auth/AdminGuard';
+import { logger } from '@/utils/logger';
 
 const ProjectListContent = () => {
     const router = useRouter();
@@ -75,10 +76,10 @@ const ProjectListContent = () => {
 
     // useGetPostList 호출 전에 searchState 값 확인
     useEffect(() => {
-        console.log('searchState:', searchState);
+        logger.info('searchState:', searchState);
     }, [searchState]);
 
-    console.log('useGetProjectList params:', {
+    logger.info('useGetProjectList params:', {
         page: searchState.page,
         limit: 10,
         search: searchState.search,
@@ -150,9 +151,9 @@ const ProjectListContent = () => {
 
     // useEffect를 사용하여 데이터가 실제로 변경될 때만 로그 출력
     useEffect(() => {
-        console.log('포스팅 데이터 업데이트:', data);
-        console.log('로딩 상태 변경:', isLoading);
-        console.log('에러 상태:', error);
+        logger.info('포스팅 데이터 업데이트:', data);
+        logger.info('로딩 상태 변경:', isLoading);
+        logger.info('에러 상태:', error);
     }, [data, isLoading, error]);
 
     if (isLoading) {

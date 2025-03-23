@@ -4,6 +4,7 @@ import { useAuthStore } from '@/store/useAuthStore'
 import { refreshTokenRequest } from '@/utils/refreshTokenRequest'
 import { getTokenPayload } from '@/utils/jwtUtils'
 import { TokenError } from '@/types/authTypes'
+import { logger } from '@/utils/logger'
 
 let isRefreshing = false
 let refreshSubscribers: ((token: string) => void)[] = []
@@ -21,11 +22,11 @@ let refreshPromise: Promise<string> | null = null;  // 토큰 갱신 Promise 저
 // 3. shouldRefreshToken: 갱신 필요 여부 확인
 
 export async function handleTokenRefresh() {
-  console.log('[handleTokenRefresh] 토큰 갱신 시작');
+  logger.info('[handleTokenRefresh] 토큰 갱신 시작');
   
   // 이미 진행 중인 갱신 요청이 있다면 해당 Promise 반환
   if (refreshPromise) {
-    console.log('[handleTokenRefresh] 이미 진행 중인 갱신 요청 재사용');
+    logger.info('[handleTokenRefresh] 이미 진행 중인 갱신 요청 재사용');
     return refreshPromise;
   }
 
@@ -34,19 +35,19 @@ export async function handleTokenRefresh() {
   // 새로운 갱신 요청 생성
   refreshPromise = (async () => {
     try {
-      console.log('[handleTokenRefresh] refresh_token으로 새 토큰 요청');
+      logger.info('[handleTokenRefresh] refresh_token으로 새 토큰 요청');
       const newToken = await refreshTokenRequest();
       
-      console.log('[handleTokenRefresh] 새 토큰 검증 및 저장 시작');
+      logger.info('[handleTokenRefresh] 새 토큰 검증 및 저장 시작');
       setAuthToken(newToken);
       
       // 대기 중인 요청들 처리
       refreshSubscribers.forEach(callback => callback(newToken));
       
-      console.log('[handleTokenRefresh] 토큰 갱신 성공');
+      logger.info('[handleTokenRefresh] 토큰 갱신 성공');
       return newToken;
     } catch (error) {
-      console.error('[handleTokenRefresh] 토큰 갱신 실패:', error);
+      logger.error('[handleTokenRefresh] 토큰 갱신 실패:', error);
       throw error;
     } finally {
       isRefreshing = false;
@@ -94,20 +95,20 @@ export { isRefreshing }
 
 
 export async function setAuthToken(token: string | null) {
-  console.log('[setAuthToken] 토큰 설정 시작');
+  logger.info('[setAuthToken] 토큰 설정 시작');
 
   if (!token) {
-    console.log('[setAuthToken] 토큰이 null, 인증 상태 초기화');
+    logger.info('[setAuthToken] 토큰이 null, 인증 상태 초기화');
     useAuthStore.getState().resetAuthState();
     useAuthStore.getState().setLoading(false);
     return;
   }
 
   try {
-    console.log('[setAuthToken] 토큰 유효성 검증');
+    logger.info('[setAuthToken] 토큰 유효성 검증');
     const payload = getTokenPayload(token);
     
-    console.log('[setAuthToken] store에 토큰 정보 저장');
+    logger.info('[setAuthToken] store에 토큰 정보 저장');
     // 상태 업데이트를 Promise로 감싸서 완료를 보장
     await new Promise<void>((resolve) => {
       useAuthStore.getState().updateAuthState({
@@ -130,9 +131,9 @@ export async function setAuthToken(token: string | null) {
       });
     });
     
-    console.log('[setAuthToken] 토큰 설정 완료');
+    logger.info('[setAuthToken] 토큰 설정 완료');
   } catch (error) {
-    console.error('[setAuthToken] 토큰 검증 실패:', error);
+    logger.error('[setAuthToken] 토큰 검증 실패:', error);
     useAuthStore.getState().resetAuthState();
     useAuthStore.getState().setLoading(false);
     throw new TokenError('유효하지 않은 토큰 형식입니다.');

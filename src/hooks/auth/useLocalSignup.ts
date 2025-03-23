@@ -2,6 +2,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { LocalSignupCredentials } from "@/types/authTypes";
 import { fetchClient, FetchOptions } from '@/lib/fetchClient'
+import { logger } from '@/utils/logger';
 
 export const useLocalSignup = () => {
   return useMutation({
@@ -15,7 +16,7 @@ export const useLocalSignup = () => {
         body: JSON.stringify(credentials),
         skipAuth: true // 인증 헤더 추가하지 않음
       } as FetchOptions)
-      console.log("response from localSignup", response)
+      logger.info("response from localSignup", response)
       return response;
     }
   })

@@ -20,6 +20,7 @@ import { MoreVertical } from 'lucide-react';
 import { useDeletePost } from '@/hooks/posts/useDeletePost';
 import { useRouter } from 'next/navigation';
 import { useIsAuthor } from '@/hooks/auth/useIsAuthor';
+import { logger } from '@/utils/logger';
 
 interface PostDetailClientProps {
     publicId: string;
@@ -65,11 +66,11 @@ const PostDetailClient: React.FC<PostDetailClientProps> = ({ publicId, prefetch 
                 // }
                 // 우선은 간편한 방법을 써서 삭제 후 목록 페이지로 이동. 추후 서버 응답 구조에 따라 수정 필요.
                 const result = await deletePostAsync(publicId);
-                console.log(result);
+                logger.info('게시글 삭제 결과:', await result.json());
                 router.push('/posts');
                
             } catch (error) {
-                console.error('게시글 삭제 실패:', error);
+                logger.error('게시글 삭제 실패:', error);
                 alert('게시글 삭제에 실패했습니다.');
             }
         }
