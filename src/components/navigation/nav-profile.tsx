@@ -5,9 +5,11 @@ import { useWindowSize } from "@/hooks/layout/useWindowSize"
 import { CommonDrawer } from "@/components/common/common-drawer"
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { useProfile } from '@/hooks/auth/useProfile'
 
 export function NavProfile() {
     const [isDrawerOpen, setIsDrawerOpen] = useState(false)
+    const { data: profile, isLoading: isProfileLoading } = useProfile();
 
     const { mutateAsync: logoutMutation, isPending: isLogoutPending } = useLogout({
         // alert는 숨기고, 로그인 폼 상태는 자동으로 초기화됨
@@ -15,9 +17,7 @@ export function NavProfile() {
         onSuccess: () => setIsDrawerOpen(false)
     });
     
-    const email = useAuthStore(state => state.email)
     const role = useAuthStore(state => state.role)
-    const nickname = useAuthStore(state => state.nickname)
     const {isMobile, isTablet} = useWindowSize()
     const router = useRouter()
     const roleType: { [key: string]: string } = {
@@ -26,19 +26,9 @@ export function NavProfile() {
         'GUEST': '게스트'
     }
 
-    // const handleLogout = async () => {
-    //     try {
-    //         await logout()
-    //         setIsDrawerOpen(false)  // 드로어 닫기
-    //     } catch (error) {
-    //         console.error('로그아웃 실패:', error)
-    //     }
-    // }
-
     const handleLogout = async () => {
         try {
-            await logoutMutation(); // 폼 리셋 + 로그아웃 api 호출
-            // setIsDrawerOpen(false)는 onSuccess 옵션으로 이동했으므로 여기서는 제거
+            await logoutMutation();
         } catch (error) {
             console.error('로그아웃 실패:', error)
         }
@@ -49,20 +39,12 @@ export function NavProfile() {
         {
             id: 'profile',
             section: 'info',
-            label: email,
-            subLabel: nickname ? nickname : '게스트',
+            label: profile?.email || '게스트',
+            subLabel: profile?.nickname || '게스트',
             onClick: () => {
                 router.push('/mypage')
             },
         },
-        // {
-        //     id: 'mypage',
-        //     section: 'menu',
-        //     label: '마이페이지',
-        //     onClick: () => {
-        //         router.push('/mypage')
-        //     },
-        // },
         {
             id: 'settings',
             section: 'menu',
@@ -142,7 +124,6 @@ export function NavProfile() {
         return (
             <>
                 <div onClick={() => setIsDrawerOpen(true)}>
-                    {/* <p>{email?.split('@')[0]}</p> */}
                     <svg 
                             className="w-6 h-6" 
                             viewBox="0 0 24 24" 
@@ -155,7 +136,7 @@ export function NavProfile() {
                     trigger={null}
                     isOpen={isDrawerOpen} 
                     onClose={() => setIsDrawerOpen(false)}
-                    title={`${email}`}
+                    title={profile?.email || '게스트'}
                     portalTo="drawer-root"
                 >
                     <ProfileMenuContent inDrawer={true} />
@@ -169,7 +150,6 @@ export function NavProfile() {
             trigger={
                 <div>
                     <div className="flex items-center">
-                    {/* <p>{email?.split('@')[0]}</p> */}
                         <svg 
                             className="w-6 h-6" 
                             viewBox="0 0 24 24" 

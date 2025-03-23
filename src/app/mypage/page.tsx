@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useAuthStore } from '@/store/useAuthStore';
-import { useProfileStore } from '@/store/useProfileStore';
+import { useProfile } from '@/hooks/auth/useProfile';
 import { colors } from '@/constants/styles';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -11,17 +11,11 @@ import { useWithdraw } from '@/hooks/auth/useWithdraw';
 import { WithdrawalReason, WithdrawalReasonLabel } from '@/types/member';
 import { useUpdatePassword } from '@/hooks/auth/useUpdatePassword';
 import { logger } from '@/utils/logger';
+
 export default function MyPage() {
-  const { isAuthenticated, email, nickname } = useAuthStore();
+  const { isAuthenticated } = useAuthStore();
   const router = useRouter();
-  const { 
-    profile, 
-    isLoading, 
-    error, 
-    isEditMode,
-    toggleEditMode,
-    updateProfile 
-  } = useProfileStore();
+  const { data: profile, isLoading, error } = useProfile();
   const [isWithdrawModalOpen, setIsWithdrawModalOpen] = useState(false);
   const [withdrawReason, setWithdrawReason] = useState('');
   const [withdrawDetail, setWithdrawDetail] = useState('');
@@ -46,6 +40,25 @@ export default function MyPage() {
       isAuthenticated
     });
   }, [isLoading, error, profile, isAuthenticated]);
+
+  // 인증되지 않은 사용자는 로그인 페이지로 리다이렉트
+  useEffect(() => {
+    if (!isAuthenticated) {
+      router.push('/auth/login');
+    }
+  }, [isAuthenticated, router]);
+
+  if (isLoading) {
+    return <div>로딩 중...</div>;
+  }
+
+  if (error) {
+    return <div>프로필 정보를 불러오는데 실패했습니다.</div>;
+  }
+
+  if (!profile) {
+    return <div>프로필 정보가 없습니다.</div>;
+  }
 
   const handleWithdraw = () => {
     if (!withdrawReason) {
@@ -92,171 +105,63 @@ export default function MyPage() {
     });
   };
 
-  if (!isAuthenticated) {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
-        <p className="text-lg font-medium text-gray-600">로그인이 필요한 페이지입니다.</p>
-        <button
-          onClick={() => router.push('/')}
-          className="mt-4 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-        >
-          홈으로 이동
-        </button>
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h1 className="text-2xl font-bold text-gray-900 mb-8">마이페이지</h1>
-        
-        {isLoading ? (
-          <div className="flex justify-center py-12">
-            <div className="text-gray-600">로딩 중...</div>
-          </div>
-        ) : error ? (
-          <div className="bg-red-50 p-4 rounded-lg text-red-600">{error}</div>
-        ) : (
-          <div className="space-y-8">
-            {/* 프로필 섹션 */}
-            <section className="bg-white rounded-xl shadow-sm overflow-hidden">
-              <div className="p-6 sm:p-8">
-                <div className="flex justify-between items-center mb-8">
-                  <h2 className="text-xl font-semibold text-gray-900">프로필 정보</h2>
-                  <button
-                    onClick={toggleEditMode}
-                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-                  >
-                    {isEditMode ? '저장' : '수정'}
-                  </button>
+    <div className="container mx-auto px-4 py-8">
+      <div className="max-w-4xl mx-auto">
+        <h1 className="text-3xl font-bold mb-8">마이페이지</h1>
+
+        <div className="bg-white rounded-lg shadow-md p-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {/* 프로필 이미지 */}
+            <div className="flex flex-col items-center">
+              <div className="w-40 h-40 rounded-full overflow-hidden border-4 border-gray-100 shadow-md">
+                {profile.profileImage ? (
+                  <Image
+                    src={profile.profileImage}
+                    alt="프로필 이미지"
+                    width={160}
+                    height={160}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center bg-gray-100">
+                    <User className="w-20 h-20 text-gray-400" />
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* 프로필 정보 */}
+            <div className="md:col-span-2">
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">이메일</label>
+                  <p className="mt-1 text-gray-900">{profile.email}</p>
                 </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                  {/* 프로필 이미지 */}
-                  <div className="flex flex-col items-center">
-                    <div className="w-40 h-40 rounded-full overflow-hidden border-4 border-gray-100 shadow-md">
-                      {profile?.avatarUrl ? (
-                        <Image
-                          src={profile.avatarUrl}
-                          alt="프로필 이미지"
-                          width={160}
-                          height={160}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center bg-gray-100">
-                          <User className="w-20 h-20 text-gray-400" />
-                        </div>
-                      )}
-                    </div>
-                    {isEditMode && (
-                      <button className="mt-4 px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
-                        이미지 변경
-                      </button>
-                    )}
-                  </div>
-
-                  {/* 프로필 정보 */}
-                  <div className="md:col-span-2 space-y-6">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">이메일</label>
-                        <p className="text-gray-900">{email}</p>
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">닉네임</label>
-                        {isEditMode ? (
-                          <input
-                            type="text"
-                            value={profile?.nickname || ''}
-                            onChange={(e) => updateProfile({ nickname: e.target.value })}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                          />
-                        ) : (
-                          // <p className="text-gray-900">{profile?.nickname}</p>
-                          <p className="text-gray-900">{nickname}</p>
-                        )}
-                      </div>
-                    </div>
-
-                    {profile && (
-                      <>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">자기소개</label>
-                          {isEditMode ? (
-                            <textarea
-                              value={profile.bio}
-                              onChange={(e) => updateProfile({ bio: e.target.value })}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                              rows={3}
-                            />
-                          ) : (
-                            <p className="text-gray-900 whitespace-pre-line">{profile.bio}</p>
-                          )}
-                        </div>
-                      </>
-                    )}
-                  </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">이름</label>
+                  <p className="mt-1 text-gray-900">{profile.name}</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">닉네임</label>
+                  <p className="mt-1 text-gray-900">{profile.nickname}</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">상태</label>
+                  <p className="mt-1 text-gray-900">{profile.status}</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">이메일 인증</label>
+                  <p className="mt-1 text-gray-900">{profile.emailVerified ? '인증됨' : '미인증'}</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">마지막 로그인</label>
+                  <p className="mt-1 text-gray-900">{new Date(profile.lastLoginAt).toLocaleString()}</p>
                 </div>
               </div>
-            </section>
-
-            {/* 설정 섹션 */}
-            <section className="bg-white rounded-xl shadow-sm overflow-hidden">
-              <div className="p-6 sm:p-8">
-                <h2 className="text-xl font-semibold text-gray-900 mb-6">설정</h2>
-                <div className="space-y-6">
-                  {/* 비밀번호 변경 버튼은 profile 여부와 관계없이 표시 */}
-                  <div className="pt-4 border-t border-gray-200">
-                    <button
-                      onClick={() => setIsPasswordModalOpen(true)}
-                      className="px-4 py-2 text-green-600 border border-green-600 rounded-lg hover:bg-green-50 transition-colors"
-                    >
-                      비밀번호 변경
-                    </button>
-                  </div>
-
-                  {/* 테마와 언어 설정은 profile이 있을 때만 표시 */}
-                  {profile && (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">테마</label>
-                        <select
-                          value={profile.preferences.theme}
-                          onChange={(e) => updateProfile({
-                            preferences: { ...profile.preferences, theme: e.target.value as 'light' | 'dark' }
-                          })}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                          disabled={!isEditMode}
-                        >
-                          <option value="light">라이트</option>
-                          <option value="dark">다크</option>
-                        </select>
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">언어</label>
-                        <select
-                          value={profile.preferences.language}
-                          onChange={(e) => updateProfile({
-                            preferences: { ...profile.preferences, language: e.target.value }
-                          })}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                          disabled={!isEditMode}
-                        >
-                          <option value="ko">한국어</option>
-                          <option value="en">English</option>
-                        </select>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </section>
+            </div>
           </div>
-        )}
+        </div>
 
         <div className="mt-8">
           <button

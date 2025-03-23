@@ -22,7 +22,31 @@ interface AuthStore {
   nickname: string | null;
   isAuthenticated: boolean;
 
-  // 로그인 폼 상태 추가
+  // 토큰 관련 상태 추가
+  tokenVersion: number | null;
+  keepLoggedIn: boolean;
+
+  // 프로필 정보 추가
+  profile: {
+    name: string | null;
+    profileImage: string | null;
+    status: string | null;
+    emailVerified: boolean;
+    lastLoginAt: string | null;
+    preferences: {
+      language: string;
+      timezone: string;
+      theme: string;
+    } | null;
+    notificationSettings: any | null;
+    points: number;
+    levelInfo: any | null;
+    marketingAgreed: boolean;
+    termsAgreed: boolean;
+    privacyAgreed: boolean;
+  } | null;
+
+  // 로그인 폼 상태
   loginForm: LoginFormState;
 
   // 기존 액션들...
@@ -34,11 +58,17 @@ interface AuthStore {
     email: string | null;
     sub: string | null;
     isAuthenticated: boolean;
+    tokenVersion: number | null;
+    keepLoggedIn: boolean;
   }>) => void;
   resetAuthState: () => void;
   setLoading: (isLoading: boolean) => void;
 
-  // 로그인 폼 관련 액션 추가
+  // 프로필 관련 액션 추가
+  updateProfile: (profile: AuthStore['profile']) => void;
+  resetProfile: () => void;
+
+  // 로그인 폼 관련 액션
   updateLoginForm: (payload: Partial<LoginFormState>) => void;
   resetLoginForm: () => void;
 }
@@ -53,6 +83,13 @@ const initialState = {
   sub: null,
   nickname: null,
   isAuthenticated: false,
+
+  // 토큰 관련 상태 초기화
+  tokenVersion: null,
+  keepLoggedIn: false,
+
+  // 프로필 정보 초기화
+  profile: null,
 
   // 로그인 폼 초기 상태
   loginForm: {
@@ -70,15 +107,19 @@ export const useAuthStore = create<AuthStore>((set) => ({
   ...initialState,
   
   updateAuthState: (payload) => set((state) => ({
-    ...state,  // 기존 상태 유지
-    ...payload // 새로운 값으로 업데이트
+    ...state,
+    ...payload
   })),
   
   resetAuthState: () => set(initialState),
   
   setLoading: (isLoading) => set({ loading: isLoading }),
 
-  // 로그인 폼 관련 액션 추가
+  // 프로필 관련 액션
+  updateProfile: (profile) => set({ profile }),
+  resetProfile: () => set({ profile: null }),
+
+  // 로그인 폼 관련 액션
   updateLoginForm: (payload) => set((state) => ({
     loginForm: {
       ...state.loginForm,

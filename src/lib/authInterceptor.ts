@@ -93,50 +93,53 @@ export { isRefreshing }
 }
  */
 
-
 export async function setAuthToken(token: string | null) {
-  logger.info('[setAuthToken] 토큰 설정 시작');
-
-  if (!token) {
-    logger.info('[setAuthToken] 토큰이 null, 인증 상태 초기화');
-    useAuthStore.getState().resetAuthState();
-    useAuthStore.getState().setLoading(false);
-    return;
-  }
-
   try {
-    logger.info('[setAuthToken] 토큰 유효성 검증');
+    if (!token) {
+      useAuthStore.getState().resetAuthState();
+      useAuthStore.getState().resetProfile();
+      useAuthStore.getState().setLoading(false);
+      return;
+    }
+
     const payload = getTokenPayload(token);
-    
-    logger.info('[setAuthToken] store에 토큰 정보 저장');
-    // 상태 업데이트를 Promise로 감싸서 완료를 보장
+    if (!payload) {
+      throw new Error('Invalid token');
+    }
+
+    // 상태 업데이트
     await new Promise<void>((resolve) => {
       useAuthStore.getState().updateAuthState({
         accessToken: token,
         tokenExpiry: payload.exp * 1000,
-        nickname: payload.nickname || null,
         role: payload.role,
-        email: payload.email,
         sub: payload.sub,
-        isAuthenticated: true,
+        tokenVersion: payload.tokenVersion,
+        keepLoggedIn: payload.keepLoggedIn,
+        isAuthenticated: true
       });
-      
-      // 다음 렌더 사이클에서 상태가 실제로 업데이트되었는지 확인
-      requestAnimationFrame(() => {
-        const state = useAuthStore.getState();
-        if (state.isAuthenticated && state.role === payload.role) {
-          useAuthStore.getState().setLoading(false);
-          resolve();
-        }
-      });
+      resolve();
     });
-    
-    logger.info('[setAuthToken] 토큰 설정 완료');
+
+    // 상태가 업데이트되었는지 확인
+    const state = useAuthStore.getState();
+    if (!state.isAuthenticated) {
+      throw new Error('Failed to update auth state');
+    }
+
+    logger.info('[setAuthToken] 토큰 설정 완료:', {
+      sub: payload.sub,
+      role: payload.role,
+      tokenVersion: payload.tokenVersion,
+      keepLoggedIn: payload.keepLoggedIn
+    });
+
   } catch (error) {
-    logger.error('[setAuthToken] 토큰 검증 실패:', error);
+    logger.error('[setAuthToken] 토큰 설정 실패:', error);
     useAuthStore.getState().resetAuthState();
+    useAuthStore.getState().resetProfile();
     useAuthStore.getState().setLoading(false);
-    throw new TokenError('유효하지 않은 토큰 형식입니다.');
+    throw error;
   }
 } 
 
