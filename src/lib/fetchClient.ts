@@ -17,7 +17,9 @@ import {
   isRefreshing, 
   handleTokenRefresh, 
   addRefreshSubscriber,
-  shouldRefreshToken 
+  shouldRefreshToken,
+  queueRequest,
+  isInterceptorInitialized
 } from './authInterceptor'
 import { logger } from '@/utils/logger'
 
@@ -28,130 +30,143 @@ export interface FetchOptions extends RequestInit {
 }
 
 export async function fetchClient(url: string, options: FetchOptions = {skipAuth: false}): Promise<Response> {
-  const { skipAuth, ...fetchOptions } = options
+  // 로그인 관련 요청은 queueRequest를 건너뛰기 위한 엔드포인트 체크
+  const isAuthRequest = [
+    '/auth/login',
+    '/auth/local/login',
+    '/auth/refresh',
+    '/auth/access-token',
+    '/auth/google/callback',
+    '/auth/kakao/callback',
+    '/auth/naver/callback',
+    '/auth/signup',
+    '/auth/local/signup'
+  ].some(endpoint => url.startsWith(endpoint));
 
-  // console.log('Request:', {
-  //   url: `${process.env.NEXT_PUBLIC_API_URL}${url}`,
+  const executeRequest = async () => {
+    const { skipAuth, ...fetchOptions } = options
 
-  logger.info('[fetchClient] 요청 시작:', {
-    url,
-    method: options.method || 'GET',
-    skipAuth,
-    headers: fetchOptions.headers,
-    body: options.body
-  });
+    logger.info('[fetchClient] 요청 시작:', {
+      url,
+      method: options.method || 'GET',
+      skipAuth,
+      isAuthRequest,
+      headers: fetchOptions.headers,
+      body: options.body
+    });
 
-  // 제외할 엔드포인트 체크
-  const isExcludedEndpoint = ['/auth/access-token', '/auth/google/callback', '/auth/kakao/callback', '/auth/naver/callback'].some(
-    endpoint => url.includes(endpoint)
-  );
+    // 제외할 엔드포인트 체크
+    const isExcludedEndpoint = ['/auth/access-token', '/auth/google/callback', '/auth/kakao/callback', '/auth/naver/callback'].some(
+      endpoint => url.includes(endpoint)
+    );
 
-  // 요청 전 인터셉터
-  if (!skipAuth && !isExcludedEndpoint) {
-    const accessToken = useAuthStore.getState().accessToken;
-    
-    if (!accessToken || shouldRefreshToken()) {
-      logger.info('[fetchClient] 토큰 갱신 필요');
+    // 요청 전 인터셉터
+    if (!skipAuth && !isExcludedEndpoint) {
+      const accessToken = useAuthStore.getState().accessToken;
+      
+      if (!accessToken || shouldRefreshToken()) {
+        logger.info('[fetchClient] 토큰 갱신 필요');
+        
+        try {
+          const newToken = await handleTokenRefresh();
+          logger.info('[fetchClient] 토큰 갱신 완료');
+          
+          // 헤더에 새 토큰 추가
+          fetchOptions.headers = {
+            ...fetchOptions.headers,
+            'Authorization': `Bearer ${newToken}`
+          };
+        } catch (error) {
+          logger.error('[fetchClient] 토큰 갱신 실패:', error);
+          throw error;
+        }
+      } else {
+        // 유효한 토큰이 있는 경우
+        fetchOptions.headers = {
+          ...fetchOptions.headers,
+          'Authorization': `Bearer ${accessToken}`
+        };
+      }
+    }
+
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+      ...fetchOptions.headers,
+    };
+
+    const config = {
+      ...fetchOptions,
+      headers,
+      credentials: 'include' as RequestCredentials,
+    };
+
+    // POST나 PUT 요청이고 body가 있다면 JSON 문자열로 변환
+    if (config.body && (options.method === 'POST' || options.method === 'PUT')) {
+      config.body = typeof config.body === 'string' 
+        ? config.body 
+        : JSON.stringify(config.body);
+    }
+
+    // 요청 실행 전
+    logger.info('Final request config:', {
+      url: `${process.env.NEXT_PUBLIC_API_URL}${url}`,
+      method: config.method,
+      headers: config.headers,
+      body: config.body
+    });
+
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}${url}`, config);
+
+    // 응답 로깅
+    logger.info('Response:', {
+      status: response.status,
+      statusText: response.statusText,
+      headers: Object.fromEntries(response.headers.entries())
+    });
+
+    // 401 에러 처리 로직 단순화
+    if (response.status === 401 && !skipAuth && !isExcludedEndpoint) {
+      logger.info('[fetchClient] 401 응답 감지, 토큰 갱신 후 재시도');
       
       try {
         const newToken = await handleTokenRefresh();
-        logger.info('[fetchClient] 토큰 갱신 완료');
         
-        // 헤더에 새 토큰 추가
-        fetchOptions.headers = {
-          ...fetchOptions.headers,
-          'Authorization': `Bearer ${newToken}`
-        };
+        // 갱신된 토큰으로 재요청
+        return executeRequest();
       } catch (error) {
         logger.error('[fetchClient] 토큰 갱신 실패:', error);
         throw error;
       }
-    } else {
-      // 유효한 토큰이 있는 경우
-      fetchOptions.headers = {
-        ...fetchOptions.headers,
-        'Authorization': `Bearer ${accessToken}`
-      };
     }
-  }
 
-  const headers: HeadersInit = {
-    'Content-Type': 'application/json',
-    ...fetchOptions.headers,
-  };
-
-  const config = {
-    ...fetchOptions,
-    headers,
-    credentials: 'include' as RequestCredentials,
-  };
-
-  // POST나 PUT 요청이고 body가 있다면 JSON 문자열로 변환
-  if (config.body && (options.method === 'POST' || options.method === 'PUT')) {
-    // body가 이미 문자열인지 확인
-    config.body = typeof config.body === 'string' 
-      ? config.body 
-      : JSON.stringify(config.body);
-  }
-
-  // 요청 실행 전
-  logger.info('Final request config:', {
-    url: `${process.env.NEXT_PUBLIC_API_URL}${url}`,
-    method: config.method,
-    headers: config.headers,
-    body: config.body
-  });
-
-  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}${url}`, config);
-
-  // 응답 로깅
-  logger.info('Response:', {
-    status: response.status,
-    statusText: response.statusText,
-    headers: Object.fromEntries(response.headers.entries())
-  });
-
-  // 401 에러 처리 로직 단순화
-  if (response.status === 401 && !skipAuth && !isExcludedEndpoint) {
-    logger.info('[fetchClient] 401 응답 감지, 토큰 갱신 후 재시도');
-    
-    try {
-      const newToken = await handleTokenRefresh();
+    if (!response.ok) {
+      const error = new Error() as any;
+      error.status = response.status;
       
-      // 갱신된 토큰으로 재요청
-      return fetchClient(url, {
-        ...options,
-        skipAuth: true,
-        headers: {
-          ...fetchOptions.headers,
-          'Authorization': `Bearer ${newToken}`
+      try {
+        error.details = await response.json();
+      } catch {
+        try {
+          error.details = await response.text();
+        } catch {
+          error.details = "서버에서 제공된 에러 메시지가 없습니다.";
         }
-      });
-    } catch (error) {
-      logger.error('[fetchClient] 토큰 갱신 실패:', error);
+      }
+      
+      error.message = `HTTP error! status: ${response.status} - ${JSON.stringify(error.details)}`;
       throw error;
     }
+
+    return response;
+  };
+
+  // 인증 관련 요청은 queueRequest를 건너뛰고 바로 실행
+  if (isAuthRequest) {
+    return executeRequest();
   }
 
-  if (!response.ok) {
-    const error = new Error() as any;
-    error.status = response.status;
-    
-    try {
-      error.details = await response.json();
-    } catch {
-      try {
-        error.details = await response.text();
-      } catch {
-        error.details = "서버에서 제공된 에러 메시지가 없습니다.";
-      }
-    }
-    
-    error.message = `HTTP error! status: ${response.status} - ${JSON.stringify(error.details)}`;
-    throw error;
-  }
-  // return response.json();  // response를 JSON으로 파싱하여 반환
-  return response;  // response.json() 대신 Response 객체 반환: 개별 엔드포인트에서 변환하여 사용
+  // 그 외 요청은 queueRequest로 감싸서 실행
+  return queueRequest(executeRequest);
 }
 
 

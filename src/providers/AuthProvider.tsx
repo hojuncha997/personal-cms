@@ -13,7 +13,7 @@
 
 import { useEffect } from 'react'
 import { useAuthStore } from '@/store/useAuthStore'
-import { shouldRefreshToken, handleTokenRefresh } from '@/lib/authInterceptor'
+import { shouldRefreshToken, handleTokenRefresh, markInterceptorInitialized } from '@/lib/authInterceptor'
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const setLoading = useAuthStore(state => state.setLoading)
@@ -24,11 +24,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const initializeAuth = async () => {
       try {
         setLoading(true)
+        // 초기 토큰 갱신 시도
         await handleTokenRefresh()
-        // 약간의 지연을 주어 깜빡임 방지
+        
+        // 초기화 완료 표시 전에 약간의 지연을 줌
         await new Promise(resolve => setTimeout(resolve, 100))
+        
+        if (mounted) {
+          // 인터셉터 초기화 완료 표시
+          markInterceptorInitialized()
+        }
       } catch (error) {
         console.error('초기 인증 실패:', error)
+        // 에러가 발생해도 초기화는 완료 표시
+        if (mounted) {
+          markInterceptorInitialized()
+        }
       } finally {
         if (mounted) {
           setLoading(false)

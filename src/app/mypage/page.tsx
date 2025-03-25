@@ -13,7 +13,7 @@ import { useUpdatePassword } from '@/hooks/auth/useUpdatePassword';
 import { logger } from '@/utils/logger';
 
 export default function MyPage() {
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, loading } = useAuthStore();
   const router = useRouter();
   const { data: profile, isLoading, error } = useProfile();
   const [isWithdrawModalOpen, setIsWithdrawModalOpen] = useState(false);
@@ -37,18 +37,21 @@ export default function MyPage() {
       isLoading,
       error,
       profile,
-      isAuthenticated
+      isAuthenticated,
+      loading
     });
-  }, [isLoading, error, profile, isAuthenticated]);
+  }, [isLoading, error, profile, isAuthenticated, loading]);
 
-  // 인증되지 않은 사용자는 로그인 페이지로 리다이렉트
+  // 인증 상태 체크 및 리다이렉션
   useEffect(() => {
-    if (!isAuthenticated) {
+    // 로딩 중이 아니고 인증되지 않은 경우에만 리다이렉트
+    if (!loading && !isAuthenticated) {
       router.push('/auth/login');
     }
-  }, [isAuthenticated, router]);
+  }, [isAuthenticated, loading, router]);
 
-  if (isLoading) {
+  // 로딩 중이거나 프로필 로딩 중이면 로딩 표시
+  if (loading || isLoading) {
     return <div>로딩 중...</div>;
   }
 

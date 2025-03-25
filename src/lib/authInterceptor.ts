@@ -8,7 +8,53 @@ import { logger } from '@/utils/logger'
 
 let isRefreshing = false
 let refreshSubscribers: ((token: string) => void)[] = []
-let refreshPromise: Promise<string> | null = null;  // 토큰 갱신 Promise 저장용
+let refreshPromise: Promise<string> | null = null
+let isInitialized = false
+let requestQueue: Array<() => Promise<any>> = []
+
+// 초기화 상태 확인
+export function isInterceptorInitialized(): boolean {
+  return isInitialized
+}
+
+// 초기화 완료 표시
+export function markInterceptorInitialized() {
+  isInitialized = true
+  processQueuedRequests()
+}
+
+// 요청 큐에 추가
+export function queueRequest(request: () => Promise<any>) {
+  if (!isInitialized) {
+    requestQueue.push(request)
+    return new Promise((resolve, reject) => {
+      // 큐에 있는 요청이 처리될 때까지 대기
+      const checkQueue = setInterval(() => {
+        if (isInitialized) {
+          clearInterval(checkQueue)
+          request()
+            .then(resolve)
+            .catch(reject)
+        }
+      }, 100)
+    })
+  }
+  return request()
+}
+
+// 큐에 있는 요청 처리
+async function processQueuedRequests() {
+  while (requestQueue.length > 0) {
+    const request = requestQueue.shift()
+    if (request) {
+      try {
+        await request()
+      } catch (error) {
+        logger.error('[processQueuedRequests] 큐 요청 처리 실패:', error)
+      }
+    }
+  }
+}
 
 // 토큰 갱신 관련 핵심 로직
 // - 토큰 갱신 상태 관리 (isRefreshing)
