@@ -10,7 +10,7 @@ let isRefreshing = false
 let refreshSubscribers: ((token: string) => void)[] = []
 let refreshPromise: Promise<string> | null = null
 let isInitialized = false
-let requestQueue: Array<() => Promise<any>> = []
+const requestQueue: Array<() => Promise<any>> = []
 
 // 초기화 상태 확인
 export function isInterceptorInitialized(): boolean {
