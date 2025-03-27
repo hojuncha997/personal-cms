@@ -3,15 +3,19 @@
 import { Container } from '@/components/layouts/Container'          
 import Link from 'next/link'
 import { colors } from '@/constants/styles'
-const ME_IMAGE_URL = 'https://xtcxqpiwwmtcfaqimzea.supabase.co/storage/v1/object/public/media-storage/images/project-images/1739875903567-89smburkkwm.webp'
 import Image from 'next/image'
 import { useWindowSize } from '@/hooks/layout'
 import { useState, useEffect } from 'react'
+import { supabase } from '@/lib/supabase'
 
 export default function AboutPage() {
 
     const [isMounted, setIsMounted] = useState(false);
     const { isMobile } = useWindowSize();
+
+    const { data: { publicUrl: meImageUrl } } = supabase.storage
+        .from('media-storage')
+        .getPublicUrl('images/project-images/1739875903567-89smburkkwm.webp');
 
     useEffect(() => {
         setIsMounted(true);
@@ -34,12 +38,11 @@ export default function AboutPage() {
                                 <div className={`${isMobile ? 'w-full' : 'w-[200px]'}`}>
                                     <div className="border-[1px] border-black rounded-xl">
                                         <Image 
-                                            src={ME_IMAGE_URL} 
-                                            alt="me" 
-                                            width={300} 
-                                            height={300}
-                                            className="rounded-xl w-full h-auto object-cover"
-                                        />
+                                            src={meImageUrl} 
+                                            alt="프로필 이미지" 
+                                            width={200} 
+                                            height={200}
+                                            className="rounded-xl w-full h-auto object-cover"                                        />
                                     </div>
                                 </div>
                                 
