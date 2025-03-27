@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useLogin, LoginError } from '@hooks/auth/useLogin'
 import { useAuthStore } from "@/store/useAuthStore"
 import { useLogout } from "@hooks/auth/useLogout"
-import { AlertCircle } from 'lucide-react'
+import { AlertCircle, Eye, EyeOff } from 'lucide-react'
 import useSocialSignUp from '@/hooks/auth/useSocialSignup';
 import { SOCIAL_CONFIG } from '@/constants/auth/social-config';
 import Link from 'next/link';
@@ -34,6 +34,7 @@ export default function LoginModal({
   const { signUp: socialSignUp } = useSocialSignUp();
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
 
   // 스토어에서 상태와 액션 가져오기
   const loginForm = useAuthStore(state => state.loginForm);
@@ -133,22 +134,35 @@ export default function LoginModal({
           type="email"
           value={loginForm.email}
           onChange={handleChange}
-          className="w-full px-4 py-3 text-gray-700 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+          className="w-full px-4 py-3 text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
           required
         />
       </div>
       
       <div className="space-y-2">
-        <input
-          autoComplete="off"
-          placeholder="비밀번호"
-          name="password"
-          type="password"
-          value={loginForm.password}
-          onChange={handleChange}
-          className="w-full px-4 py-3 text-gray-700 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-          required
-        />
+        <div className="relative">
+          <input
+            autoComplete="off"
+            placeholder="비밀번호"
+            name="password"
+            type={showPassword ? "text" : "password"}
+            value={loginForm.password}
+            onChange={handleChange}
+            className="w-full px-4 py-3 text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+            required
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute inset-y-0 right-0 flex items-center pr-3"
+          >
+            {showPassword ? (
+              <EyeOff className="h-5 w-5 text-gray-600" />
+            ) : (
+              <Eye className="h-5 w-5 text-gray-600" />
+            )}
+          </button>
+        </div>
       </div>
 
       <div className="flex items-center justify-between">
