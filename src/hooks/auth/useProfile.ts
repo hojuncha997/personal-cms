@@ -11,6 +11,8 @@ interface Profile {
   status: string;
   emailVerified: boolean;
   lastLoginAt: string;
+  isSocialMember: boolean;
+  provider: string;
   preferences: {
     language: string;
     timezone: string;

@@ -191,133 +191,135 @@ export default function MyPage() {
 
           <div className="mt-8 space-y-4">
             {/* 비밀번호 변경 섹션 */}
-            <div className="bg-white shadow rounded-lg p-6 mb-6 mt-6">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-lg font-medium text-gray-900">비밀번호 변경</h2>
-                <button
-                  onClick={() => setIsPasswordChangeOpen(!isPasswordChangeOpen)}
-                  className="px-4 py-2 text-sm font-medium text-white bg-blue-500 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                >
-                  {isPasswordChangeOpen ? '취소' : '비밀번호 변경'}
-                </button>
+            {!profile.isSocialMember && (
+              <div className="bg-white shadow rounded-lg p-6 mb-6 mt-6">
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="text-lg font-medium text-gray-900">비밀번호 변경</h2>
+                  <button
+                    onClick={() => setIsPasswordChangeOpen(!isPasswordChangeOpen)}
+                    className="px-4 py-2 text-sm font-medium text-white bg-blue-500 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                  >
+                    {isPasswordChangeOpen ? '취소' : '비밀번호 변경'}
+                  </button>
+                </div>
+
+                {isPasswordChangeOpen && (
+                  <form onSubmit={handlePasswordChange} className="space-y-4">
+                    <div>
+                      <label htmlFor="currentPassword" className="block text-sm font-medium text-gray-700">
+                        현재 비밀번호
+                      </label>
+                      <div className="relative">
+                        <input
+                          type={showCurrentPassword ? "text" : "password"}
+                          id="currentPassword"
+                          value={currentPassword}
+                          onChange={(e) => setCurrentPassword(e.target.value)}
+                          className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-gray-900"
+                          required
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                          className="absolute inset-y-0 right-0 flex items-center pr-3 mt-1"
+                        >
+                          {showCurrentPassword ? (
+                            <EyeOff className="h-5 w-5 text-gray-600" />
+                          ) : (
+                            <Eye className="h-5 w-5 text-gray-600" />
+                          )}
+                        </button>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700">
+                        새 비밀번호
+                      </label>
+                      <div className="relative">
+                        <input
+                          type={showNewPassword ? "text" : "password"}
+                          id="newPassword"
+                          value={newPassword}
+                          onChange={(e) => setNewPassword(e.target.value)}
+                          className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-gray-900"
+                          required
+                          minLength={PASSWORD_POLICY.MIN_LENGTH}
+                          maxLength={PASSWORD_POLICY.MAX_LENGTH}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowNewPassword(!showNewPassword)}
+                          className="absolute inset-y-0 right-0 flex items-center pr-3 mt-1"
+                        >
+                          {showNewPassword ? (
+                            <EyeOff className="h-5 w-5 text-gray-600" />
+                          ) : (
+                            <Eye className="h-5 w-5 text-gray-600" />
+                          )}
+                        </button>
+                      </div>
+                      <p className="mt-1 text-xs text-gray-500">
+                        비밀번호는 8~128자의 영문 대/소문자, 숫자, 특수문자를 모두 포함해야 합니다.
+                      </p>
+                    </div>
+
+                    <div>
+                      <label htmlFor="newPasswordConfirm" className="block text-sm font-medium text-gray-700">
+                        새 비밀번호 확인
+                      </label>
+                      <div className="relative">
+                        <input
+                          type={showNewPasswordConfirm ? "text" : "password"}
+                          id="newPasswordConfirm"
+                          value={newPasswordConfirm}
+                          onChange={(e) => setNewPasswordConfirm(e.target.value)}
+                          className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-gray-900"
+                          required
+                          minLength={PASSWORD_POLICY.MIN_LENGTH}
+                          maxLength={PASSWORD_POLICY.MAX_LENGTH}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowNewPasswordConfirm(!showNewPasswordConfirm)}
+                          className="absolute inset-y-0 right-0 flex items-center pr-3 mt-1"
+                        >
+                          {showNewPasswordConfirm ? (
+                            <EyeOff className="h-5 w-5 text-gray-600" />
+                          ) : (
+                            <Eye className="h-5 w-5 text-gray-600" />
+                          )}
+                        </button>
+                      </div>
+                    </div>
+
+                    {passwordChangeMessage && (
+                      <p className={`text-sm ${
+                        passwordChangeMessage.type === 'error' ? 'text-red-600' : 
+                        passwordChangeMessage.type === 'success' ? 'text-green-600' :
+                        'text-blue-600'
+                      } mt-2`}>
+                        {passwordChangeMessage.text}
+                      </p>
+                    )}
+
+                    <div className="flex justify-end">
+                      <button
+                        type="submit"
+                        disabled={isChangingPassword}
+                        className={`px-4 py-2 text-sm font-medium text-white rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
+                          isChangingPassword
+                            ? 'bg-blue-300 cursor-not-allowed'
+                            : 'bg-blue-500 hover:bg-blue-600'
+                        }`}
+                      >
+                        {isChangingPassword ? '변경 중...' : '변경하기'}
+                      </button>
+                    </div>
+                  </form>
+                )}
               </div>
-
-              {isPasswordChangeOpen && (
-                <form onSubmit={handlePasswordChange} className="space-y-4">
-                  <div>
-                    <label htmlFor="currentPassword" className="block text-sm font-medium text-gray-700">
-                      현재 비밀번호
-                    </label>
-                    <div className="relative">
-                      <input
-                        type={showCurrentPassword ? "text" : "password"}
-                        id="currentPassword"
-                        value={currentPassword}
-                        onChange={(e) => setCurrentPassword(e.target.value)}
-                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-gray-900"
-                        required
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                        className="absolute inset-y-0 right-0 flex items-center pr-3 mt-1"
-                      >
-                        {showCurrentPassword ? (
-                          <EyeOff className="h-5 w-5 text-gray-600" />
-                        ) : (
-                          <Eye className="h-5 w-5 text-gray-600" />
-                        )}
-                      </button>
-                    </div>
-                  </div>
-
-                  <div>
-                    <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700">
-                      새 비밀번호
-                    </label>
-                    <div className="relative">
-                      <input
-                        type={showNewPassword ? "text" : "password"}
-                        id="newPassword"
-                        value={newPassword}
-                        onChange={(e) => setNewPassword(e.target.value)}
-                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-gray-900"
-                        required
-                        minLength={PASSWORD_POLICY.MIN_LENGTH}
-                        maxLength={PASSWORD_POLICY.MAX_LENGTH}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowNewPassword(!showNewPassword)}
-                        className="absolute inset-y-0 right-0 flex items-center pr-3 mt-1"
-                      >
-                        {showNewPassword ? (
-                          <EyeOff className="h-5 w-5 text-gray-600" />
-                        ) : (
-                          <Eye className="h-5 w-5 text-gray-600" />
-                        )}
-                      </button>
-                    </div>
-                    <p className="mt-1 text-xs text-gray-500">
-                      비밀번호는 8~128자의 영문 대/소문자, 숫자, 특수문자를 모두 포함해야 합니다.
-                    </p>
-                  </div>
-
-                  <div>
-                    <label htmlFor="newPasswordConfirm" className="block text-sm font-medium text-gray-700">
-                      새 비밀번호 확인
-                    </label>
-                    <div className="relative">
-                      <input
-                        type={showNewPasswordConfirm ? "text" : "password"}
-                        id="newPasswordConfirm"
-                        value={newPasswordConfirm}
-                        onChange={(e) => setNewPasswordConfirm(e.target.value)}
-                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-gray-900"
-                        required
-                        minLength={PASSWORD_POLICY.MIN_LENGTH}
-                        maxLength={PASSWORD_POLICY.MAX_LENGTH}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowNewPasswordConfirm(!showNewPasswordConfirm)}
-                        className="absolute inset-y-0 right-0 flex items-center pr-3 mt-1"
-                      >
-                        {showNewPasswordConfirm ? (
-                          <EyeOff className="h-5 w-5 text-gray-600" />
-                        ) : (
-                          <Eye className="h-5 w-5 text-gray-600" />
-                        )}
-                      </button>
-                    </div>
-                  </div>
-
-                  {passwordChangeMessage && (
-                    <p className={`text-sm ${
-                      passwordChangeMessage.type === 'error' ? 'text-red-600' : 
-                      passwordChangeMessage.type === 'success' ? 'text-green-600' :
-                      'text-blue-600'
-                    } mt-2`}>
-                      {passwordChangeMessage.text}
-                    </p>
-                  )}
-
-                  <div className="flex justify-end">
-                    <button
-                      type="submit"
-                      disabled={isChangingPassword}
-                      className={`px-4 py-2 text-sm font-medium text-white rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
-                        isChangingPassword
-                          ? 'bg-blue-300 cursor-not-allowed'
-                          : 'bg-blue-500 hover:bg-blue-600'
-                      }`}
-                    >
-                      {isChangingPassword ? '변경 중...' : '변경하기'}
-                    </button>
-                  </div>
-                </form>
-              )}
-            </div>
+            )}
 
             {/* 회원 탈퇴 섹션 */}
             <div className="bg-white shadow rounded-lg p-6 mt-8">
