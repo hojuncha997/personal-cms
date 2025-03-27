@@ -110,7 +110,7 @@ export default function MyPage() {
     setPasswordChangeMessage({ type: 'info', text: '비밀번호를 변경하는 중입니다...' });
 
     try {
-      await fetchClient('/members/me/update-password', {
+      const response = await fetchClient('/members/me/update-password', {
         method: 'PUT',
         body: JSON.stringify({
           currentPassword,
@@ -118,17 +118,22 @@ export default function MyPage() {
         })
       });
 
-      setPasswordChangeMessage({ type: 'success', text: '비밀번호가 성공적으로 변경되었습니다.' });
-      
-      // 3초 후에 폼 닫기
-      setTimeout(() => {
-        setIsPasswordChangeOpen(false);
-        setCurrentPassword('');
-        setNewPassword('');
-        setNewPasswordConfirm('');
-        setPasswordChangeMessage(null);
-      }, 3000);
+      const { success } = await response.json();
 
+      if (success) {
+        setPasswordChangeMessage({ type: 'success', text: '비밀번호가 성공적으로 변경되었습니다.' });
+        
+        // 3초 후에 폼 닫기
+        setTimeout(() => {
+          setIsPasswordChangeOpen(false);
+          setCurrentPassword('');
+          setNewPassword('');
+          setNewPasswordConfirm('');
+          setPasswordChangeMessage(null);
+        }, 3000);
+      } else {
+        throw new Error('비밀번호 변경에 실패했습니다.');
+      }
     } catch (error) {
       // 서버에서 받은 에러 메시지 처리
       const errorMessage = error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.';
@@ -296,14 +301,18 @@ export default function MyPage() {
                   <h2 className="text-lg font-medium text-gray-900">비밀번호 변경</h2>
                   <button
                     onClick={() => setIsPasswordChangeOpen(!isPasswordChangeOpen)}
-                    className="px-4 py-2 text-sm font-medium text-white bg-blue-500 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                    className="px-4 py-2 text-sm font-medium text-white bg-blue-500 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200"
                   >
                     {isPasswordChangeOpen ? '취소' : '비밀번호 변경'}
                   </button>
                 </div>
 
-                {isPasswordChangeOpen && (
-                  <form onSubmit={handlePasswordChange} className="space-y-4">
+                <div 
+                  className={`overflow-hidden transition-all duration-300 ease-in-out ${
+                    isPasswordChangeOpen ? 'max-h-[1000px] opacity-100' : 'max-h-0 opacity-0'
+                  }`}
+                >
+                  <form onSubmit={handlePasswordChange} className="space-y-4 pt-4">
                     <div>
                       <label htmlFor="currentPassword" className="block text-sm font-medium text-gray-700">
                         현재 비밀번호
@@ -416,7 +425,7 @@ export default function MyPage() {
                       </button>
                     </div>
                   </form>
-                )}
+                </div>
               </div>
             )}
 
