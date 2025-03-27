@@ -296,6 +296,12 @@ export default function MyPage() {
                       width={160}
                       height={160}
                       className="w-full h-full object-cover"
+                      // LCP(Largest Contentful Paint) 요소이므로 우선 로드
+                      priority
+                      // 이미지 크기 지정으로 브라우저가 적절한 크기 선택
+                      sizes="160px"
+                      // 즉시 로드하여 LCP 성능 향상
+                      loading="eager"
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center bg-gray-100">
@@ -631,6 +637,10 @@ export default function MyPage() {
                       alt="프로필 이미지"
                       fill
                       className="object-contain"
+                      // 모달은 사용자가 클릭하기 전까지 보이지 않으므로 지연 로딩
+                      // Next.js의 기본 동작인 지연 로딩 사용
+                      // 초기 페이지 로드 시 불필요한 리소스 낭비 방지
+                      sizes="(max-width: 768px) 100vw, 768px"
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
