@@ -71,6 +71,9 @@ interface AuthStore {
   // 로그인 폼 관련 액션
   updateLoginForm: (payload: Partial<LoginFormState>) => void;
   resetLoginForm: () => void;
+
+  // 프로필 이미지 업데이트 액션
+  updateProfileImage: (imageUrl: string) => void;
 }
 
 const initialState = {
@@ -129,7 +132,13 @@ export const useAuthStore = create<AuthStore>((set) => ({
 
   resetLoginForm: () => set((state) => ({
     loginForm: initialState.loginForm
-  }))
+  })),
+
+  // 프로필 이미지 업데이트 액션
+  updateProfileImage: (imageUrl) => 
+    set((state) => ({
+      profile: state.profile ? { ...state.profile, profileImage: imageUrl } : null
+    })),
 }));
 
 

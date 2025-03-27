@@ -14,6 +14,7 @@ import { logger } from '@/utils/logger';
 import useGetPasswordResetToken from '@/hooks/auth/useGetPasswordResetToken';
 import { validatePassword, PASSWORD_POLICY } from '@/constants/auth/password-policy';
 import { fetchClient } from '@/lib/fetchClient';
+import { supabase } from '@/lib/supabase';
 
 export default function MyPage() {
   const { isAuthenticated, loading } = useAuthStore();
@@ -35,6 +36,11 @@ export default function MyPage() {
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showNewPasswordConfirm, setShowNewPasswordConfirm] = useState(false);
+  const [isUpdatingProfileImage, setIsUpdatingProfileImage] = useState(false);
+  const [isProfileImageModalOpen, setIsProfileImageModalOpen] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+
+  const updateProfileImage = useAuthStore((state) => state.updateProfileImage);
 
   // 디버깅을 위한 useEffect 추가
   useEffect(() => {
@@ -142,6 +148,78 @@ export default function MyPage() {
     }
   };
 
+  const handleProfileImageUpload = async (file: File) => {
+    // 파일 크기 체크 (1MB)
+    if (file.size > 1024 * 1024) {
+      alert('이미지 크기는 1MB를 초과할 수 없습니다.');
+      return;
+    }
+
+    // 파일 타입 체크
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+      alert('JPG, PNG, GIF, WEBP 형식만 지원됩니다.');
+      return;
+    }
+
+    try {
+      setIsUpdatingProfileImage(true);
+
+      // Supabase Storage에 이미지 업로드
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+      const filePath = `profile-images/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('media-storage')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      // 업로드된 이미지의 공개 URL 가져오기
+      const { data: { publicUrl } } = supabase.storage
+        .from('media-storage')
+        .getPublicUrl(filePath);
+
+      // 백엔드 API 호출하여 프로필 이미지 업데이트
+      const response = await fetchClient('/members/me/profile-image', {
+        method: 'PUT',
+        body: JSON.stringify({
+          profileImage: publicUrl,
+          size: file.size,
+          mimeType: file.type,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('프로필 이미지 업데이트 실패');
+      }
+
+      const { profileImage } = await response.json();
+      updateProfileImage(profileImage);
+      
+      // 프로필 데이터 즉시 업데이트
+      if (profile) {
+        profile.profileImage = profileImage;
+      }
+      
+      alert('프로필 이미지가 업데이트되었습니다.');
+      router.refresh();
+    } catch (error) {
+      console.error('Error:', error);
+      alert('프로필 이미지 업데이트 중 오류가 발생했습니다.');
+    } finally {
+      setIsUpdatingProfileImage(false);
+    }
+  };
+
+  // 프로필 이미지 변경 핸들러
+  const handleProfileImageChange = async (file: File) => {
+    setSelectedImage(file);
+    setIsProfileImageModalOpen(false);
+    await handleProfileImageUpload(file);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto px-4 py-8">
@@ -152,7 +230,10 @@ export default function MyPage() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {/* 프로필 이미지 */}
               <div className="flex flex-col items-center">
-                <div className="w-40 h-40 rounded-full overflow-hidden border-4 border-gray-100 shadow-md">
+                <div 
+                  className="w-40 h-40 rounded-full overflow-hidden border-4 border-gray-100 shadow-md relative group cursor-pointer"
+                  onClick={() => setIsProfileImageModalOpen(true)}
+                >
                   {profile.profileImage ? (
                     <Image
                       src={profile.profileImage}
@@ -167,6 +248,24 @@ export default function MyPage() {
                     </div>
                   )}
                 </div>
+                <button
+                  onClick={() => document.getElementById('profile-image-input')?.click()}
+                  disabled={isUpdatingProfileImage}
+                  className="mt-4 px-4 py-2 text-sm font-medium text-white bg-blue-500 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+                >
+                  {isUpdatingProfileImage ? '업로드 중...' : '프로필 이미지 변경'}
+                </button>
+                <input
+                  id="profile-image-input"
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+                    await handleProfileImageChange(file);
+                  }}
+                />
               </div>
 
               {/* 프로필 정보 */}
@@ -392,6 +491,42 @@ export default function MyPage() {
                   >
                     {isPending ? '처리중...' : '탈퇴하기'}
                   </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* 프로필 이미지 모달 */}
+          {isProfileImageModalOpen && (
+            <div 
+              className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50"
+              onClick={() => setIsProfileImageModalOpen(false)}
+            >
+              <div 
+                className="relative max-w-2xl w-full mx-4"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <button
+                  onClick={() => setIsProfileImageModalOpen(false)}
+                  className="absolute -top-12 right-0 text-white hover:text-gray-300 p-2"
+                >
+                  <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+                <div className="relative aspect-square w-full">
+                  {profile.profileImage ? (
+                    <Image
+                      src={profile.profileImage}
+                      alt="프로필 이미지"
+                      fill
+                      className="object-contain"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <User className="w-32 h-32 text-white" />
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
