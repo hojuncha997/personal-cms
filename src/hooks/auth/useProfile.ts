@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAuthStore } from '@/store/useAuthStore';
 import { fetchClient } from '@/lib/fetchClient';
 import { logger } from '@/utils/logger';
@@ -37,13 +37,16 @@ interface Profile {
  * React Query의 enabled 옵션에 의해 isAuthenticated가 true일 때만 자동으로 실행됨
  * 컴포넌트에서 useProfile()을 선언만 해두면 위 조건이 만족될 때 자동으로 프로필 정보를 가져옴
  */
+export const PROFILE_QUERY_KEY = ['profile'] as const;
+
 export function useProfile() {
   // useAuthStore에서 현재 인증 상태와 프로필 정보를 가져옴,
   // isAuthenticated가 true가 되면 함수가 실행됨
   const { isAuthenticated, profile, updateProfile } = useAuthStore();
+  const queryClient = useQueryClient();
 
   return useQuery({
-    queryKey: ['profile'],
+    queryKey: PROFILE_QUERY_KEY,
     queryFn: async () => {
       if (!isAuthenticated) {
         throw new Error('인증되지 않은 사용자');
@@ -55,7 +58,10 @@ export function useProfile() {
         const profileData = await response.json();
         
         logger.info('[useProfile] 프로필 정보 조회 성공:', profileData);
+        
+        // 프로필 정보 업데이트 시 nickname도 함께 업데이트
         updateProfile(profileData);
+        useAuthStore.getState().updateAuthState({ nickname: profileData.nickname });
         
         return profileData as Profile;
       } catch (error) {

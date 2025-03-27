@@ -29,6 +29,7 @@ interface AuthStore {
   // 프로필 정보 추가
   profile: {
     name: string | null;
+    nickname: string | null;
     profileImage: string | null;
     status: string | null;
     emailVerified: boolean;
@@ -74,6 +75,9 @@ interface AuthStore {
 
   // 프로필 이미지 업데이트 액션
   updateProfileImage: (imageUrl: string) => void;
+
+  // 프로필 닉네임 업데이트 액션
+  updateNickname: (nickname: string) => void;
 }
 
 const initialState = {
@@ -119,7 +123,11 @@ export const useAuthStore = create<AuthStore>((set) => ({
   setLoading: (isLoading) => set({ loading: isLoading }),
 
   // 프로필 관련 액션
-  updateProfile: (profile) => set({ profile }),
+  updateProfile: (profile) => set((state) => ({
+    ...state,
+    profile,
+    nickname: profile?.nickname ?? null
+  })),
   resetProfile: () => set({ profile: null }),
 
   // 로그인 폼 관련 액션
@@ -138,6 +146,13 @@ export const useAuthStore = create<AuthStore>((set) => ({
   updateProfileImage: (imageUrl) => 
     set((state) => ({
       profile: state.profile ? { ...state.profile, profileImage: imageUrl } : null
+    })),
+
+  // 프로필 닉네임 업데이트 액션
+  updateNickname: (nickname) => 
+    set((state) => ({
+      nickname,
+      profile: state.profile ? { ...state.profile, nickname } : null
     })),
 }));
 

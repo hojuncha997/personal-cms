@@ -2,11 +2,11 @@
 
 import { useEffect, useState } from 'react';
 import { useAuthStore } from '@/store/useAuthStore';
-import { useProfile } from '@/hooks/auth/useProfile';
+import { useProfile, PROFILE_QUERY_KEY } from '@/hooks/auth/useProfile';
 import { colors } from '@/constants/styles';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { User, Eye, EyeOff } from 'lucide-react';
+import { User, Eye, EyeOff, Pencil } from 'lucide-react';
 import { useWithdraw } from '@/hooks/auth/useWithdraw';
 import { WithdrawalReason, WithdrawalReasonLabel } from '@/types/member';
 import { useUpdatePassword } from '@/hooks/auth/useUpdatePassword';
@@ -15,10 +15,12 @@ import useGetPasswordResetToken from '@/hooks/auth/useGetPasswordResetToken';
 import { validatePassword, PASSWORD_POLICY } from '@/constants/auth/password-policy';
 import { fetchClient } from '@/lib/fetchClient';
 import { supabase } from '@/lib/supabase';
+import { useQueryClient } from '@tanstack/react-query';
 
 export default function MyPage() {
   const { isAuthenticated, loading } = useAuthStore();
   const router = useRouter();
+  const queryClient = useQueryClient();
   const { data: profile, isLoading, error } = useProfile();
   const [isWithdrawModalOpen, setIsWithdrawModalOpen] = useState(false);
   const [withdrawReason, setWithdrawReason] = useState('');
@@ -41,6 +43,12 @@ export default function MyPage() {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
 
   const updateProfileImage = useAuthStore((state) => state.updateProfileImage);
+  const updateNickname = useAuthStore((state) => state.updateNickname);
+
+  const [isNicknameEditing, setIsNicknameEditing] = useState(false);
+  const [newNickname, setNewNickname] = useState('');
+  const [nicknameMessage, setNicknameMessage] = useState<{ type: 'success' | 'error' | 'info', text: string } | null>(null);
+  const [isUpdatingNickname, setIsUpdatingNickname] = useState(false);
 
   // 디버깅을 위한 useEffect 추가
   useEffect(() => {
@@ -225,6 +233,48 @@ export default function MyPage() {
     await handleProfileImageUpload(file);
   };
 
+  const handleNicknameChange = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!newNickname.trim()) {
+      setNicknameMessage({ type: 'error', text: '닉네임을 입력해주세요.' });
+      return;
+    }
+
+    setIsUpdatingNickname(true);
+    setNicknameMessage({ type: 'info', text: '닉네임을 변경하는 중입니다...' });
+
+    try {
+      const response = await fetchClient('/members/me/nickname', {
+        method: 'PUT',
+        body: JSON.stringify({ nickname: newNickname })
+      });
+
+      const { nickname } = await response.json();
+
+      if (nickname) {
+        updateNickname(nickname);
+        // React Query 캐시 무효화
+        await queryClient.invalidateQueries({ queryKey: PROFILE_QUERY_KEY });
+        setNicknameMessage({ type: 'success', text: '닉네임이 성공적으로 변경되었습니다.' });
+        
+        // 3초 후에 편집 모드 종료
+        setTimeout(() => {
+          setIsNicknameEditing(false);
+          setNewNickname('');
+          setNicknameMessage(null);
+        }, 2000);
+      } else {
+        throw new Error('닉네임 변경에 실패했습니다.');
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.';
+      setNicknameMessage({ type: 'error', text: errorMessage });
+    } finally {
+      setIsUpdatingNickname(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto px-4 py-8">
@@ -286,7 +336,58 @@ export default function MyPage() {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700">닉네임</label>
-                    <p className="mt-1 text-gray-900">{profile.nickname}</p>
+                    {isNicknameEditing ? (
+                      <form onSubmit={handleNicknameChange} className="mt-1 flex items-center space-x-2">
+                        <input
+                          type="text"
+                          value={newNickname}
+                          onChange={(e) => setNewNickname(e.target.value)}
+                          className="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                          placeholder="새 닉네임을 입력하세요"
+                          disabled={isUpdatingNickname}
+                        />
+                        <button
+                          type="submit"
+                          disabled={isUpdatingNickname}
+                          className="px-4 py-2 text-sm font-medium text-white bg-blue-500 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+                        >
+                          {isUpdatingNickname ? '변경 중...' : '변경'}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setIsNicknameEditing(false);
+                            setNewNickname('');
+                            setNicknameMessage(null);
+                          }}
+                          className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+                        >
+                          취소
+                        </button>
+                      </form>
+                    ) : (
+                      <div className="mt-1 flex items-center space-x-2">
+                        <p className="text-gray-900">{profile.nickname}</p>
+                        <button
+                          onClick={() => {
+                            setNewNickname(profile.nickname);
+                            setIsNicknameEditing(true);
+                          }}
+                          className="p-1 text-gray-500 hover:text-gray-700"
+                        >
+                          <Pencil className="w-4 h-4" />
+                        </button>
+                      </div>
+                    )}
+                    {nicknameMessage && (
+                      <p className={`mt-1 text-sm ${
+                        nicknameMessage.type === 'error' ? 'text-red-600' : 
+                        nicknameMessage.type === 'success' ? 'text-green-600' :
+                        'text-blue-600'
+                      }`}>
+                        {nicknameMessage.text}
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>
