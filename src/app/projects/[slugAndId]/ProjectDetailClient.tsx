@@ -16,6 +16,7 @@ import { useDeleteProject } from '@/hooks/projects/useDeleteProject';
 import Image from 'next/image';
 import { User } from 'lucide-react';
 import { useIncrementViewCount } from '@/hooks/projects/useIncrementViewCount';
+import ProjectDetailSkeleton from '@/components/projects/skeletons/ProjectDetailSkeleton';
 
 interface ProjectDetailClientProps {
     publicId: string;
@@ -48,7 +49,7 @@ const ProjectDetailClient: React.FC<ProjectDetailClientProps> = ({ publicId }) =
     };
 
     if (isLoading) {
-        return <div>로딩 중...</div>;
+        return <ProjectDetailSkeleton />;
     }
 
     if (error || !project) {

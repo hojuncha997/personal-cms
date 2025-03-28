@@ -6,36 +6,41 @@ import { useGetPostDetail } from '@/hooks/posts/useGetPostDetail'
 import Link from 'next/link'
 import { PostForList } from '@/types/posts/postTypes'
 import Image from 'next/image'
+import HomePageSkeleton from '@/components/home/skeletons/HomePageSkeleton'
 
 export default function Home() {
-  const { data: latestPosts } = useGetPostList({ 
+  const { data: latestPosts, isLoading: isLatestPostsLoading } = useGetPostList({ 
     limit: 1, 
     sortBy: 'createdAt', 
     order: 'DESC' 
   });
   
   const latestPost = latestPosts?.data[0];
-  const { data: featuredPost } = useGetPostDetail(
+  const { data: featuredPost, isLoading: isFeaturedPostLoading } = useGetPostDetail(
     latestPost?.public_id || '', 
     { enabled: !!latestPost }
   );
 
-  const { data: recentPosts } = useGetPostList({
+  const { data: recentPosts, isLoading: isRecentPostsLoading } = useGetPostList({
     limit: 7,
     page: 1,
     sortBy: 'createdAt',
     order: 'DESC'
   });
 
+  if (isLatestPostsLoading || isFeaturedPostLoading || isRecentPostsLoading) {
+    return <HomePageSkeleton />;
+  }
+
   return (
-    <div className="bg-white text-black ">
+    <div className="bg-white text-gray-600 min-h-screen">
       <Container className="">
         <div className="py-6">
           {/* 메인 섹션 */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-6  border-black">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-6  border-gray-300">
             {/* 메인 뉴스 영역 */}
             {featuredPost && (
-              <div className="lg:col-span-8 lg:border-r lg:border-black lg:pr-8">
+              <div className="lg:col-span-8 lg:border-r lg:border-gray-300 lg:pr-8">
                 <Link href={`/posts/${featuredPost.slug}-${featuredPost.public_id}`}>
                   <div className="group cursor-pointer">
                     <h1 className="text-3xl font-bold mb-4 group-hover:text-blue-600 leading-tight">
@@ -75,11 +80,11 @@ export default function Home() {
 
             {/* 우측 서브 뉴스 영역 */}
             <div className="lg:col-span-4">
-              <h2 className="text-lg font-bold mb-4 pb-2 border-b border-black">최신 포스트</h2>
+              <h2 className="text-lg font-bold mb-4 pb-2 border-b border-gray-300">최신 포스트</h2>
               <div className="space-y-6">
                 {recentPosts?.data.slice(1, 3).map((post: PostForList) => (
                   <Link key={post.public_id} href={`/posts/${post.slug}-${post.public_id}`}>
-                    <div className="group cursor-pointer pb-6 border-b border-black last:border-0">
+                    <div className="group cursor-pointer pb-6 border-b border-gray-300 last:border-0">
                       <div className="flex gap-4">
                         <div className="flex-1">
                           <h3 className="text-base font-bold group-hover:text-blue-600 line-clamp-2 mb-2">
@@ -113,7 +118,7 @@ export default function Home() {
 
           {/* 하단 뉴스 그리드 */}
           <div>
-            <h2 className="text-lg font-bold mb-6 pb-2 border-b border-black">추천 포스트</h2>
+            <h2 className="text-lg font-bold mb-6 pb-2 border-b border-gray-300">추천 포스트</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {recentPosts?.data.slice(4).map((post: PostForList, index) => (
                 <Link key={post.public_id} href={`/posts/${post.slug}-${post.public_id}`}>

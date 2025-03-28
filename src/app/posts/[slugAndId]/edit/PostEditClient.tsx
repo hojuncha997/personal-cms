@@ -7,6 +7,8 @@ import { useUpdatePost } from '@/hooks/posts/useUpdatePost';
 import PostForm from '@/components/posts/PostForm';
 import { PostData } from '@/types/posts/postTypes';
 import { useIsAuthor } from '@/hooks/auth/useIsAuthor';
+import PostDetailSkeleton from '@/components/posts/skeletons/PostDetailSkeleton';
+
 
 interface PostEditClientProps {
     publicId: string;
@@ -33,7 +35,7 @@ export default function PostEditClient({ publicId }: PostEditClientProps) {
     };
 
     if (isLoading) {
-        return <div>로딩 중...</div>;
+        return <PostDetailSkeleton />;
     }
 
     if (!post) {

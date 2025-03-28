@@ -7,6 +7,7 @@ import { useUpdateProject } from '@/hooks/projects/useUpdateProject';
 import ProjectForm from '@/components/projects/ProjectForm';
 import { ProjectData } from '@/types/projects/projectTypes';
 import { useIsAuthor } from '@/hooks/auth/useIsAuthor';
+import ProjectDetailSkeleton from '@/components/projects/skeletons/ProjectDetailSkeleton';
 
 interface ProjectEditClientProps {
     publicId: string;
@@ -33,7 +34,7 @@ export default function ProjectEditClient({ publicId }: ProjectEditClientProps) 
     };
 
     if (isLoading) {
-        return <div>로딩 중...</div>;
+        return <ProjectDetailSkeleton />;
     }
 
     if (!project) {

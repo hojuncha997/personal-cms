@@ -16,6 +16,7 @@ import { validatePassword, PASSWORD_POLICY } from '@/constants/auth/password-pol
 import { fetchClient } from '@/lib/fetchClient';
 import { supabase } from '@/lib/supabase';
 import { useQueryClient } from '@tanstack/react-query';
+import MyPageSkeleton from '@/components/auth/skeletons/MyPageSkeleton';
 
 export default function MyPage() {
   const { isAuthenticated, loading } = useAuthStore();
@@ -71,7 +72,7 @@ export default function MyPage() {
 
   // 로딩 중이거나 프로필 로딩 중이면 로딩 표시
   if (loading || isLoading) {
-    return <div>로딩 중...</div>;
+    return <MyPageSkeleton />;
   }
 
   if (error) {

@@ -7,9 +7,9 @@ import Image from 'next/image'
 import { useWindowSize } from '@/hooks/layout'
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
+import AboutPageSkeleton from '@/components/about/skeletons/AboutPageSkeleton'
 
 export default function AboutPage() {
-
     const [isMounted, setIsMounted] = useState(false);
     const { isMobile } = useWindowSize();
 
@@ -20,6 +20,10 @@ export default function AboutPage() {
     useEffect(() => {
         setIsMounted(true);
     }, []);
+
+    if (!isMounted) {
+        return <AboutPageSkeleton />;
+    }
 
     // 초기 레이아웃을 위한 기본값 설정
     // const imageWidth = isMounted ? (isMobile ? 'w-full' : 'w-[200px]') : 'w-[200px]';
