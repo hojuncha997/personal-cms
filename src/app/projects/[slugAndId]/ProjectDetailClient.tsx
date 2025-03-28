@@ -13,18 +13,27 @@ import { useIsAuthor } from '@/hooks/auth/useIsAuthor';
 import { CommonPopover } from '@/components/common/common-popover';
 import { MoreVertical } from 'lucide-react';
 import { useDeleteProject } from '@/hooks/projects/useDeleteProject';
+import Image from 'next/image';
+import { User } from 'lucide-react';
+import { useIncrementViewCount } from '@/hooks/projects/useIncrementViewCount';
 
 interface ProjectDetailClientProps {
     publicId: string;
-    prefetch?: boolean;
 }
 
-const ProjectDetailClient: React.FC<ProjectDetailClientProps> = ({ publicId, prefetch = true }) => {
-    const { data: project, isLoading, error } = useGetProjectDetail(publicId, {enabled: prefetch});
+const ProjectDetailClient: React.FC<ProjectDetailClientProps> = ({ publicId }) => {
+    const { data: project, isLoading, error } = useGetProjectDetail(publicId);
+    const { mutate: incrementViewCount } = useIncrementViewCount();
     const [isLiked, setIsLiked] = useState(false);
     const { mutateAsync: deleteProject } = useDeleteProject();
     const router = useRouter();
     const isAuthor = useIsAuthor(project?.author_uuid);
+
+    useEffect(() => {
+        if (project) {
+            incrementViewCount(publicId);
+        }
+    }, [project, publicId, incrementViewCount]);
 
     const handleDeleteProject = async () => {
         if (window.confirm('정말로 이 프로젝트를 삭제하시겠습니까?')) {
@@ -61,7 +70,22 @@ const ProjectDetailClient: React.FC<ProjectDetailClientProps> = ({ publicId, pre
                                     <h1 className="text-xl sm:text-2xl font-bold mb-2">{project.title}</h1>
                                     <div className="flex justify-between items-center">
                                         <div className="flex flex-wrap gap-2 sm:gap-4 text-xs sm:text-sm text-gray-600">
-                                            <span>작성자: {project.author_display_name.includes('@') ? project.author_display_name.split('@')[0] : project.author_display_name}</span>
+                                            <div className="flex items-center gap-2">
+                                                {project.author_profile_image ? (
+                                                    <Image
+                                                        src={project.author_profile_image}
+                                                        alt="작성자 프로필"
+                                                        width={24}
+                                                        height={24}
+                                                        className="rounded-full"
+                                                    />
+                                                ) : (
+                                                    <div className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center">
+                                                        <User className="w-4 h-4 text-gray-500" />
+                                                    </div>
+                                                )}
+                                                <span>{project.author_display_name?.includes('@') ? project.author_display_name.split('@')[0] : project.author_display_name}</span>
+                                            </div>
                                             <span>조회수: {project.viewCount}</span>
                                             <span>작성일: {format(new Date(project.createdAt), 'yyyy-MM-dd')}</span>
                                         </div>

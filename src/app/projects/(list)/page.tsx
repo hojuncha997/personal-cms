@@ -9,7 +9,7 @@ import { useGetProjectList } from '@/hooks/projects/useGetProjectList';
 import { format, subMonths } from 'date-fns';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, User } from 'lucide-react';
 import { extractTextFromContent } from '@/utils/postUtils'
 import { ProjectForList, ProjectListResponse } from '@/types/projects/projectTypes';
 import ProjectListSkeleton from '@/components/projects/skeletons/projectListSkeleton';
@@ -288,7 +288,22 @@ const ProjectListContent = () => {
                                                 >
                                                     {project.categorySlug || 'no category'}
                                                 </span>
-                                                <span>{project.author_display_name.includes('@') ? project.author_display_name.split('@')[0] : project.author_display_name}</span>
+                                                <div className="flex items-center gap-2">
+                                                    {project.author_profile_image ? (
+                                                        <Image
+                                                            src={project.author_profile_image}
+                                                            alt="작성자 프로필"
+                                                            width={20}
+                                                            height={20}
+                                                            className="rounded-full"
+                                                        />
+                                                    ) : (
+                                                        <div className="w-5 h-5 rounded-full bg-gray-200 flex items-center justify-center">
+                                                            <User className="w-3 h-3 text-gray-500" />
+                                                        </div>
+                                                    )}
+                                                    <span>{project.current_author_name?.includes('@') ? project.current_author_name.split('@')[0] : project.current_author_name}</span>
+                                                </div>
                                                 <span>조회 {project.viewCount}</span>
                                                 <span>좋아요 {project.likeCount}</span>
                                                 <span>{format(new Date(project.createdAt), 'yyyy-MM-dd')}</span>

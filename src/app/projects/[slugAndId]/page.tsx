@@ -11,13 +11,12 @@ interface PageProps {
 }
 
 export default async function ProjectPage({ params, searchParams }: PageProps) {
-    // params를 await로 해결
-    const resolvedParams = await params;
-    const publicId = resolvedParams.slugAndId.split('-').pop() || '';
+    const { slugAndId } = await params;
+    const publicId = slugAndId.split('-').pop() || '';
 
     return (
         <Suspense fallback={<ProjectDetailSkeleton />}>
-            <ProjectDetailClient publicId={publicId} prefetch={true} /> 
+            <ProjectDetailClient publicId={publicId} />
         </Suspense>
     );
 }

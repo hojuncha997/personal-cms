@@ -34,8 +34,9 @@ export interface ProjectDetail {
     };
     author_display_name: string;
     current_author_name: string;
-    isSecret: boolean;
     author_uuid: string;
+    author_profile_image?: string;
+    isSecret: boolean;
     categorySlug: string;
     slug: string;
     tags: string[];
@@ -69,6 +70,8 @@ export interface ProjectForList {
     excerpt: string | null;
     author_display_name: string;
     current_author_name: string;
+    author_uuid: string;
+    author_profile_image?: string;
     categorySlug: string;
     slug: string;
     tags: string[];
