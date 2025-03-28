@@ -17,7 +17,7 @@ export default async function PostPage({ params, searchParams }: PageProps) {
 
     return (
         <Suspense fallback={<PostDetailSkeleton />}>
-            <PostDetailClient publicId={publicId} prefetch={true} /> 
+            <PostDetailClient publicId={publicId} />
         </Suspense>
     );
 }

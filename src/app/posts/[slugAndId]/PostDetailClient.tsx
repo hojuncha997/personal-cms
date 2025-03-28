@@ -1,7 +1,7 @@
 // src/app/posts/[slugAndId]/PostDetailClient.tsx
 'use client'
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Container } from '@/components/layouts/Container';
 import { colors } from '@/constants/styles/colors';
 import Link from 'next/link';
@@ -23,22 +23,28 @@ import { useIsAuthor } from '@/hooks/auth/useIsAuthor';
 import { logger } from '@/utils/logger';
 import Image from 'next/image';
 import { User } from 'lucide-react';
+import { useIncrementViewCount } from '@/hooks/posts/useIncrementViewCount';
 
 interface PostDetailClientProps {
     publicId: string;
-    prefetch?: boolean;
 }
 
-const PostDetailClient: React.FC<PostDetailClientProps> = ({ publicId, prefetch = true }) => {
-    const { data: post, isLoading: postLoading, error: postError } = useGetPostDetail(publicId, {enabled: prefetch}); // prefetch가 false일 경우 쿼리 실행
+const PostDetailClient: React.FC<PostDetailClientProps> = ({ publicId }) => {
+    const { data: post, isLoading: postLoading, error: postError } = useGetPostDetail(publicId);
     const { data: relatedPosts, isLoading: relatedLoading } = useGetRelatedPosts(publicId);
     const { data: navigationPosts, isLoading: navigationLoading } = useGetPostNavigation(publicId);
+    const { mutate: incrementViewCount } = useIncrementViewCount();
     const [isLiked, setIsLiked] = useState(false);
     const [showRelated, setShowRelated] = useState(false);
-    // const deletePost = useDeletePost();
     const { mutate: deletePost, mutateAsync: deletePostAsync, isPending, isError } = useDeletePost();
     const router = useRouter();
     const isAuthor = useIsAuthor(post?.author_uuid);
+
+    useEffect(() => {
+        if (post) {
+            incrementViewCount(publicId);
+        }
+    }, [post, publicId, incrementViewCount]);
 
     useEffect(() => {
         if (post) {
@@ -50,27 +56,9 @@ const PostDetailClient: React.FC<PostDetailClientProps> = ({ publicId, prefetch 
     const handleDeletePost = async () => {
         if (window.confirm('정말로 이 게시글을 삭제하시겠습니까?')) {
             try {
-                // await deletePost.mutateAsync(publicId);
-                // deletePost.isPending
-                // await deletePostAsync(publicId); 프로미스를 반환함. 성공하면 then 또는 await 이후 다음 코드로 진행.
-                // router.push('/posts');  // 삭제 성공 후 목록 페이지로 이동
-                // 실패하면 catch로 이동. 따라서 이걸로도 괜찮지만, 아래처럼 명시적으로 써주는 게 좋음. 더욱 안전하고 명확함
-
-                // const result = await deletePostAsync(publicId);
-                // 서버 응답 구조에 따라 결과 형식이 다를 수 있음. 예를 들어 다음과 같은 형식이 가능함.
-                // { success: true }
-                // { success: false, error: '게시글 삭제에 실패했습니다.' }
-
-                // if(result.success) {
-                //     router.push('/posts');  // 삭제 성공 후 목록 페이지로 이동
-                 // } else {
-                //     alert('게시글 삭제에 실패했습니다.');
-                // }
-                // 우선은 간편한 방법을 써서 삭제 후 목록 페이지로 이동. 추후 서버 응답 구조에 따라 수정 필요.
                 const result = await deletePostAsync(publicId);
                 logger.info('게시글 삭제 결과:', await result.json());
                 router.push('/posts');
-               
             } catch (error) {
                 logger.error('게시글 삭제 실패:', error);
                 alert('게시글 삭제에 실패했습니다.');
