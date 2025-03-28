@@ -13,9 +13,9 @@ export default function AboutPage() {
     const [isMounted, setIsMounted] = useState(false);
     const { isMobile } = useWindowSize();
 
-    const { data: { publicUrl: meImageUrl } } = supabase.storage
-        .from('media-storage')
-        .getPublicUrl('images/project-images/1739875903567-89smburkkwm.webp');
+    // const { data: { publicUrl: meImageUrl } } = supabase.storage
+    //     .from('media-storage')
+    //     .getPublicUrl('images/project-images/1739875903567-89smburkkwm.webp');
 
     useEffect(() => {
         setIsMounted(true);
@@ -39,7 +39,7 @@ export default function AboutPage() {
                         {isMounted ? (
                             <>
                                 {/* 사진 */}
-                                <div className={`${isMobile ? 'w-full' : 'w-[200px]'}`}>
+                                {/* <div className={`${isMobile ? 'w-full' : 'w-[200px]'}`}>
                                     <div className="border-[1px] border-gray-300 rounded-xl">
                                         <Image 
                                             src={meImageUrl} 
@@ -48,7 +48,7 @@ export default function AboutPage() {
                                             height={200}
                                             className="rounded-xl w-full h-auto object-cover"                                        />
                                     </div>
-                                </div>
+                                </div> */}
                                 
                                 {/* 소개 정보 */}
                                 <div className="flex flex-col text-gray-700 flex-1">
