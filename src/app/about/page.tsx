@@ -40,7 +40,7 @@ export default function AboutPage() {
                             <>
                                 {/* 사진 */}
                                 <div className={`${isMobile ? 'w-full' : 'w-[200px]'}`}>
-                                    <div className="border-[1px] border-black rounded-xl">
+                                    <div className="border-[1px] border-gray-300 rounded-xl">
                                         <Image 
                                             src={meImageUrl} 
                                             alt="프로필 이미지" 
@@ -51,7 +51,7 @@ export default function AboutPage() {
                                 </div>
                                 
                                 {/* 소개 정보 */}
-                                <div className="flex flex-col text-black flex-1">
+                                <div className="flex flex-col text-gray-700 flex-1">
                                     {/* 이름과 직함 */}
                                     <div className="mb-4">
                                         <h1 className="text-2xl mb-2">차호준</h1>
@@ -112,8 +112,8 @@ export default function AboutPage() {
                     </div>
 
 
-                    <div className="mb-12 text-black">
-                        <h2 className="text-xl mb-6 border-b-[1px] border-black"><span className="bg-black text-white px-2 inline-flex items-center">사용 가능한 기술</span></h2>
+                    <div className="mb-12 text-gray-700">
+                        <h2 className="text-xl mb-6 border-b-[1px] border-gray-600"><span className="bg-gray-600 text-white px-2 inline-flex items-center">사용 가능한 기술</span></h2>
                         <div className="grid grid-cols-2 gap-4">
                             <div>
                                 <h3 className="font-semibold mb-2">프론트엔드</h3>
@@ -126,9 +126,9 @@ export default function AboutPage() {
                         </div>
                     </div>
 
-                    <div className="mb-12 text-black">
-                        <h2 className="text-xl mb-6 border-b-[1px] border-black">
-                            <span className="bg-black text-white px-2 inline-flex items-center">경력</span>
+                    <div className="mb-12 text-gray-700">
+                        <h2 className="text-xl mb-6 border-b-[1px] border-gray-700">
+                            <span className="bg-gray-700 text-white px-2 inline-flex items-center">경력</span>
                         </h2>
                         <div className="space-y-8">
                             {isMounted ? (
@@ -163,9 +163,9 @@ export default function AboutPage() {
                         </div>
                     </div>
 
-                    <div className="mb-12 text-black">
-                    <h2 className="text-xl mb-6 border-b-[1px] border-black"><span className="bg-black text-white px-2 inline-flex items-center">프로젝트</span></h2>
-                    <div className="space-y-8">
+                    <div className="mb-12 text-gray-700">
+                        <h2 className="text-xl mb-6 border-b-[1px] border-gray-600"><span className="bg-gray-600 text-white px-2 inline-flex items-center">프로젝트</span></h2>
+                        <div className="space-y-8">
 
                     <div>
                         <h3 className="text-xl font-semibold mb-2">커뮤니티 기능이 추가된 개인 블로그(개인 프로젝트)</h3>
@@ -245,9 +245,9 @@ export default function AboutPage() {
 
                     
 
-                    <div className="mb-12 text-black">
-                    <h2 className="text-xl mb-6 border-b-[1px] border-black">
-                        <span className="bg-black text-white px-2 inline-flex items-center">교육</span>
+                    <div className="mb-12 text-gray-700">
+                    <h2 className="text-xl mb-6 border-b-[1px] border-gray-600">
+                        <span className="bg-gray-600 text-white px-2 inline-flex items-center">교육</span>
                     </h2>
                     <div>
                             <h3 className="text-xl font-semibold mb-2">국민대학교</h3>
@@ -255,8 +255,8 @@ export default function AboutPage() {
                         </div>
                     </div>
 
-                    <div className="mb-12 text-black">
-                    <h2 className="text-xl mb-6 border-b-[1px] border-black"><span className="bg-black text-white px-2 inline-flex items-center ">자격증</span></h2>
+                    <div className="mb-12 text-gray-700">
+                    <h2 className="text-xl mb-6 border-b-[1px] border-gray-600"><span className="bg-gray-600 text-white px-2 inline-flex items-center ">자격증</span></h2>
                         {/* <div className="grid grid-cols-2 gap-4"> */}
                         <div className="">
 

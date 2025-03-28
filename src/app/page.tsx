@@ -145,7 +145,7 @@ export default function Home() {
                     <span className="text-xs text-gray-500">{post.current_author_name}</span>
                     {/* 마지막 아이템이 아닐 경우에만 우측 구분선 추가 */}
                     {index !== recentPosts.data.slice(4).length - 1 && (
-                      <div className="hidden md:block absolute top-0 right-0 h-full border-r border-black" />
+                      <div className="hidden md:block absolute top-0 right-0 h-full border-r border-gray-300" />
                     )}
                   </div>
                 </Link>
