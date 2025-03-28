@@ -344,7 +344,7 @@ export default function MyPage() {
                   <div>
                     <label className="block text-sm font-medium text-gray-700">닉네임</label>
                     {isNicknameEditing ? (
-                      <form onSubmit={handleNicknameChange} className="mt-1 flex items-center space-x-2">
+                      <form onSubmit={handleNicknameChange} className="mt-1 flex items-center space-x-2 text-gray-700">
                         <input
                           type="text"
                           value={newNickname}
@@ -559,7 +559,7 @@ export default function MyPage() {
             <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
               <div className="bg-white rounded-lg w-full max-w-md p-6 space-y-4">
                 <div className="space-y-2">
-                  <h3 className="text-lg font-medium text-black">회원 탈퇴</h3>
+                  <h3 className="text-lg font-medium text-gray-700">회원 탈퇴</h3>
                   <p className="text-sm text-red-600">
                     회원 탈퇴 시 모든 개인정보가 삭제되며, 이 작업은 되돌릴 수 없습니다.
                   </p>
@@ -567,7 +567,7 @@ export default function MyPage() {
 
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <label className="block text-sm font-medium text-black">탈퇴 사유 *</label>
+                    <label className="block text-sm font-medium text-gray-700">탈퇴 사유 *</label>
                     <select
                       value={withdrawReason}
                       onChange={(e) => setWithdrawReason(e.target.value)}
@@ -583,13 +583,13 @@ export default function MyPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <label className="block text-sm font-medium text-black">상세 사유 (선택사항)</label>
+                    <label className="block text-sm font-medium text-gray-700">상세 사유 (선택사항)</label>
                     <textarea
                       value={withdrawDetail}
                       onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setWithdrawDetail(e.target.value)}
                       placeholder="상세 사유를 입력해주세요"
                       rows={3}
-                      className="text-black w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                      className="text-gray-700 w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                     />
                   </div>
                 </div>

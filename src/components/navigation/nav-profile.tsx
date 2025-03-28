@@ -50,7 +50,7 @@ export function NavProfile() {
         {
             id: 'settings',
             section: 'menu',
-            label: 'Settings',
+            label: 'Settings(구현 중)',
             onClick: () => {},
         },
         {
@@ -64,7 +64,7 @@ export function NavProfile() {
 
     // 프로필 메뉴 컨텐츠 컴포넌트
     const ProfileMenuContent = ({ inDrawer = false }) => (
-        <div className={`min-h-[12rem] text-black text-sm ${!inDrawer && 'w-[14rem]'}`}>
+        <div className={`min-h-[12rem] text-gray-700 text-sm ${!inDrawer && 'w-[14rem]'}`}>
             {/* 프로필 정보 섹션 */}
             <div className="px-3 py-3 hover:bg-gray-100 hover:text-blue-500 rounded-t-xl">
                 {profileMenuItems
@@ -127,7 +127,7 @@ export function NavProfile() {
             <>
                 <div onClick={() => setIsDrawerOpen(true)}>
                     <div className="flex items-center gap-2 cursor-pointer">
-                        <div className="w-8 h-8 rounded-full overflow-hidden">
+                        <div className="w-8 h-8 rounded-full overflow-hidden flex items-center justify-center bg-gray-100">
                             {profileImage ? (
                                 <Image
                                     src={profileImage}
@@ -138,7 +138,7 @@ export function NavProfile() {
                                 />
                             ) : (
                                 <svg 
-                                    className="w-6 h-6" 
+                                    className="w-8 h-8 flex items-center justify-center" 
                                     viewBox="0 0 24 24" 
                                     fill="currentColor"
                                 >
@@ -165,7 +165,7 @@ export function NavProfile() {
         <CommonPopover
             trigger={
                 <div className="flex items-center gap-2 cursor-pointer">
-                    <div className="w-8 h-8 rounded-full overflow-hidden">
+                    <div className="w-8 h-8 rounded-full overflow-hidden flex items-center justify-center bg-gray-100">
                         {profileImage ? (
                             <Image
                                 src={profileImage}
@@ -177,7 +177,7 @@ export function NavProfile() {
                         ) : (
                             // 기본 아바타 이미지
                             <svg 
-                                className="w-6 h-6" 
+                                className="w-8 h-8 flex items-center justify-center" 
                                 viewBox="0 0 24 24" 
                                 fill="currentColor"
                             >

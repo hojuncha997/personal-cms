@@ -70,7 +70,7 @@ export function CommonPopover({
            z-50 
           
            border 
-           border-black 
+           border-gray-300 
            bg-[#ffffff] 
            rounded-xl
            
