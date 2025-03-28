@@ -34,6 +34,7 @@ export interface PostDetail {
     };
     author_display_name: string;
     current_author_name: string;
+    author_profile_image?: string;
     isSecret: boolean;
     author_uuid: string;
     categorySlug: string;
@@ -66,32 +67,18 @@ export interface PostDetail {
 export interface PostForList {
     public_id: string;
     title: string;
-    excerpt: string | null;
+    slug: string;
+    excerpt?: string;
+    thumbnail?: string;
+    categorySlug?: string;
     author_display_name: string;
     current_author_name: string;
-    categorySlug: string;
-    slug: string;
-    tags: string[];
-    thumbnail: string | null;
-    status: string;
-    isFeatured: boolean;
-    createdAt: string;
-    updatedAt: string;
+    author_uuid: string;
+    author_profile_image?: string;
     viewCount: number;
     likeCount: number;
-    commentCount: number;
+    createdAt: string;
     isSecret: boolean;
-    description: string | null;
-    readingTime: number | null;
-    publishedAt: string | null;
-    metaDescription: string | null;
-    curation: {
-        isCurated: boolean;
-        curatedAt: string | null;
-        curatedBy: string | null;
-        curationOrder: number;
-        curationType: string[];
-    };
 }
 
 // 포스팅 목록 페이지를 위한 타입

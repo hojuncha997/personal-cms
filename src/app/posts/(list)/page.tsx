@@ -17,6 +17,7 @@ import Image from 'next/image';
 import { useAuthStore } from '@/store/useAuthStore'
 import { AdminGuard } from '@/components/auth/AdminGuard';
 import { logger } from '@/utils/logger';
+import { User } from 'lucide-react';
 
 const PostContent = () => {
     const router = useRouter();
@@ -280,7 +281,22 @@ const PostContent = () => {
                                             )}
                                             <div className='text-sm text-gray-500 flex flex-wrap gap-4'>
                                                 <span className='px-2 py-1 bg-gray-100 text-sm rounded-md'>{post.categorySlug || 'no category'}</span>
-                                                <span>{post.author_display_name.includes('@') ? post.author_display_name.split('@')[0] : post.author_display_name}</span>
+                                                <div className="flex items-center gap-2">
+                                                    {post.author_profile_image ? (
+                                                        <Image
+                                                            src={post.author_profile_image}
+                                                            alt="작성자 프로필"
+                                                            width={20}
+                                                            height={20}
+                                                            className="rounded-full"
+                                                        />
+                                                    ) : (
+                                                        <div className="w-5 h-5 rounded-full bg-gray-200 flex items-center justify-center">
+                                                            <User className="w-3 h-3 text-gray-500" />
+                                                        </div>
+                                                    )}
+                                                    <span>{post.current_author_name?.includes('@') ? post.current_author_name.split('@')[0] : post.current_author_name}</span>
+                                                </div>
                                                 <span>조회 {post.viewCount}</span>
                                                 <span>좋아요 {post.likeCount}</span>
                                                 <span>{format(new Date(post.createdAt), 'yyyy-MM-dd')}</span>

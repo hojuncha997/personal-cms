@@ -21,6 +21,8 @@ import { useDeletePost } from '@/hooks/posts/useDeletePost';
 import { useRouter } from 'next/navigation';
 import { useIsAuthor } from '@/hooks/auth/useIsAuthor';
 import { logger } from '@/utils/logger';
+import Image from 'next/image';
+import { User } from 'lucide-react';
 
 interface PostDetailClientProps {
     publicId: string;
@@ -100,7 +102,22 @@ const PostDetailClient: React.FC<PostDetailClientProps> = ({ publicId, prefetch 
                                     <h1 className="text-xl sm:text-2xl font-bold mb-2">{post.title}</h1>
                                     <div className="flex justify-between items-center">
                                         <div className="flex flex-wrap gap-2 sm:gap-4 text-xs sm:text-sm text-gray-600">
-                                            <span>작성자: {post.author_display_name.includes('@') ? post.author_display_name.split('@')[0] : post.author_display_name}</span>
+                                            <div className="flex items-center gap-2">
+                                                {post.author_profile_image ? (
+                                                    <Image
+                                                        src={post.author_profile_image}
+                                                        alt="작성자 프로필"
+                                                        width={24}
+                                                        height={24}
+                                                        className="rounded-full"
+                                                    />
+                                                ) : (
+                                                    <div className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center">
+                                                        <User className="w-4 h-4 text-gray-500" />
+                                                    </div>
+                                                )}
+                                                <span>{post.current_author_name.includes('@') ? post.current_author_name.split('@')[0] : post.current_author_name}</span>
+                                            </div>
                                             <span>조회수: {post.viewCount}</span>
                                             <span>작성일: {format(new Date(post.createdAt), 'yyyy-MM-dd')}</span>
                                         </div>
