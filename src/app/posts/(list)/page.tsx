@@ -21,6 +21,7 @@ import { User } from 'lucide-react';
 import Accordion from '@/components/common/Accordion';
 import FilterContent from '@/components/common/FilterContent';
 import { useGetPostCategories, PostCategory } from '@/hooks/posts/useGetPostCategories';
+import { processCategories } from '@/utils/categoryUtils';
 
 const PostContent = () => {
     const router = useRouter();
@@ -62,7 +63,7 @@ const PostContent = () => {
     const [localSearch, setLocalSearch] = useState(searchParams.get('search') || '');
     const [localCategory, setLocalCategory] = useState(searchParams.get('categorySlug') || '');
 
-    // 두 번째 useEffect 최적화 - 한 번에 모든 로컬 상태 업데이트
+    // 두 번째 useEffect 최적화 - 한 번에 모든 로컬 상태 업데이트. 개별 상태를 객체로 묶어서 비교하여 불필요한 렌더링 방지
     useEffect(() => {
         const updates = {
             sort: searchState.sort,
@@ -166,30 +167,6 @@ const PostContent = () => {
     }, [data, isLoading, error]);
 
     // 카테고리 데이터 가공
-    const processCategories = (categories: PostCategory[] = []): Array<{ value: string; label: string }> => {
-        const result: Array<{ value: string; label: string }> = [];
-        
-        const processCategory = (category: PostCategory, parentPath?: string) => {
-            if (!category.children?.length) {
-                // 자식이 없는 경우 현재 카테고리만 추가
-                result.push({
-                    value: category.slug,
-                    label: parentPath ? `${parentPath}/${category.name}` : category.name
-                });
-                return;
-            }
-            
-            // 자식이 있는 경우 각 자식에 대해 처리
-            category.children.forEach(child => {
-                const currentPath = parentPath ? `${parentPath}/${category.name}` : category.name;
-                processCategory(child, currentPath);
-            });
-        };
-
-        categories.forEach(category => processCategory(category));
-        return result;
-    };
-
     const processedCategories = useMemo(() => {
         return processCategories(rawCategories);
     }, [rawCategories]);
