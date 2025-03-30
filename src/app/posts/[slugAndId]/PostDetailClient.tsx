@@ -23,7 +23,7 @@ import { useIsAuthor } from '@/hooks/auth/useIsAuthor';
 import { logger } from '@/utils/logger';
 import Image from 'next/image';
 import { User } from 'lucide-react';
-import { useIncrementViewCount } from '@/hooks/posts/useIncrementViewCount';
+import { useIncrementViewCount } from '@/hooks/common/useIncrementViewCount';
 
 interface PostDetailClientProps {
     publicId: string;
@@ -42,7 +42,7 @@ const PostDetailClient: React.FC<PostDetailClientProps> = ({ publicId }) => {
 
     useEffect(() => {
         if (post) {
-            incrementViewCount(publicId);
+            incrementViewCount({ contentType: 'posts', publicId });
         }
     }, [post, publicId, incrementViewCount]);
 

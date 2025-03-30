@@ -15,7 +15,7 @@ import { MoreVertical } from 'lucide-react';
 import { useDeleteProject } from '@/hooks/projects/useDeleteProject';
 import Image from 'next/image';
 import { User } from 'lucide-react';
-import { useIncrementViewCount } from '@/hooks/projects/useIncrementViewCount';
+import { useIncrementViewCount } from '@/hooks/common/useIncrementViewCount';
 import ProjectDetailSkeleton from '@/components/projects/skeletons/ProjectDetailSkeleton';
 
 interface ProjectDetailClientProps {
@@ -32,7 +32,7 @@ const ProjectDetailClient: React.FC<ProjectDetailClientProps> = ({ publicId }) =
 
     useEffect(() => {
         if (project) {
-            incrementViewCount(publicId);
+            incrementViewCount({ contentType: 'projects', publicId });
         }
     }, [project, publicId, incrementViewCount]);
 
