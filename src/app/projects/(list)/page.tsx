@@ -17,11 +17,18 @@ import Image from 'next/image';
 import { useAuthStore } from '@/store/useAuthStore'
 import { AdminGuard } from '@/components/auth/AdminGuard';
 import { logger } from '@/utils/logger';
+import Accordion from '@/components/common/Accordion';
+import FilterContent from '@/components/common/FilterContent';
+import { useGetProjectCategories, ProjectCategory } from '@/hooks/projects/useGetProjectCategories';
+import { processCategories } from '@/utils/categoryUtils';
+
+
 
 const ProjectListContent = () => {
     const router = useRouter();
     const searchParams = useSearchParams();
     const { isAuthenticated, role, loading } = useAuthStore();
+    const { data: rawCategories } = useGetProjectCategories();
     
     // searchState를 useMemo로 최적화
     const searchState = useMemo(() => ({
@@ -55,6 +62,7 @@ const ProjectListContent = () => {
     const [localStartDate, setLocalStartDate] = useState(searchParams.get('startDate') || '');
     const [localEndDate, setLocalEndDate] = useState(searchParams.get('endDate') || '');
     const [localSearch, setLocalSearch] = useState(searchParams.get('search') || '');
+    const [localCategory, setLocalCategory] = useState(searchParams.get('categorySlug') || '');
 
     // 두 번째 useEffect 최적화 - 한 번에 모든 로컬 상태 업데이트. 개별 상태를 객체로 묶어서 비교하여 불필요한 렌더링 방지
     useEffect(() => {
@@ -63,7 +71,8 @@ const ProjectListContent = () => {
             order: searchState.order,
             startDate: searchState.startDate,
             endDate: searchState.endDate,
-            search: searchState.search
+            search: searchState.search,
+            categorySlug: searchState.categorySlug
         };
 
         // 실제 변경사항이 있을 때만 상태 업데이트
@@ -72,6 +81,7 @@ const ProjectListContent = () => {
         if (localStartDate !== updates.startDate) setLocalStartDate(updates.startDate);
         if (localEndDate !== updates.endDate) setLocalEndDate(updates.endDate);
         if (localSearch !== updates.search) setLocalSearch(updates.search);
+        if (localCategory !== updates.categorySlug) setLocalCategory(updates.categorySlug);
     }, [searchState]);
 
     // useGetPostList 호출 전에 searchState 값 확인
@@ -122,12 +132,13 @@ const ProjectListContent = () => {
             order: localOrder,
             startDate: localStartDate,
             endDate: localEndDate,
+            categorySlug: localCategory,
             page: '1'
         })}`);
-    }, [router, createQueryString, localSearch, localSort, localOrder, localStartDate, localEndDate]);
+    }, [router, createQueryString, localSearch, localSort, localOrder, localStartDate, localEndDate, localCategory]);
 
     const handleCategoryChange = (category: string) => {
-        router.push(`/projects?${createQueryString({ categorySlug: category, page: '1' })}`);
+        setLocalCategory(category);
     };
 
     const handleSortChange = useCallback((sortBy: string) => {
@@ -156,6 +167,11 @@ const ProjectListContent = () => {
         logger.info('에러 상태:', error);
     }, [data, isLoading, error]);
 
+    // 카테고리 데이터 가공
+    const processedCategories = useMemo(() => {
+        return processCategories(rawCategories);
+    }, [rawCategories]);
+
     if (isLoading) {
         return <ProjectListSkeleton />;
     }
@@ -169,86 +185,22 @@ const ProjectListContent = () => {
             {/* <h1 className="text-3xl font-bold mb-12 border-b border-black pb-4">포스팅</h1> */}
             
             {/* 아코디언 필터 영역 */}
-            <div className="mb-6 border border-gray-200 rounded-lg">
-                <button
-                    onClick={() => setIsFilterOpen(!isFilterOpen)}
-                    className="w-full px-4 py-3 flex items-center justify-between bg-white rounded-lg hover:bg-gray-50"
-                >
-                    <span className="font-medium">검색 및 정렬 옵션</span>
-                    <ChevronDown 
-                        className={`transform transition-transform duration-200 ${isFilterOpen ? 'rotate-180' : ''}`}
-                        size={20}
-                    />
-                </button>
-                
-                {isFilterOpen && (
-                    <div className="p-4 border-t border-gray-200">
-                        {/* 정렬 옵션 */}
-                        <div className="mb-4 flex gap-4">
-                            <button
-                                onClick={() => handleSortChange('createdAt')}
-                                className={`text-sm ${localSort === 'createdAt' ? 'text-blue-600 font-bold' : 'text-gray-600'}`}
-                            >
-                                최신순 {localSort === 'createdAt' && (localOrder === 'DESC' ? '↓' : '↑')}
-                            </button>
-                            <button
-                                onClick={() => handleSortChange('viewCount')}
-                                className={`text-sm ${localSort === 'viewCount' ? 'text-blue-600 font-bold' : 'text-gray-600'}`}
-                            >
-                                조회순 {localSort === 'viewCount' && (localOrder === 'DESC' ? '↓' : '↑')}
-                            </button>
-                            <button
-                                onClick={() => handleSortChange('likeCount')}
-                                className={`text-sm ${localSort === 'likeCount' ? 'text-blue-600 font-bold' : 'text-gray-600'}`}
-                            >
-                                좋아요순 {localSort === 'likeCount' && (localOrder === 'DESC' ? '↓' : '↑')}
-                            </button>
-                        </div>
-
-                        {/* 검색 영역 */}
-                        <div className="space-y-4">
-                            {/* 날짜 선택 영역을 모바일에서 세로로 배치 */}
-                            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
-                                <div className="w-full sm:w-auto">
-                                    <label className="block text-sm text-gray-600 mb-1">시작일</label>
-                                    <input
-                                        type="date"
-                                        value={localStartDate}
-                                        onChange={(e) => handleDateChange(e.target.value, localEndDate)}
-                                        className="w-full sm:w-auto px-3 py-2 border rounded-md"
-                                    />
-                                </div>
-                                <span className="hidden sm:block">~</span>
-                                <div className="w-full sm:w-auto">
-                                    <label className="block text-sm text-gray-600 mb-1">종료일</label>
-                                    <input
-                                        type="date"
-                                        value={localEndDate}
-                                        onChange={(e) => handleDateChange(localStartDate, e.target.value)}
-                                        className="w-full sm:w-auto px-3 py-2 border rounded-md"
-                                    />
-                                </div>
-                            </div>
-                            
-                            <form onSubmit={handleSearch} className="flex gap-2">
-                                <input
-                                    type="text"
-                                    value={localSearch}
-                                    onChange={(e) => setLocalSearch(e.target.value)}
-                                    placeholder="검색어를 입력하세요"
-                                    className="flex-1 px-4 py-2 border rounded-md"
-                                />
-                                <button
-                                    type="submit"
-                                    className="px-4 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-700"
-                                >
-                                    검색
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                )}
-            </div>
+            <Accordion title="검색 및 정렬 옵션">
+                <FilterContent
+                    searchValue={localSearch}
+                    onSearchChange={setLocalSearch}
+                    onSearchSubmit={handleSearch}
+                    sortValue={localSort}
+                    orderValue={localOrder}
+                    onSortChange={handleSortChange}
+                    startDate={localStartDate}
+                    endDate={localEndDate}
+                    onDateChange={handleDateChange}
+                    categoryValue={localCategory}
+                    onCategoryChange={handleCategoryChange}
+                    categories={processedCategories}
+                />
+            </Accordion>
 
             <div className="w-full">
                 <div>
