@@ -49,9 +49,9 @@ const NavMenuContent = [
   //   path: '/contact'
   // },
   {
-    id: 'guestbook',
-    label: 'Guestbook',
-    path: '/guestbook'
+    id: 'guestbooks',
+    label: 'Guestbooks',
+    path: '/guestbooks'
   }
 ]
 
