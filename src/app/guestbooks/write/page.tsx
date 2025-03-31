@@ -7,19 +7,19 @@ import { useRouter } from 'next/navigation';
 import { useCreateGuestbook } from '@/hooks/guestbooks/useCreateGuestbook';
 import GuestbookForm from '@/components/guestbooks/GuestbookForm';
 import { GuestbookData } from '@/types/guestbooks/guestbookTypes';
-import { AdminGuard } from '@/components/auth/AdminGuard';
+// import { AdminGuard } from '@/components/auth/AdminGuard';
 import { useAuthStore } from '@/store/useAuthStore';
 
 export default function GuestbookWrite() {
     const router = useRouter();
     const { createGuestbook } = useCreateGuestbook();
-    const { isAuthenticated, role } = useAuthStore();
+    const { isAuthenticated } = useAuthStore();
 
     useEffect(() => {
-        if (!isAuthenticated || role !== 'ADMIN') {
+        if (!isAuthenticated) {
             router.push('/guestbooks');
         }
-    }, [isAuthenticated, role, router]);
+    }, [isAuthenticated, router]);
 
     const handleSubmit = async (data: GuestbookData) => {
         await createGuestbook(data);
@@ -31,12 +31,12 @@ export default function GuestbookWrite() {
     };
 
     return (
-        <AdminGuard fallback={null}>
+        // <AdminGuard fallback={null}></AdminGuard>
             <GuestbookForm
                 mode="create"
                 onSubmit={handleSubmit}
                 onCancel={handleCancel}
-            />
-        </AdminGuard>
+        />
+        // </AdminGuard>
     );
 } 

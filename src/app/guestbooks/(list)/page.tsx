@@ -9,7 +9,7 @@ import { useGetGuestbookList } from '@/hooks/guestbooks/useGetGuestbookList';
 import { format, subMonths } from 'date-fns';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { ChevronDown, User } from 'lucide-react';
+import { ChevronDown, User, Plus } from 'lucide-react';
 // import { extractTextFromContent } from '@/utils/postUtils'
 import { GuestbookForList, GuestbookListResponse } from '@/types/guestbooks/guestbookTypes';
 import GuestbookListSkeleton from '@/components/guestbooks/skeletons/GuestbooktListSkeleton';
@@ -172,6 +172,15 @@ const GuestbookListContent = () => {
         return processCategories(rawCategories);
     }, [rawCategories]);
 
+    const handleWriteClick = () => {
+        if (!isAuthenticated) {
+            alert('방명록을 작성하려면 로그인이 필요합니다.');
+            // router.push('/auth/login');
+            return;
+        }
+        router.push('/guestbooks/write');
+    };
+
     if (isLoading) {
         return <GuestbookListSkeleton />;
     }
@@ -182,7 +191,16 @@ const GuestbookListContent = () => {
 
     return (
         <div className="w-full">
-            {/* <h1 className="text-3xl font-bold mb-12 border-b border-black pb-4">포스팅</h1> */}
+            <div className="flex justify-between items-center mb-6">
+                <h1 className="text-2xl font-bold">방명록</h1>
+                <button
+                    onClick={handleWriteClick}
+                    className="flex items-center gap-2 px-4 py-2 bg-black text-white rounded-md hover:bg-gray-800 transition-colors"
+                >
+                    <Plus className="w-4 h-4" />
+                    <span>방명록 작성</span>
+                </button>
+            </div>
             
             {/* 아코디언 필터 영역 */}
             <Accordion title="검색 및 정렬 옵션">
@@ -303,18 +321,6 @@ const GuestbookListContent = () => {
                             ))}
                         </div>
                     )}
-
-                    <div className="mt-4 flex justify-end">
-                        {!loading && (  // 로딩이 완료된 후에만 AdminGuard를 렌더링
-                            <AdminGuard>
-                                <Link href="/guestbooks/write">
-                                    <button className="px-4 py-2 bg-black text-white rounded-md hover:bg-blue-600 transition-colors">
-                                        게시글 작성
-                                    </button>
-                                </Link>
-                            </AdminGuard>
-                        )}
-                    </div>
                 </div>
             </div>
         </div>
