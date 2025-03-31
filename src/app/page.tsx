@@ -3,8 +3,10 @@
 import { Container } from '@/components/layouts/Container'
 import { useGetPostList } from '@/hooks/posts/useGetPostList'
 import { useGetPostDetail } from '@/hooks/posts/useGetPostDetail'
+import { useGetProjectList } from '@/hooks/projects/useGetProjectList'
 import Link from 'next/link'
 import { PostForList } from '@/types/posts/postTypes'
+import { ProjectForList } from '@/types/projects/projectTypes'
 import Image from 'next/image'
 import HomePageSkeleton from '@/components/home/skeletons/HomePageSkeleton'
 
@@ -28,7 +30,14 @@ export default function Home() {
     order: 'DESC'
   });
 
-  if (isLatestPostsLoading || isFeaturedPostLoading || isRecentPostsLoading) {
+  const { data: projects, isLoading: isProjectsLoading } = useGetProjectList({
+    limit: 3,
+    page: 1,
+    sortBy: 'createdAt',
+    order: 'DESC'
+  });
+
+  if (isLatestPostsLoading || isFeaturedPostLoading || isRecentPostsLoading || isProjectsLoading) {
     return <HomePageSkeleton />;
   }
 
@@ -116,18 +125,18 @@ export default function Home() {
             </div>
           </div>
 
-          {/* 하단 뉴스 그리드 */}
+          {/* 프로젝트 섹션 */}
           <div>
-            <h2 className="text-lg font-bold mb-6 pb-2 border-b border-gray-300">추천 포스트</h2>
+            <h2 className="text-lg font-bold mb-6 pb-2 border-b border-gray-300">프로젝트</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {recentPosts?.data.slice(4).map((post: PostForList, index) => (
-                <Link key={post.public_id} href={`/posts/${post.slug}-${post.public_id}`}>
+              {projects?.data.map((project: ProjectForList, index) => (
+                <Link key={project.public_id} href={`/projects/${project.slug}-${project.public_id}`}>
                   <div className="group cursor-pointer">
-                    {post.thumbnail ? (
+                    {project.thumbnail ? (
                       <div className="aspect-[16/10] bg-gray-100 rounded-sm overflow-hidden mb-3">
                         <Image 
-                          src={post.thumbnail} 
-                          alt={post.title}
+                          src={project.thumbnail} 
+                          alt={project.title}
                           width={400}
                           height={250}
                           className="object-cover w-full h-full"
@@ -137,14 +146,14 @@ export default function Home() {
                       <div className="aspect-[16/10] bg-gray-100 rounded-sm mb-3" />
                     )}
                     <h3 className="text-base font-bold group-hover:text-blue-600 line-clamp-2 mb-2">
-                      {post.title}
+                      {project.title}
                     </h3>
                     <p className="text-sm text-gray-600 line-clamp-2 mb-1">
-                      {post.excerpt}
+                      {project.excerpt}
                     </p>
-                    <span className="text-xs text-gray-500">{post.current_author_name}</span>
+                    <span className="text-xs text-gray-500">{project.current_author_name}</span>
                     {/* 마지막 아이템이 아닐 경우에만 우측 구분선 추가 */}
-                    {index !== recentPosts.data.slice(4).length - 1 && (
+                    {index !== projects.data.length - 1 && (
                       <div className="hidden md:block absolute top-0 right-0 h-full border-r border-gray-300" />
                     )}
                   </div>
