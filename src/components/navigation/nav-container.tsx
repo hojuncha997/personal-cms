@@ -10,52 +10,13 @@ import { useState } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import { colors } from '@/constants/styles'
 import { Logo } from '@components/common/logo'
-
+import { NavMenuContent } from '@/constants/navigation'
 
 interface NavContainerProps {
   onOpenDrawer: () => void;
   onOpenLogin: () => void;
   hideOnScroll?: boolean;
 }
-
-const NavMenuContent = [
-  {
-    id: 'home',
-    label: 'Home',
-    path: '/'
-  },
-  {
-    id: 'about',
-    label: 'About',
-    path: '/about'
-  },
-  // {
-  //   id: 'service',
-  //   label: '서비스',
-  //   path: '/service'
-  // },
-  {
-    id: 'posts',
-    label: 'Posts',
-    path: '/posts'
-  },
-  {
-    id: 'projects',
-    label: 'Projects',
-    path: '/projects'
-  },
-
-  // {
-  //   id: 'contact',
-  //   label: '문의하기',
-  //   path: '/contact'
-  // },
-  {
-    id: 'guestbooks',
-    label: 'Guestbooks',
-    path: '/guestbooks'
-  }
-]
 
 export function NavContainer({ 
   onOpenDrawer, 
@@ -124,7 +85,11 @@ export function NavContainer({
           <div className="hidden lg:flex lg:items-center lg:space-x-6">
            {NavMenuContent.map((item) => {
              return (
-              <Link href={item.path} key={item.id} className="text-sm text-gray-700 hover:text-blue-500">
+              <Link 
+                href={item.path} 
+                key={item.id} 
+                className={`text-sm text-gray-700 hover:text-blue-500 ${pathname === item.path ? 'font-bold' : ''}`}
+              >
                 {item.label}
               </Link>
              )
@@ -159,10 +124,13 @@ export function NavContainer({
                 {NavMenuContent.map((item) => {
                   return (
                     <div key={item.id} className="p-4">
-                    <span className="text-gray-600 hover:text-orange-500" onClick={() => handleLinkClick(item.path)}> 
-                      {item.label}
-                    </span>
-                  </div>
+                      <span 
+                        className={`text-gray-600 hover:text-orange-500 cursor-pointer ${pathname === item.path ? 'font-bold' : ''}`} 
+                        onClick={() => handleLinkClick(item.path)}
+                      > 
+                        {item.label}
+                      </span>
+                    </div>
                   )
                 })}
               </div>
