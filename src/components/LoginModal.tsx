@@ -9,6 +9,7 @@ import Link from 'next/link';
 import { colors } from '@/constants/styles';
 import useGetPasswordResetToken from '@/hooks/auth/useGetPasswordResetToken';
 import { SocialProvider } from '@/types/authTypes';
+import { Button, Input } from './ui/index';
 
 interface LoginModalProps {
   isOpen: boolean
@@ -17,9 +18,6 @@ interface LoginModalProps {
   overlayColor?: string // 오버레이 색상 커스터마이징
   overlayOpacity?: string // 오버레이 투명도 커스터마이징 예를 들면, 'bg-opacity-50'
 }
-
-
-
 
 export default function LoginModal({ 
   isOpen, 
@@ -120,36 +118,33 @@ export default function LoginModal({
   const renderLoginView = () => (
     <form onSubmit={handleSubmit} className="space-y-4">
       {loginForm.error && (
-        <div className="flex items-center p-3 bg-red-50 border border-red-200 text-red-600 text-sm rounded">
+        <div className="flex items-center p-3 bg-red-50 border border-black text-red-600 text-sm rounded">
           <AlertCircle className="w-4 h-4 mr-2" />
           {loginForm.error}
         </div>
       )}
       
-      <div className="space-y-2">
-        <input
-          autoComplete="off"
-          placeholder="이메일"
-          name="email"
-          type="email"
-          value={loginForm.email}
-          onChange={handleChange}
-          className="w-full px-4 py-3 text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-          required
-        />
-      </div>
+      <Input
+        autoComplete="off"
+        placeholder="이메일"
+        name="email"
+        type="email"
+        value={loginForm.email}
+        onChange={handleChange}
+        required
+      />
       
       <div className="space-y-2">
         <div className="relative">
-          <input
+          <Input
             autoComplete="off"
             placeholder="비밀번호"
             name="password"
             type={showPassword ? "text" : "password"}
             value={loginForm.password}
             onChange={handleChange}
-            className="w-full px-4 py-3 text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
             required
+            className="pr-10"
           />
           <button
             type="button"
@@ -171,113 +166,74 @@ export default function LoginModal({
             type="checkbox"
             checked={loginForm.keepLoggedIn}
             onChange={handleKeepLoggedIn}
-            className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+            className="w-4 h-4 text-black border-black rounded focus:ring-black"
           />
-          <label onClick={handleKeepLoggedIn} className="ml-2 text-sm text-gray-600">로그인 상태 유지</label>
+          <label onClick={handleKeepLoggedIn} className="ml-2 text-sm text-black">로그인 상태 유지</label>
         </div>
         <div className="text-sm">
           <button
             type="button"
             onClick={() => updateLoginForm({ view: 'findPassword' })}
-            className="text-blue-600 hover:text-blue-800 font-medium transition-colors duration-200"
+            className="text-black hover:text-gray-800 font-medium transition-colors duration-200"
           >
             비밀번호 찾기
           </button>
         </div>
       </div>
       
-      <button
+      <Button
         type="submit"
+        isLoading={isPending || loginForm.isLocalLoading}
         disabled={isPending || loginForm.isLocalLoading}
-        className={`w-full py-3 px-4 rounded-lg transition-all duration-200 ${
-          (isPending || loginForm.isLocalLoading)
-            ? 'bg-blue-300 cursor-not-allowed' 
-            : 'bg-blue-500 hover:bg-blue-600 active:bg-blue-700'
-        } text-white font-medium`}
+        fullWidth
       >
-        {(isPending || loginForm.isLocalLoading) ? (
-          <span className="flex items-center justify-center">
-            <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
-            로그인 중...
-          </span>
-        ) : (
-          '로그인'
-        )}
-      </button>
+        로그인
+      </Button>
 
-      {/* 소셜 로그인 구분선 */}
-      <div className="relative py-1">
-        <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-gray-200"></div>
-        </div>
-        <div className="relative flex justify-center text-sm">
-          <span className="px-2 bg-white text-gray-500">간편 로그인</span>
-        </div>
+      <div className="flex items-center justify-between my-4">
+        <div className="flex-1 border-t border-black"></div>
+        <div className="px-3 text-sm text-black">또는</div>
+        <div className="flex-1 border-t border-black"></div>
       </div>
 
-      {/* <div className="grid grid-cols-3 gap-3"> */}
-      <div className="grid grid-cols-1 gap-3">
-        <button
-          type="button"
-          onClick={() => handleSocialLogin('google')}
-          className="flex items-center justify-center px-4 py-2 border border-gray-300 rounded-lg shadow-sm bg-white hover:bg-gray-50 transition-colors duration-200"
-        >
-          {SOCIAL_CONFIG.google.icon}
-          <span className="sr-only">Google 로그인</span>
-          <span className="ml-2 text-gray-700">Google 로그인</span>
-        </button>
-      </div>
-
-      <div className="flex items-center justify-between pt-4 text-sm">
-        <button
-          type="button"
-          onClick={() => updateLoginForm({ view: 'findId' })}
-          className="text-gray-600 hover:text-gray-800 transition-colors duration-200"
-        >
-          아이디 찾기
-        </button>
-        <span className="text-gray-500 lg:hidden md:hidden">|</span>
-        <div className="flex items-center space-x-1">
-          <span className="text-gray-500">계정이 없으신가요?</span>
-          <Link
-              href="/auth/signup"
-            className="text-blue-600 hover:text-blue-800 font-medium transition-colors duration-200"
-            onClick={handleCloseModal}
+      <div className="space-y-3">
+        {/* 소셜 로그인 버튼 */}
+        {Object.entries(SOCIAL_CONFIG).map(([provider, config]) => (
+          <button
+            key={provider}
+            type="button"
+            onClick={() => handleSocialLogin(provider as SocialProvider)}
+            className={`w-full flex items-center justify-center py-3 px-4 border ${config.border} rounded-lg ${config.color} ${config.textColor} font-medium transition-all duration-200 `}
           >
-            회원가입
-          </Link>
-        </div>
+            <span className="mr-3">{config.icon}</span>
+            Continue with {provider.charAt(0).toUpperCase() + provider.slice(1)}
+          </button>
+        ))}
       </div>
     </form>
   )
 
   const renderFindIdView = () => (
     <form onSubmit={handleFindId} className="space-y-4">
-      <p className="text-sm text-gray-600 mb-4">
+      <p className="text-sm text-black mb-4">
         가입 시 등록한 이메일을 입력해 주세요.
       </p>
-      <input
+      <Input
         type="email"
         placeholder="이메일"
-        className="w-full px-4 py-3 text-gray-700 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
         required
       />
-      <button
-        type="submit"
-        className="w-full py-3 px-4 bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white rounded-lg transition-all duration-200 font-medium"
-      >
+      <Button type="submit" fullWidth>
         아이디 찾기
-      </button>
-      <button
-        type="button"
+      </Button>
+      <Button 
+        type="button" 
+        variant="secondary"
         onClick={() => updateLoginForm({ view: 'login' })}
-        className="w-full text-sm text-gray-600 hover:text-gray-800 transition-colors duration-200"
+        fullWidth
       >
         로그인으로 돌아가기
-      </button>
+      </Button>
     </form>
   )
 
@@ -305,68 +261,54 @@ export default function LoginModal({
 
     return (
       <form onSubmit={handleFindPassword} className="space-y-4">
-        <p className="text-sm text-gray-600 mb-4">
+        <p className="text-sm text-black mb-4">
           가입한 아이디(이메일)를 입력하시면 비밀번호 재설정 링크를 보내드립니다.
         </p>
         
         {message && (
           <div className={`flex items-center p-3 ${
-            message.type === 'success' ? 'bg-green-50 text-green-600 border-green-200' : 'bg-red-50 text-red-600 border-red-200'
-          } border text-sm rounded`}>
+            message.type === 'success' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'
+          } border border-black text-sm rounded`}>
             <AlertCircle className="w-4 h-4 mr-2" />
             {message.text}
           </div>
         )}
 
-        <input
+        <Input
           type="email"
           placeholder="이메일"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="w-full px-4 py-3 text-gray-700 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
           required
         />
-        <button
+        <Button
           type="submit"
+          isLoading={isPasswordResetPending}
           disabled={isPasswordResetPending}
-          className={`w-full py-3 px-4 rounded-lg transition-all duration-200 ${
-            isPasswordResetPending
-              ? 'bg-blue-300 cursor-not-allowed'
-              : 'bg-blue-500 hover:bg-blue-600 active:bg-blue-700'
-          } text-white font-medium`}
+          fullWidth
         >
-          {isPasswordResetPending ? (
-            <span className="flex items-center justify-center">
-              <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-              처리 중...
-            </span>
-          ) : (
-            '비밀번호 재설정 링크 받기'
-          )}
-        </button>
-        <button
+          비밀번호 재설정 링크 받기
+        </Button>
+        <Button
           type="button"
+          variant="secondary"
           onClick={() => updateLoginForm({ view: 'login' })}
-          className="w-full text-sm text-gray-600 hover:text-gray-800 transition-colors duration-200"
+          fullWidth
         >
           로그인으로 돌아가기
-        </button>
+        </Button>
       </form>
     );
   };
-
 
   return (
     <>
       {isOpen && (
         <div className={`fixed inset-0 ${overlayColor} ${overlayOpacity} ${hasBlur ? 'backdrop-blur-sm' : ''} flex items-center justify-center z-50 p-4`}>
-          <div className={`bg-[${colors.primary.main}] rounded-xl w-full max-w-md mx-4 sm:mx-auto shadow-xl transform transition-all duration-300 border-[1px] border-black `} style={{backgroundColor: colors.primary.main}}>
+          <div className={`bg-white rounded-xl w-full max-w-md mx-4 sm:mx-auto shadow-xl transform transition-all duration-300 border-[1px] border-black`}>
             <div className="p-6 sm:p-8">
               <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-bold text-gray-800">
+                <h2 className="text-2xl font-bold text-black">
                   {loginForm.view === 'login' && '로그인'}
                   {loginForm.view === 'findId' && '아이디 찾기'}
                   {loginForm.view === 'findPassword' && '비밀번호 찾기'}

@@ -6,6 +6,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Container } from '@/components/layouts/Container';
 import { colors } from '@/constants/styles/colors';
 import Tiptap from '@/components/editor/tiptap/Tiptap';
+// import TiptapWithStickyToolbar from '@/components/editor/tiptap/TiptapWithStickyToolbar';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -293,15 +294,26 @@ export const GuestbookForm: React.FC<GuestbookFormProps> = ({
 
                         <div>
                             <label className="block text-sm font-medium mb-2">내용</label>
-                            <Tiptap
-                                initialContent={watch('content')}
-                                onChange={handleContentChange}
-                                onImageClick={handleImageSelect}
-                                selectedImages={selectedThumbnails}
-                                toolbarStyle="border-b bg-gray-50 p-2 flex flex-wrap gap-1"
-                                contentStyle="p-4 min-h-[200px] bg-white prose-sm"
-                                editable={true}
-                            />
+                            <div className="relative border rounded-md">
+                                <Tiptap
+                                    initialContent={watch('content')}
+                                    onChange={handleContentChange}
+                                    onImageClick={handleImageSelect}
+                                    selectedImages={selectedThumbnails}
+                                    toolbarStyle="border-b bg-gray-50 p-2 flex flex-wrap gap-1"
+                                    contentStyle="p-4 min-h-[200px] bg-white prose-sm"
+                                    editable={true}
+                                />
+                                {/* 
+                                <TiptapWithStickyToolbar
+                                    initialContent={watch('content')}
+                                    onChange={handleContentChange}
+                                    onImageClick={handleImageSelect}
+                                    selectedImages={selectedThumbnails}
+                                    editable={true}
+                                />
+                                */}
+                            </div>
                         </div>
 
                         {selectedThumbnails.length > 0 && (

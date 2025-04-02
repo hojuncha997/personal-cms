@@ -5,6 +5,7 @@ import { Container } from './layouts/Container'
 import { useGetPostList } from '@/hooks/posts/useGetPostList'
 import { extractTextFromContent } from '@/utils/postUtils'
 import { PostForList } from '@/types/posts/postTypes'
+import { Heading } from './ui/Heading'
 
 export default function PostSection() {
   const { data, isLoading } = useGetPostList({
@@ -19,7 +20,7 @@ export default function PostSection() {
     return (
       <Container>
         <section className="py-12">
-          <h2 className="text-gray-600 text-3xl font-bold mb-8">최신 포스트</h2>
+          <Heading level={2} className="mb-8">최신 포스트</Heading>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[1, 2, 3].map((_, index) => (
               <div key={index} className="animate-pulse">
@@ -37,7 +38,7 @@ export default function PostSection() {
   return (
     <Container>
       <section className="py-12">
-        <h2 className="text-gray-600 text-3xl font-bold mb-8">최신 포스트</h2>
+        <Heading level={2} className="mb-8">최신 포스트</Heading>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {data?.data?.map((post: PostForList) => (
             <PostCard

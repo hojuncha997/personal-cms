@@ -1,15 +1,45 @@
 import React from 'react';
 import { themeClasses } from '@/styles/theme-classes';
 
+/**
+ * Button 컴포넌트
+ * 
+ * 기본 버튼 컴포넌트로, 프로젝트 전체에서 일관된 디자인을 유지하기 위해 사용.
+ * 
+ * @example
+ * // 기본 버튼
+ * <Button>버튼 텍스트</Button>
+ * 
+ * // 세컨더리 버튼 (흰 배경, 검은색 테두리)
+ * <Button variant="secondary">세컨더리 버튼</Button>
+ * 
+ * // 로딩 상태 버튼
+ * <Button isLoading>로딩 중</Button>
+ * 
+ * // 전체 너비 버튼
+ * <Button fullWidth>전체 너비 버튼</Button>
+ * 
+ * // 커스텀 스타일 버튼
+ * <Button className="bg-red-500 hover:bg-red-600 py-2">커스텀 버튼</Button>
+ * 
+ * // 비활성화 버튼
+ * <Button disabled>비활성화 버튼</Button>
+ */
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  /** 버튼 스타일 변형. 'primary'는 검은 배경, 'secondary'는 흰 배경과 검은 테두리 */
   variant?: 'primary' | 'secondary';
+  /** 로딩 상태 표시 여부 */
   isLoading?: boolean;
+  /** 버튼을 부모 요소의 너비에 맞게 확장할지 여부 */
+  fullWidth?: boolean;
+  /** 버튼 내용 */
   children: React.ReactNode;
 }
 
 export function Button({
   variant = 'primary',
   isLoading = false,
+  fullWidth = false,
   children,
   className = '',
   disabled,
@@ -24,7 +54,7 @@ export function Button({
   
   return (
     <button
-      className={`py-3 px-4 rounded-lg ${baseClass} ${className}`}
+      className={`py-3 px-4 rounded-lg ${baseClass} ${fullWidth ? 'w-full' : ''} ${className}`}
       disabled={disabled || isLoading}
       {...props}
     >
