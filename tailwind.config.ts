@@ -1,4 +1,5 @@
 import type { Config } from "tailwindcss";
+import { theme as appTheme } from "./src/constants/styles/theme";
 
 export default {
   content: [
@@ -11,6 +12,13 @@ export default {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
+        theme: {
+          primary: appTheme.colors.primary,
+          secondary: appTheme.colors.secondary,
+          white: appTheme.colors.secondary,
+          black: appTheme.colors.primary,
+          gray: appTheme.colors.gray,
+        }
       },
     },
   },
