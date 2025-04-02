@@ -25,6 +25,7 @@
       "@store/*": ["./src/store/*"],
       "@components/*": ["./src/components/*"],
       "@images/*": ["/public/images/*"],
+      "@/images/*": ["/public/images/*"],
       "@utils/*": ["./src/utils/*"]
     }
   },

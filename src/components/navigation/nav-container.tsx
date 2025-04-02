@@ -9,6 +9,8 @@ import { CommonDrawer } from '@components/common/common-drawer'
 import { useState } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import { colors } from '@/constants/styles'
+import { Logo } from '@components/common/logo'
+
 
 interface NavContainerProps {
   onOpenDrawer: () => void;
@@ -112,7 +114,10 @@ export function NavContainer({
         <div className="flex justify-between h-16 items-center">
           {/* 로고 */}
           <div className="flex items-center">
-            <Link href="/" className="text-xl text-gray-700">notes&nodes</Link>
+            <Link href="/" className="flex items-center">
+              <Logo width={32} height={32} />
+              <span className="hidden md:block text-black text-xl font-bold">notes&nodes</span>
+            </Link>
           </div>
 
           {/* 데스크탑 메뉴 */}
