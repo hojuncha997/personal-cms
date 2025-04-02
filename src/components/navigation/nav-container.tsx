@@ -8,9 +8,11 @@ import { Container } from '@/components/layouts/Container'
 import { CommonDrawer } from '@components/common/common-drawer'
 import { useState } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
-import { colors } from '@/constants/styles'
 import { Logo } from '@components/common/logo'
 import { NavMenuContent } from '@/constants/navigation'
+import { themeClasses } from '@/styles/theme-classes'
+import { theme } from '@/constants/styles/theme'
+import { Button } from '@/components/ui'
 
 interface NavContainerProps {
   onOpenDrawer: () => void;
@@ -41,8 +43,8 @@ export function NavContainer({
   const renderAuthButton = () => {
     if (isAuthenticated) {
       return (
-        <div className="border-[1px] border-gray-200 rounded-full  flex items-center text-gray-400 hover:bg-blue-500 hover:text-white group">
-          <div className="group-hover:text-white cursor-pointer">
+        <div className={`${theme.button.secondary.border} rounded-full flex items-center`}>
+          <div className="cursor-pointer">
             {/* 프로필 메뉴 컴포넌트 */}
             <NavProfile />
           </div>
@@ -51,24 +53,22 @@ export function NavContainer({
     }
 
     if (loading) {
-      return <div className="h-4 w-20 bg-gray-200 animate-pulse rounded" />
+      return <div className={`h-4 w-20 ${themeClasses.skeleton.base}`} />
     }
 
     return (
-      <button 
+      <Button 
+        variant="secondary"
         onClick={onOpenLogin} 
-        className="border-[1px] border-gray-300 rounded-lg p-1 text-blue-500 hover:bg-gray-200"
+        className="py-1 px-2 text-sm"
       >
         로그인
-      </button>
+      </Button>
     )
   }
 
   return (
-    // <nav className={`fixed w-full bg-white shadow-md z-10 transition-transform duration-200 ${
-    //   isScrollingDown ? '-translate-y-full' : 'translate-y-0'
-    // }`}>
-    <nav style={{backgroundColor: colors.primary.main}} className={`fixed w-full bg-[${colors.primary.main}] border-b-[1px] border-gray-300 z-10 transition-transform duration-200 ${
+    <nav className={`fixed w-full ${theme.card.bg} border-b ${theme.card.border.split(' ')[1]} z-10 transition-transform duration-200 ${
       isScrollingDown ? '-translate-y-full' : 'translate-y-0'
     }`}>
       <Container className="">
@@ -77,7 +77,7 @@ export function NavContainer({
           <div className="flex items-center">
             <Link href="/" className="flex items-center">
               <Logo width={32} height={32} />
-              <span className="hidden md:block text-black text-xl font-bold">notes&nodes</span>
+              <span className={`hidden md:block ${theme.button.secondary.text} text-xl font-bold`}>notes&nodes</span>
             </Link>
           </div>
 
@@ -88,7 +88,7 @@ export function NavContainer({
               <Link 
                 href={item.path} 
                 key={item.id} 
-                className={`text-sm text-gray-700 hover:text-blue-500 ${pathname === item.path ? 'font-bold' : ''}`}
+                className={`text-sm ${theme.button.secondary.text} ${theme.button.primary.hover.replace('bg-', 'text-')} transition-all duration-200 ${pathname === item.path ? 'font-bold' : ''}`}
               >
                 {item.label}
               </Link>
@@ -102,9 +102,9 @@ export function NavContainer({
             {renderAuthButton()}
             <button 
               onClick={() => setIsDrawerOpen(true)}
-              className="text-gray-500 hover:text-gray-700"
+              className={`${theme.button.secondary.text.replace('text-black', 'text-gray-500')} ${theme.button.primary.hover.replace('bg-', 'text-')} transition-all duration-200`}
             >
-              <svg className="h-6 w-6 text-black" fill="none" strokeWidth="1" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className={`h-6 w-6 ${theme.button.secondary.text}`} fill="none" strokeWidth="1" viewBox="0 0 24 24" stroke="currentColor">
                 <path d="M4 6h16M4 12h16M4 18h16"></path>
               </svg>
             </button>
@@ -125,7 +125,7 @@ export function NavContainer({
                   return (
                     <div key={item.id} className="p-4">
                       <span 
-                        className={`text-gray-600 hover:text-orange-500 cursor-pointer ${pathname === item.path ? 'font-bold' : ''}`} 
+                        className={`${theme.button.secondary.text} ${theme.button.primary.hover.replace('bg-', 'text-')} cursor-pointer transition-all duration-200 ${pathname === item.path ? 'font-bold' : ''}`} 
                         onClick={() => handleLinkClick(item.path)}
                       > 
                         {item.label}

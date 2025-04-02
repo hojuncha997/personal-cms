@@ -68,10 +68,8 @@ export function CommonPopover({
         <PopoverPrimitive.Content
           className={`
            z-50 
-          
-           border 
-           border-gray-300 
-           bg-[#ffffff] 
+           
+           bg-[#ffffff]
            rounded-xl
            
            outline-none 
