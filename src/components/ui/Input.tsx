@@ -55,4 +55,13 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
       </div>
     );
   }
-); 
+);
+
+/**
+ * displayName 속성을 설정해주는 이유:
+ * 1. forwardRef를 사용한 컴포넌트는 익명 함수로 처리되어 React DevTools에서 컴포넌트 이름이 표시되지 않음.
+ * 2. ESLint의 react/display-name 규칙을 준수하기 위해 필요.
+ * 3. 디버깅 및 에러 메시지에서 컴포넌트 식별을 용이하게 함.
+ * 4. Vercel 빌드 과정에서 ESLint 오류를 방지.
+ */
+Input.displayName = 'Input'; 
