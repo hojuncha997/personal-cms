@@ -53,10 +53,10 @@ export default function Home() {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-0">
               {/* 메인 뉴스 영역 */}
               {featuredPost && (
-                <div className="lg:col-span-8 lg:border-r lg:border-black p-6">
+                <div className={`lg:col-span-8 lg:border-r border-primary p-6`}>
                   <Link href={`/posts/${featuredPost.slug}-${featuredPost.public_id}`}>
                     <div className="group cursor-pointer">
-                      <Heading level={1} className="mb-4 group-hover:text-gray-700 leading-tight">
+                      <Heading level={1} className={`mb-4 ${theme.colors.primary} group-hover:text-gray-700 leading-tight`}>
                         {featuredPost.title}
                       </Heading>
                       <div className="grid grid-cols-12 gap-6">
@@ -93,14 +93,14 @@ export default function Home() {
 
               {/* 우측 서브 뉴스 영역 */}
               <div className="lg:col-span-4 flex flex-col">
-                <div className={`${theme.button.primary.bg} ${theme.button.primary.text} p-4 lg:pr-6`}>
+                <div className={`${theme.button.primary.bg} p-1 lg:pr-4`}>
                   <Heading level={2} className={`m-0 ${theme.button.primary.text}`}>최신 포스트</Heading>
                 </div>
                 <div className="space-y-6 p-4 lg:p-6">
                   {recentPosts?.data.slice(1, 3).map((post: PostForList) => (
                     <Link key={post.public_id} href={`/posts/${post.slug}-${post.public_id}`}>
                       {/* 카드 컴포넌트 사용 : border-0 추가하여 기본 속성 오버라이드 -> 테두리 제거 */}
-                      <Card className="cursor-pointer pb-6 border-b border-black last:border-0 shadow-none hover:shadow-none border-0">
+                      <Card className={`cursor-pointer pb-6 border-b border-primary last:border-0 shadow-none hover:shadow-none border-0`}>
                         <CardContent className="p-0">
                           <div className="flex gap-4">
                             <div className="flex-1">
@@ -137,7 +137,7 @@ export default function Home() {
 
           {/* 프로젝트 섹션 */}
           <section className={`${theme.card.border} rounded-lg p-0 overflow-hidden`}>
-            <div className={`${theme.button.primary.bg} ${theme.button.primary.text} p-4 lg:p-6`}>
+            <div className={`${theme.button.primary.bg} ${theme.button.primary.text} p-1 lg:p-1 `}>
               <Heading level={2} className={`m-0 ${theme.button.primary.text}`}>프로젝트</Heading>
             </div>
             <div className="p-4 lg:p-6">
