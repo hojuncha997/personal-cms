@@ -2,70 +2,57 @@
  * 프로젝트 공통 테마 설정
  * 
  * 이 파일은 앱 전체에서 사용되는 색상, 버튼, 입력 필드 등의 공통 스타일을 정의.
- * 앱의 디자인을 변경하고 싶다면 이 파일만 수정 .
+ * 앱의 디자인을 변경하고 싶다면 이 파일만 수정.
  * 
  * 현재 테마: Gray and White (회색과 흰색 테마)
  * 
- * CSS 변수 기반 테마 시스템을 사용.
- * 전역 CSS에 정의된 CSS 변수를 참조하여 런타임에도 테마 변경 가능.
- * 
  * @example
- * // 컴포넌트에서 테마 색상 직접 사용
+ * // 컴포넌트에서 테마 사용 예시
  * import { theme } from '@/constants/styles/theme';
  * 
  * function MyComponent() {
  *   return (
- *     <div style={{ backgroundColor: theme.colors.background.light }}>
- *       <p style={{ color: theme.colors.text.light }}>텍스트</p>
+ *     <div className="bg-primary">
+ *       <button className={`${theme.button.primary.bg} ${theme.button.primary.text}`}>버튼</button>
  *     </div>
  *   );
  * }
  */
-export const theme = {
+
+// 직접 색상 값을 정의하는 기본 테마 값
+export const themeValues = {
   colors: {
-    /** 기본 색상 (회색) */
-    primary: 'var(--color-primary)',
-    /** 보조 색상 (흰색) */
-    secondary: 'var(--color-secondary)',
+    primary: '#374151', // gray-700
+    secondary: '#ffffff',
     background: {
-      /** 라이트 모드 배경색 */
-      light: 'var(--color-bg-light)',
-      /** 다크 모드 배경색 */
-      dark: 'var(--color-bg-dark)',
+      light: '#ffffff',
+      dark: '#374151', // gray-700
     },
     text: {
-      /** 라이트 모드 텍스트 색상 */
-      light: 'var(--color-text-light)',
-      /** 다크 모드 텍스트 색상 */
-      dark: 'var(--color-text-dark)',
+      light: '#374151', // gray-700
+      dark: '#ffffff',
     },
     gray: {
-      /** 아주 밝은 회색 (거의 흰색) */
-      100: 'var(--color-gray-100)',
-      /** 밝은 회색 */
-      200: 'var(--color-gray-200)',
-      /** 중간 밝은 회색 */
-      300: 'var(--color-gray-300)',
-      /** 중간 회색 */
-      400: 'var(--color-gray-400)',
-      /** 회색 */
-      500: 'var(--color-gray-500)',
-      /** 중간 어두운 회색 */
-      600: 'var(--color-gray-600)',
-      /** 어두운 회색 */
-      700: 'var(--color-gray-700)',
-      /** 매우 어두운 회색 */
-      800: 'var(--color-gray-800)',
-      /** 거의 검은색 */
-      900: 'var(--color-gray-900)',
+      100: '#f3f4f6',
+      200: '#e5e7eb',
+      300: '#d1d5db',
+      400: '#9ca3af',
+      500: '#6b7280',
+      600: '#4b5563',
+      700: '#374151',
+      800: '#1f2937',
+      900: '#111827',
     },
     border: {
-      /** 라이트 모드 테두리 색상 */
-      light: 'var(--color-border-light)',
-      /** 다크 모드 테두리 색상 */
-      dark: 'var(--color-border-dark)',
+      light: '#374151', // gray-700
+      dark: '#374151', // gray-700
     },
-  },
+  }
+};
+
+// UI 컴포넌트 스타일 정의
+export const theme = {
+  colors: themeValues.colors, // 직접 참조 가능하도록 노출
   button: {
     primary: {
       /** 기본 버튼 배경색 */
@@ -122,4 +109,4 @@ export const theme = {
     /** 스켈레톤 애니메이션 */
     animation: 'animate-pulse',
   },
-} 
+}; 

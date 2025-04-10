@@ -1,5 +1,5 @@
 import type { Config } from "tailwindcss";
-import { theme as appTheme } from "./src/constants/styles/theme";
+import { themeValues } from "./src/constants/styles/theme";
 
 export default {
   content: [
@@ -12,19 +12,18 @@ export default {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
-        theme: {
-          primary: appTheme.colors.primary,
-          secondary: appTheme.colors.secondary,
-          white: appTheme.colors.secondary,
-          black: appTheme.colors.primary,
-          gray: appTheme.colors.gray,
-        }
+        primary: themeValues.colors.primary,
+        secondary: themeValues.colors.secondary,
+        'primary-light': themeValues.colors.gray[600],
+        'primary-dark': themeValues.colors.gray[800],
+        ...themeValues.colors.gray,
       },
     },
   },
   plugins: [
     require('@tailwindcss/typography')
   ],
+  darkMode: 'class',
 } satisfies Config;
 
 // import type { Config } from "tailwindcss";

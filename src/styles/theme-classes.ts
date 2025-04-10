@@ -24,12 +24,14 @@ import { theme } from '@/constants/styles/theme';
 export const themeClasses = {
   // 버튼 스타일
   button: {
-    /** 기본 버튼 스타일 (검은색 배경, 흰색 텍스트) */
+    /** 기본 버튼 스타일 (회색 배경, 흰색 텍스트) */
     primary: `${theme.button.primary.bg} ${theme.button.primary.text} ${theme.button.primary.hover} ${theme.button.primary.active} transition-all duration-200`,
     /** 비활성화된 기본 버튼 스타일 */
     primaryDisabled: `${theme.button.primary.disabled} text-white cursor-not-allowed transition-all duration-200`,
-    /** 보조 버튼 스타일 (흰색 배경, 검은색 테두리와 텍스트) */
+    /** 보조 버튼 스타일 (흰색 배경, 회색 테두리와 텍스트) */
     secondary: `${theme.button.secondary.bg} ${theme.button.secondary.text} ${theme.button.secondary.hover} ${theme.button.secondary.active} ${theme.button.secondary.border} transition-all duration-200`,
+    /** 버튼 내부 아이템 스타일 (인라인 플렉스, 패딩) */
+    item: `${theme.button.primary.bg} ${theme.button.primary.text} px-2 inline-flex items-center`,
   },
   
   // 입력 필드 스타일
@@ -47,13 +49,27 @@ export const themeClasses = {
   // 텍스트 스타일
   heading: {
     /** h1 제목 스타일 */
-    h1: 'text-4xl font-bold text-black',
+    h1: 'text-4xl font-bold text-gray-700',
     /** h2 제목 스타일 */
-    h2: 'text-3xl font-bold text-black',
+    h2: 'text-3xl font-bold text-gray-700',
     /** h3 제목 스타일 */
-    h3: 'text-2xl font-bold text-black',
+    h3: 'text-2xl font-bold text-gray-700',
     /** h4 제목 스타일 */
-    h4: 'text-xl font-bold text-black',
+    h4: 'text-xl font-bold text-gray-700',
+    /** 섹션 제목 스타일 (밑줄 포함) */
+    section: 'text-xl mb-6 border-b border-primary',
+  },
+  
+  // 링크 스타일
+  /** 링크 스타일 */
+  link: `${theme.button.primary.hover.replace('bg-', 'text-')}`,
+  
+  // 콘텐츠 스타일
+  content: {
+    /** 텍스트 콘텐츠 스타일 */
+    text: 'text-primary',
+    /** 섹션 콘텐츠 스타일 */
+    section: 'mb-12 text-primary',
   },
   
   // 레이아웃 스타일
@@ -67,7 +83,7 @@ export const themeClasses = {
   // 다크모드에서 색상 반전
   darkMode: {
     /** 다크모드 배경색 */
-    bg: 'bg-black',
+    bg: 'bg-gray-700',
     /** 다크모드 텍스트 색상 */
     text: 'text-white',
   },
