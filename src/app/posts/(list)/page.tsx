@@ -199,7 +199,7 @@ const PostContent = () => {
      
                     <div className="flex justify-between items-center mb-6">
                         <h1 className="text-2xl font-bold text-gray-700">포스팅</h1>
-                       <div className="mt-4 flex justify-end">
+                       <div className="flex justify-end">
                         {writeButton()}
                        
                     </div>
@@ -235,7 +235,7 @@ const PostContent = () => {
                                 <Link 
                                     key={post.public_id}
                                     href={`/posts/${post.slug}-${post.public_id}`}
-                                    className='block border-b border-b-gray-300 cursor-pointer py-4 group'
+                                    className='block border-b border-b-gray-300 cursor-pointer py-2 group'
                                 >
                                     <div className='flex items-center'>
                                         <div className='flex-1'>

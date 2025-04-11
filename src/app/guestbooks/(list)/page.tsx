@@ -232,7 +232,7 @@ const GuestbookListContent = () => {
                                 <Link 
                                     key={guestbook.public_id}
                                     href={`/guestbooks/${guestbook.slug}-${guestbook.public_id}`}
-                                    className='block border-b border-b-gray-300 cursor-pointer py-4 group'
+                                    className='block border-b border-b-gray-300 cursor-pointer py-2 group'
                                 >
                                     <div className='flex items-center'>
                                         <div className='flex-1'>
