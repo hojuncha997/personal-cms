@@ -22,7 +22,7 @@ export const Pagination: React.FC<PaginationProps> = ({
                     className={`px-4 py-2 rounded-md ${
                         currentPage === page 
                             ? `${activeColor} text-white` 
-                            : 'bg-gray-100 hover:bg-gray-200'
+                            : 'border border-gray-300 hover:bg-gray-300'
                     }`}
                 >
                     {page}

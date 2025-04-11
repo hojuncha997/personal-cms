@@ -71,13 +71,17 @@ export default function Home() {
                         {featuredPost.thumbnail ? (
                           <div className="col-span-6">
                             <div className={`aspect-[4/3] bg-${theme.colors.gray[100]} rounded-sm overflow-hidden ${theme.card.border}`}>
-                              <Image 
-                                src={featuredPost.thumbnail} 
-                                alt={featuredPost.title}
-                                width={800}
-                                height={600}
-                                className={themeClasses.image}
-                              />
+                              {featuredPost.thumbnail ? (
+                                <Image 
+                                  src={featuredPost.thumbnail} 
+                                  alt={featuredPost.title}
+                                  width={800}
+                                  height={600}
+                                  className={themeClasses.image}
+                                />
+                              ) : (
+                                <div className={`aspect-[4/3] bg-${theme.colors.gray[100]} rounded-sm ${theme.card.border}`} />
+                              )}
                             </div>
                           </div>
                         ) : (

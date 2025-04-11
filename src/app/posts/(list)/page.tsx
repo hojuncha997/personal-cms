@@ -23,7 +23,7 @@ import FilterContent from '@/components/common/FilterContent';
 import { useGetPostCategories, PostCategory } from '@/hooks/posts/useGetPostCategories';
 import { processCategories } from '@/utils/categoryUtils';
 import { Pagination } from '@/components/common/Pagination';
-
+import { Plus } from 'lucide-react';
 const PostContent = () => {
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -180,12 +180,33 @@ const PostContent = () => {
         return <div className="text-center py-8">데이터를 불러올 수 없습니다.</div>;
     }
 
+    const writeButton = () => {
+        if (!loading) {
+            return (
+                <AdminGuard>
+                    <Link href="/posts/write" className='flex items-center gap-2 px-4 py-2 bg-gray-700 text-white rounded-md hover:bg-gray-800 transition-colors'>
+                        <Plus className="w-4 h-4" />
+                        <span>포스팅 작성</span>
+                    </Link>
+                </AdminGuard>
+            )
+        }
+    }
+
     return (
         <div className="w-full">
             {/* <h1 className="text-3xl font-bold mb-12 border-b border-black pb-4">포스팅</h1> */}
-            
+     
+                    <div className="flex justify-between items-center mb-6">
+                        <h1 className="text-2xl font-bold text-gray-700">포스팅</h1>
+                       <div className="mt-4 flex justify-end">
+                        {writeButton()}
+                       
+                    </div>
+                    </div>
+
             {/* 아코디언 필터 영역 */}
-            <Accordion title="검색 및 정렬 옵션" className="border-gray-200 text-gray-700">
+            <Accordion title="검색 및 정렬 옵션" className="border-gray-300 text-gray-700">
                 <FilterContent
                     searchValue={localSearch}
                     onSearchChange={setLocalSearch}
@@ -214,7 +235,7 @@ const PostContent = () => {
                                 <Link 
                                     key={post.public_id}
                                     href={`/posts/${post.slug}-${post.public_id}`}
-                                    className='block border-b border-b-gray-700 cursor-pointer py-4 group'
+                                    className='block border-b border-b-gray-300 cursor-pointer py-4 group'
                                 >
                                     <div className='flex items-center'>
                                         <div className='flex-1'>
@@ -233,7 +254,7 @@ const PostContent = () => {
                                             <div className='text-sm text-gray-500 flex flex-wrap gap-4'>
                                                 <span className='px-2 py-1 bg-gray-100 text-sm rounded-md'>{post.categorySlug || 'no category'}</span>
                                                 <div className="flex items-center gap-2">
-                                                    {post.author_profile_image ? (
+                                                    {/* {post.author_profile_image ? (
                                                         <Image
                                                             src={post.author_profile_image}
                                                             alt="작성자 프로필"
@@ -245,17 +266,17 @@ const PostContent = () => {
                                                         <div className="w-5 h-5 rounded-full bg-gray-200 flex items-center justify-center">
                                                             <User className="w-3 h-3 text-gray-500" />
                                                         </div>
-                                                    )}
+                                                    )} */}
                                                     <span>{post.current_author_name?.includes('@') ? post.current_author_name.split('@')[0] : post.current_author_name}</span>
-                                                </div>
                                                 <span>조회 {post.viewCount}</span>
                                                 <span>좋아요 {post.likeCount}</span>
                                                 <span>{format(new Date(post.createdAt), 'yyyy-MM-dd')}</span>
                                             </div>
+                                            </div>
                                         </div>
                                         <div className='w-40 ml-4'>
                                             {/* 썸네일 영역 */}
-                                            <div className={`w-full h-24 rounded-lg overflow-hidden ${!post.thumbnail ? 'bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center p-2' : ''}`}>
+                                            <div className={`w-full h-24 rounded-lg overflow-hidden ${!post.thumbnail ? 'bg-gradient-to-r from-gray-400 to-gray-700 flex items-center justify-center p-2' : ''}`}>
                                                 {post.thumbnail ? (
                                                     <Image 
                                                         src={post.thumbnail} 
@@ -288,15 +309,7 @@ const PostContent = () => {
                     )}
 
                     <div className="mt-4 flex justify-end">
-                        {!loading && (  // 로딩이 완료된 후에만 AdminGuard를 렌더링
-                            <AdminGuard>
-                                <Link href="/posts/write">
-                                    <button className="px-4 py-2 bg-black text-white rounded-md hover:bg-blue-600 transition-colors">
-                                        게시글 작성
-                                    </button>
-                                </Link>
-                            </AdminGuard>
-                        )}
+                        {writeButton()}
                     </div>
                 </div>
             </div>

@@ -70,7 +70,7 @@ const CategoryNav = ({ pathname, onItemClick }: { pathname: string, onItemClick?
                     )}
                 </div>
                 {hasChildren && isExpanded && (
-                    <ul className="ml-4 mt-1 space-y-1 border-l border-gray-700 pl-2">
+                    <ul className="ml-4 mt-1 space-y-1 border-l border-gray-300 pl-2">
                         {category.children?.map((child: PostCategory) => renderCategory(child))}
                     </ul>
                 )}
