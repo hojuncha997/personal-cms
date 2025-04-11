@@ -232,11 +232,11 @@ const GuestbookListContent = () => {
                                 <Link 
                                     key={guestbook.public_id}
                                     href={`/guestbooks/${guestbook.slug}-${guestbook.public_id}`}
-                                    className='block border-b border-b-gray-300 cursor-pointer py-2 group'
+                                    className='block border-b border-b-gray-300 cursor-pointer py-3 group'
                                 >
                                     <div className='flex items-center'>
                                         <div className='flex-1'>
-                                            <div className='text-lg font-medium text-black group-hover:text-blue-500 flex items-center gap-2 mb-2'>
+                                            <div className='text-lg font-medium text-gray-700 group-hover:text-blue-500 flex items-center gap-2 mb-2'>
                                                 {guestbook.isSecret && (
                                                     <span className="text-xs bg-gray-200 px-2 py-0.5 rounded">비밀글</span>
                                                 )}
