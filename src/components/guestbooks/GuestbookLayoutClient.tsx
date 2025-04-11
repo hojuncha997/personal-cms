@@ -12,6 +12,7 @@ import { useWindowSize } from '@/hooks/layout';
 import { useGetGuestbookCategories, GuestbookCategory } from '@/hooks/guestbooks/useGetGuestbookCategories';
 import { useCategoryStore } from '@/store/useCategoryStore';
 import { useRouter } from 'next/navigation';
+import { CategorySkeleton } from '@/components/ui';
 
 // CategoryNav 컴포넌트 수정
 const CategoryNav = ({ pathname, onItemClick }: { pathname: string, onItemClick?: () => void }) => {
@@ -22,7 +23,13 @@ const CategoryNav = ({ pathname, onItemClick }: { pathname: string, onItemClick?
     const router = useRouter();
     
     if (isLoading) {
-        return <div className="p-6">category loading...</div>;
+        return (
+            <nav className="p-6">
+                <ul className="space-y-3">
+                    <CategorySkeleton count={4} />
+                </ul>
+            </nav>
+        );
     }
 
     // path 길이가 1인 것이 최상위 카테고리 (예: "1", "4", "5" 등)
@@ -41,7 +48,7 @@ const CategoryNav = ({ pathname, onItemClick }: { pathname: string, onItemClick?
                         <button
                             onClick={() => toggleCategory(category.id)}
                             className={`flex-1 block p-2 rounded-md transition-colors text-left
-                                ${currentCategory === category.slug ? 'bg-blue-100 text-blue-600' : 'hover:bg-gray-100'}
+                                ${currentCategory === category.slug ? 'bg-gray-700 text-white' : 'hover:bg-gray-100'}
                             `}
                         >
                             <span className="flex items-center gap-2">
@@ -59,7 +66,7 @@ const CategoryNav = ({ pathname, onItemClick }: { pathname: string, onItemClick?
                         <Link
                             href={`/guestbooks?categorySlug=${category.slug}`}
                             className={`flex-1 block p-2 rounded-md transition-colors
-                                ${currentCategory === category.slug ? 'bg-blue-100 text-blue-600' : 'hover:bg-gray-100'}
+                                ${currentCategory === category.slug ? 'bg-gray-700 text-white' : 'hover:bg-gray-100'}
                             `}
                             onClick={onItemClick}
                         >
@@ -68,7 +75,7 @@ const CategoryNav = ({ pathname, onItemClick }: { pathname: string, onItemClick?
                     )}
                 </div>
                 {hasChildren && isExpanded && (
-                    <ul className="ml-4 mt-1 space-y-1 border-l border-gray-200 pl-2">
+                    <ul className="ml-4 mt-1 space-y-1 border-l border-gray-700 pl-2">
                         {category.children?.map((child: GuestbookCategory) => renderCategory(child))}
                     </ul>
                 )}
@@ -83,7 +90,7 @@ const CategoryNav = ({ pathname, onItemClick }: { pathname: string, onItemClick?
                     <Link
                         href="/guestbooks"
                         className={`block p-2 rounded-md transition-colors
-                            ${!currentCategory ? 'bg-blue-100 text-blue-600' : 'hover:bg-gray-100'}
+                            ${!currentCategory ? 'bg-gray-700 text-white' : 'hover:bg-gray-100'}
                         `}
                     >
                         all
@@ -141,7 +148,7 @@ export default function GuestbookLayoutClient({
                         - sticky로 스크롤 시에도 고정
                     */}
                     {!showDrawer && (
-                        <div className="w-64 border-r border-gray-200 min-h-[calc(100vh-4rem)] sticky top-16 -ml-6">
+                        <div className="w-64 border-r border-gray-700 min-h-[calc(100vh-4rem)] sticky top-16 -ml-6">
                             <CategoryNav pathname={pathname} />
                         </div>
                     )}
@@ -176,7 +183,7 @@ export default function GuestbookLayoutClient({
                     isOpen={isDrawerOpen}
                     onClose={() => setIsDrawerOpen(false)}
                     hasOverlay={true}
-                    className="border-r border-gray-200"
+                    className="border-r border-gray-700"
                 >
                     <CategoryNav 
                         pathname={pathname} 

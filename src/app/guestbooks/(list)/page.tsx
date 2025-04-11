@@ -195,7 +195,7 @@ const GuestbookListContent = () => {
                 <h1 className="text-2xl font-bold">방명록</h1>
                 <button
                     onClick={handleWriteClick}
-                    className="flex items-center gap-2 px-4 py-2 bg-black text-white rounded-md hover:bg-gray-800 transition-colors"
+                    className="flex items-center gap-2 px-4 py-2 bg-gray-700 text-white rounded-md hover:bg-gray-800 transition-colors"
                 >
                     <Plus className="w-4 h-4" />
                     <span>방명록 작성</span>
@@ -203,7 +203,7 @@ const GuestbookListContent = () => {
             </div>
             
             {/* 아코디언 필터 영역 */}
-            <Accordion title="검색 및 정렬 옵션">
+            <Accordion title="검색 및 정렬 옵션" className="border-gray-200 text-gray-700">
                 <FilterContent
                     searchValue={localSearch}
                     onSearchChange={setLocalSearch}
@@ -232,7 +232,7 @@ const GuestbookListContent = () => {
                                 <Link 
                                     key={guestbook.public_id}
                                     href={`/guestbooks/${guestbook.slug}-${guestbook.public_id}`}
-                                    className='block border-b border-b-gray-300 cursor-pointer py-4 group'
+                                    className='block border-b border-b-gray-700 cursor-pointer py-4 group'
                                 >
                                     <div className='flex items-center'>
                                         <div className='flex-1'>
@@ -312,7 +312,7 @@ const GuestbookListContent = () => {
                                     onClick={() => handlePageChange(page)}
                                     className={`px-4 py-2 rounded-md ${
                                         searchState.page === page 
-                                            ? 'bg-blue-500 text-white' 
+                                            ? 'bg-gray-700 text-white' 
                                             : 'bg-gray-100 hover:bg-gray-200'
                                     }`}
                                 >

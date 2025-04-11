@@ -1,3 +1,5 @@
+import { theme } from '@/constants/styles/theme'
+
 interface LogoProps {
   width?: number;
   height?: number;
@@ -5,8 +7,8 @@ interface LogoProps {
 }
 
 export function Logo({ width = 40, height = 40, isDarkMode = false }: LogoProps) {
-  const strokeColor = isDarkMode ? "white" : "black";
-  const fillColor = isDarkMode ? "white" : "black";
+  const strokeColor = isDarkMode ? "white" : theme.colors.primary;
+  const fillColor = isDarkMode ? "white" : theme.colors.primary;
   
   return (
     <svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width={width} height={height}>

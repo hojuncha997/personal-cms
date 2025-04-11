@@ -20,7 +20,7 @@ const Accordion: React.FC<AccordionProps> = ({ title, children, className }) => 
         <div className={`mb-6 border border-gray-200 rounded-lg ${className || ''}`}>
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="w-full px-4 py-3 flex items-center justify-between bg-white rounded-lg hover:bg-gray-50"
+                className={`w-full px-4 py-3 flex items-center justify-between bg-white rounded-lg hover:bg-gray-50 ${className || ''}`}
             >
                 {/* 아코디언 제목 */}
                 <span className="font-medium">{title}</span>

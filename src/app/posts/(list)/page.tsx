@@ -22,6 +22,7 @@ import Accordion from '@/components/common/Accordion';
 import FilterContent from '@/components/common/FilterContent';
 import { useGetPostCategories, PostCategory } from '@/hooks/posts/useGetPostCategories';
 import { processCategories } from '@/utils/categoryUtils';
+import { Pagination } from '@/components/common/Pagination';
 
 const PostContent = () => {
     const router = useRouter();
@@ -184,7 +185,7 @@ const PostContent = () => {
             {/* <h1 className="text-3xl font-bold mb-12 border-b border-black pb-4">포스팅</h1> */}
             
             {/* 아코디언 필터 영역 */}
-            <Accordion title="검색 및 정렬 옵션">
+            <Accordion title="검색 및 정렬 옵션" className="border-gray-200 text-gray-700">
                 <FilterContent
                     searchValue={localSearch}
                     onSearchChange={setLocalSearch}
@@ -213,7 +214,7 @@ const PostContent = () => {
                                 <Link 
                                     key={post.public_id}
                                     href={`/posts/${post.slug}-${post.public_id}`}
-                                    className='block border-b border-b-gray-300 cursor-pointer py-4 group'
+                                    className='block border-b border-b-gray-700 cursor-pointer py-4 group'
                                 >
                                     <div className='flex items-center'>
                                         <div className='flex-1'>
@@ -278,21 +279,12 @@ const PostContent = () => {
 
                     {/* 페이지네이션 */}
                     {data.meta && (
-                        <div className="mt-6 flex justify-center gap-2">
-                            {Array.from({ length: data.meta.totalPages }, (_, i) => i + 1).map((page) => (
-                                <button
-                                    key={page}
-                                    onClick={() => handlePageChange(page)}
-                                    className={`px-4 py-2 rounded-md ${
-                                        searchState.page === page 
-                                            ? 'bg-blue-500 text-white' 
-                                            : 'bg-gray-100 hover:bg-gray-200'
-                                    }`}
-                                >
-                                    {page}
-                                </button>
-                            ))}
-                        </div>
+                        <Pagination
+                            currentPage={searchState.page}
+                            totalPages={data.meta.totalPages}
+                            onPageChange={handlePageChange}
+                            activeColor="bg-gray-700"
+                        />
                     )}
 
                     <div className="mt-4 flex justify-end">

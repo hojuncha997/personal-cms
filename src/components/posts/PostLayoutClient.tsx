@@ -9,6 +9,7 @@ import { CommonDrawer } from '@components/common/common-drawer'
 import { useWindowSize } from '@/hooks/layout';
 import { useGetPostCategories, PostCategory } from '@/hooks/posts/useGetPostCategories';
 import { useCategoryStore } from '@/store/useCategoryStore';
+import { CategorySkeleton } from '@/components/ui';
 
 // CategoryNav 컴포넌트 수정
 const CategoryNav = ({ pathname, onItemClick }: { pathname: string, onItemClick?: () => void }) => {
@@ -18,7 +19,13 @@ const CategoryNav = ({ pathname, onItemClick }: { pathname: string, onItemClick?
     const { expandedCategories, toggleCategory } = useCategoryStore();
     
     if (isLoading) {
-        return <div className="p-6">category loading...</div>;
+        return (
+            <nav className="p-6">
+                <ul className="space-y-3">
+                    <CategorySkeleton count={4} />
+                </ul>
+            </nav>
+        );
     }
 
     // path 길이가 1인 것이 최상위 카테고리 (예: "1", "4", "5" 등)
@@ -54,7 +61,7 @@ const CategoryNav = ({ pathname, onItemClick }: { pathname: string, onItemClick?
                         <Link
                             href={`/posts?categorySlug=${category.slug}`}
                             className={`flex-1 block p-2 rounded-md transition-colors
-                                ${currentCategory === category.slug ? 'bg-blue-100 text-blue-600' : 'hover:bg-gray-100'}
+                                ${currentCategory === category.slug ? 'bg-gray-700 text-white' : 'hover:bg-gray-100'}
                             `}
                             onClick={onItemClick}
                         >
@@ -63,7 +70,7 @@ const CategoryNav = ({ pathname, onItemClick }: { pathname: string, onItemClick?
                     )}
                 </div>
                 {hasChildren && isExpanded && (
-                    <ul className="ml-4 mt-1 space-y-1 border-l border-gray-200 pl-2">
+                    <ul className="ml-4 mt-1 space-y-1 border-l border-gray-700 pl-2">
                         {category.children?.map((child: PostCategory) => renderCategory(child))}
                     </ul>
                 )}
@@ -74,17 +81,23 @@ const CategoryNav = ({ pathname, onItemClick }: { pathname: string, onItemClick?
     return (
         <nav className="p-6">
             <ul className="space-y-3">
-                <li onClick={onItemClick}>
-                    <Link
-                        href="/posts"
-                        className={`block p-2 rounded-md transition-colors
-                            ${!currentCategory ? 'bg-blue-100 text-blue-600' : 'hover:bg-gray-100'}
-                        `}
-                    >
-                        all
-                    </Link>
-                </li>
-                {rootCategories.map(category => renderCategory(category))}
+                {rootCategories.length === 0 ? (
+                    <CategorySkeleton count={3} />
+                ) : (
+                    <>
+                        <li onClick={onItemClick}>
+                            <Link
+                                href="/posts"
+                                className={`block p-2 rounded-md transition-colors
+                                    ${!currentCategory ? 'bg-gray-700 text-white' : 'hover:bg-gray-100'}
+                                `}
+                            >
+                                all
+                            </Link>
+                        </li>
+                        {rootCategories.map(category => renderCategory(category))}
+                    </>
+                )}
             </ul>
         </nav>
     );
@@ -136,7 +149,7 @@ export default function PostLayoutClient({
                         - sticky로 스크롤 시에도 고정
                     */}
                     {!showDrawer && (
-                        <div className="w-64 border-r border-gray-200 min-h-[calc(100vh-4rem)] sticky top-16 -ml-6">
+                        <div className="w-64 border-r border-gray-700 min-h-[calc(100vh-4rem)] sticky top-16 -ml-6">
                             <CategoryNav pathname={pathname} />
                         </div>
                     )}
@@ -171,7 +184,7 @@ export default function PostLayoutClient({
                     isOpen={isDrawerOpen}
                     onClose={() => setIsDrawerOpen(false)}
                     hasOverlay={true}
-                    className="border-r border-gray-200"
+                    className="border-r border-gray-700"
                 >
                     <CategoryNav 
                         pathname={pathname} 
