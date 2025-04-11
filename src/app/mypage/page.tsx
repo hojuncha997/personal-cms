@@ -280,7 +280,7 @@ export default function MyPage() {
     <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-3xl font-bold mb-8 text-gray-900">마이페이지</h1>
+          <h1 className="text-3xl font-bold mb-8 text-gray-700">마이페이지</h1>
 
           <div className="bg-white rounded-lg shadow-md p-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -313,7 +313,7 @@ export default function MyPage() {
                 <button
                   onClick={() => document.getElementById('profile-image-input')?.click()}
                   disabled={isUpdatingProfileImage}
-                  className="mt-4 px-4 py-2 text-sm font-medium text-white bg-blue-500 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+                  className="mt-4 px-4 py-2 text-sm font-medium text-white bg-gray-700 rounded-md hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:opacity-50"
                 >
                   {isUpdatingProfileImage ? '업로드 중...' : '프로필 이미지 변경'}
                 </button>
@@ -335,11 +335,11 @@ export default function MyPage() {
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700">이메일</label>
-                    <p className="mt-1 text-gray-900">{profile.email}</p>
+                    <p className="mt-1 text-gray-700">{profile.email}</p>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700">이름</label>
-                    <p className="mt-1 text-gray-900">{profile.name}</p>
+                    <p className="mt-1 text-gray-700">{profile.name}</p>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700">닉네임</label>
@@ -374,7 +374,7 @@ export default function MyPage() {
                       </form>
                     ) : (
                       <div className="mt-1 flex items-center space-x-2">
-                        <p className="text-gray-900">{profile.nickname}</p>
+                        <p className="text-gray-700">{profile.nickname}</p>
                         <button
                           onClick={() => {
                             setNewNickname(profile.nickname);
@@ -406,10 +406,10 @@ export default function MyPage() {
             {!profile.isSocialMember && (
               <div className="bg-white shadow rounded-lg p-6 mb-6 mt-6">
                 <div className="flex justify-between items-center mb-4">
-                  <h2 className="text-lg font-medium text-gray-900">비밀번호 변경</h2>
+                  <h2 className="text-lg font-medium text-gray-700">비밀번호 변경</h2>
                   <button
                     onClick={() => setIsPasswordChangeOpen(!isPasswordChangeOpen)}
-                    className="px-4 py-2 text-sm font-medium text-white bg-blue-500 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200"
+                    className="px-4 py-2 text-sm font-medium text-white bg-gray-700 rounded-md hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-all duration-200"
                   >
                     {isPasswordChangeOpen ? '취소' : '비밀번호 변경'}
                   </button>
@@ -431,7 +431,7 @@ export default function MyPage() {
                           id="currentPassword"
                           value={currentPassword}
                           onChange={(e) => setCurrentPassword(e.target.value)}
-                          className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-gray-900"
+                          className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-gray-700"
                           required
                         />
                         <button
@@ -458,7 +458,7 @@ export default function MyPage() {
                           id="newPassword"
                           value={newPassword}
                           onChange={(e) => setNewPassword(e.target.value)}
-                          className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-gray-900"
+                          className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-gray-700"
                           required
                           minLength={PASSWORD_POLICY.MIN_LENGTH}
                           maxLength={PASSWORD_POLICY.MAX_LENGTH}
@@ -490,7 +490,7 @@ export default function MyPage() {
                           id="newPasswordConfirm"
                           value={newPasswordConfirm}
                           onChange={(e) => setNewPasswordConfirm(e.target.value)}
-                          className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-gray-900"
+                          className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-gray-700"
                           required
                           minLength={PASSWORD_POLICY.MIN_LENGTH}
                           maxLength={PASSWORD_POLICY.MAX_LENGTH}
@@ -540,7 +540,7 @@ export default function MyPage() {
             {/* 회원 탈퇴 섹션 */}
             <div className="bg-white shadow rounded-lg p-6 mt-8">
               <div className="flex justify-between items-center">
-                <h2 className="text-lg font-medium text-gray-900">회원 탈퇴</h2>
+                <h2 className="text-lg font-medium text-gray-700">회원 탈퇴</h2>
                 <button
                   onClick={() => setIsWithdrawModalOpen(true)}
                   className="px-4 py-2 text-sm font-medium text-red-600 border border-red-600 rounded-md hover:bg-red-50 transition-colors"
