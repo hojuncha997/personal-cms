@@ -8,7 +8,8 @@ export const metadata: Metadata = {
   description: '프로젝트 목록 페이지입니다.',
   alternates: {
     canonical: `${process.env.NEXT_PUBLIC_SITE_URL}/projects`
-  }
+  },
+  robots: 'noindex, nofollow' // 검색 엔진에 색인되지 않도록 설정
 }
 
 export default function ProjectListLayout({
@@ -23,4 +24,4 @@ export default function ProjectListLayout({
       </ProjectLayoutClient>
     </div>
   )
-} 
+}
