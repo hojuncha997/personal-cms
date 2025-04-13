@@ -185,7 +185,7 @@ const ProjectListContent = () => {
         if (!loading) {
             return (
                 <AdminGuard>
-                    <Link href="/posts/write" className='flex items-center gap-2 px-4 py-2 bg-gray-700 text-white rounded-md hover:bg-gray-800 transition-colors'>
+                    <Link href="/projects/write" className='flex items-center gap-2 px-4 py-2 bg-gray-700 text-white rounded-md hover:bg-gray-800 transition-colors'>
                         <Plus className="w-4 h-4" />
                         <span>프로젝트 작성</span>
                     </Link>
