@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Eye, EyeOff, ChevronDown, ChevronUp } from 'lucide-react';
 import { TERMS } from '@/constants/auth/terms';
@@ -14,6 +14,8 @@ import { useWindowSize } from '@/hooks/layout';
 import { SocialProvider } from '@/types/authTypes';
 import useSocialSignUp from '@/hooks/auth/useSocialSignup';
 import { validatePassword } from '@/constants/auth/password-policy';
+import { useAuthStore } from '@/store/useAuthStore'
+import { SignupSkeleton } from '@/components/auth/skeletons/SignupSkeleton';
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -21,12 +23,18 @@ export default function SignUpPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [expandedTermId, setExpandedTermId] = useState<string | null>(null);
   const { mutateAsync: localSignup } = useLocalSignup();
+  const { isAuthenticated } = useAuthStore();
   // const { mutateAsync: localSignup, isPending } = useLocalSignup()
 
   const { setIsSignupComplete } = useSignupStore();
   // const { isMobile, isTablet, isDesktop } = useWindowSize();
   // const { handleSignupSuccess } = useSignupNavigation();
 
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.replace('/');
+    }
+  }, [isAuthenticated, router]);
 
   const [formData, setFormData] = useState({
     email: '',
@@ -151,9 +159,24 @@ export default function SignUpPage() {
     );
   };
 
+  if (isAuthenticated) {
+    return (
+      <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-xl border border-gray-700 text-center">
+          <h2 className="text-2xl text-gray-700">이미 로그인되어 있습니다</h2>
+          <p className="text-gray-600">잠시 후 메인 페이지로 이동합니다...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (isLoading) {
+    return <SignupSkeleton />;
+  }
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-xl shadow-lg">
+    <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-xl border border-gray-700">
         <div className="text-center">
           <h2 className="text-2xl  text-gray-700">회원가입</h2>
           {/* <p className="mt-2 text-sm text-gray-600">
@@ -389,7 +412,7 @@ export default function SignUpPage() {
                 w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white
                 ${isLoading 
                   ? 'bg-gray-400 cursor-not-allowed' 
-                  : 'bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500'
+                  : 'bg-gray-700 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500'
                 }
               `}
             >

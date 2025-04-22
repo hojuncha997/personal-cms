@@ -210,6 +210,17 @@ export default function LoginModal({
           </button>
         ))}
       </div>
+
+      <div className="text-center mt-4">
+        <span className="text-sm text-gray-600">계정이 없으신가요? </span>
+        <Link 
+          href="/auth/signup" 
+          className="text-sm font-medium text-blue-600 hover:text-blue-500 transition-colors duration-200"
+          onClick={handleCloseModal}
+        >
+          회원가입하기
+        </Link>
+      </div>
     </form>
   )
 
