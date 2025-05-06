@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 import '../styles/editor.css'
 import ClientRootLayout from '@/components/layouts/ClientRootLayout';
+import { GoogleAnalytics } from '@next/third-parties/google'
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
