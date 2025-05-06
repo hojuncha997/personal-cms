@@ -24,6 +24,7 @@ export const metadata: Metadata = {
   description: "음악과 IT를 좋아하는 사람들의 사이트",
 };
 
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -35,7 +36,7 @@ export default function RootLayout({
         <ClientRootLayout>
           {children}
         </ClientRootLayout>
-        <GoogleAnalytics gaId={`${process.env.NEXT_PUBLIC_GA_ID}`} />
+        <GoogleAnalytics gaId="G-46NWETE22D" />
       </body>
     </html>
   );
