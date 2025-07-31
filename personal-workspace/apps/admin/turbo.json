@@ -1,12 +1,3 @@
 {
-  "extends": [
-    "//"
-  ],
-  "tasks": {
-    "build": {
-      "outputs": [
-        "dist/**"
-      ]
-    }
-  }
+  "extends": ["//turbo.json"]
 }

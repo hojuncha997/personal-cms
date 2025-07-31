@@ -1,4 +1,3 @@
-/** @type {import("eslint").Linter.Config} */
-import { config } from "@repo/eslint-config";
+import { config } from '@repo/eslint-config/next.js';
 
 export default config;
