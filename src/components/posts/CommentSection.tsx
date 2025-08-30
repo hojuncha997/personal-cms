@@ -62,12 +62,16 @@ export const CommentSection: React.FC<CommentSectionProps> = ({ publicId }) => {
 
   const CommentItem = ({ comment, isReply = false }: any) => {
     const isAuthor = useIsAuthor(comment.member.uuid);
+    const isDeleted = comment.isDeleted || false;
+    
+    // 백엔드에서 이미 필터링되어 옴
+    // 대댓글인 경우에만 추가 체크 (삭제된 대댓글도 표시해야 함)
     
     return (
     <div className={`${isReply ? 'ml-12' : ''} mb-4`}>
       <div className="flex gap-3">
         <div className="flex-shrink-0">
-          {comment.member.profileImage ? (
+          {!isDeleted && comment.member.profileImage ? (
             <Image
               src={comment.member.profileImage}
               alt={comment.member.nickname}
@@ -86,16 +90,22 @@ export const CommentSection: React.FC<CommentSectionProps> = ({ publicId }) => {
           <div className="bg-gray-50 rounded-lg p-3">
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
-                <span className="font-semibold text-sm">{comment.member.nickname}</span>
-                <span className="text-xs text-gray-500">
-                  {format(new Date(comment.createdAt), 'MM월 dd일 HH:mm', { locale: ko })}
+                <span className={`font-semibold text-sm ${isDeleted ? 'text-gray-400' : ''}`}>
+                  {isDeleted ? '삭제된 댓글' : comment.member.nickname}
                 </span>
-                {comment.isEdited && (
-                  <span className="text-xs text-gray-400">(수정됨)</span>
+                {!isDeleted && comment.createdAt && (
+                  <>
+                    <span className="text-xs text-gray-500">
+                      {format(new Date(comment.createdAt), 'MM월 dd일 HH:mm', { locale: ko })}
+                    </span>
+                    {comment.isEdited && (
+                      <span className="text-xs text-gray-400">(수정됨)</span>
+                    )}
+                  </>
                 )}
               </div>
               
-              {isAuthenticated && isAuthor && (
+              {isAuthenticated && isAuthor && !isDeleted && (
                 <div className="flex items-center gap-1">
                   <button
                     onClick={() => setEditingComment(comment.id)}
@@ -116,7 +126,9 @@ export const CommentSection: React.FC<CommentSectionProps> = ({ publicId }) => {
               
             </div>
             
-            <p className="text-sm text-gray-700 whitespace-pre-wrap">{comment.content}</p>
+            <p className={`text-sm whitespace-pre-wrap ${isDeleted ? 'text-gray-400 italic' : 'text-gray-700'}`}>
+              {isDeleted ? '삭제된 댓글입니다.' : (comment.content || '')}
+            </p>
           </div>
           
           {editingComment === comment.id ? (
@@ -132,7 +144,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({ publicId }) => {
               />
             </div>
           ) : (
-            !isReply && isAuthenticated && (
+            !isReply && isAuthenticated && !isDeleted && (
               <button
                 onClick={() => setReplyingTo(comment.id)}
                 className="mt-2 text-xs text-gray-500 hover:text-gray-700 flex items-center gap-1"
