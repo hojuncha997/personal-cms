@@ -26,6 +26,7 @@ import { User } from 'lucide-react';
 import { useIncrementViewCount } from '@/hooks/common/useIncrementViewCount';
 import { useToggleLike } from '@/hooks/posts/useToggleLike';
 import { useGetLikeStatus } from '@/hooks/posts/useGetLikeStatus';
+import { CommentSection } from '@/components/posts/CommentSection';
 
 interface PostDetailClientProps {
     publicId: string;
@@ -186,9 +187,7 @@ const PostDetailClient: React.FC<PostDetailClientProps> = ({ publicId }) => {
                                 </div>
 
                                 <div className="p-4 sm:p-6 border border-gray-300 rounded-lg">
-                                    <div className="text-gray-500 text-center py-4">
-                                        댓글 기능 준비 중...
-                                    </div>
+                                    <CommentSection publicId={publicId} />
                                 </div>
                             </div>
                         </div>
