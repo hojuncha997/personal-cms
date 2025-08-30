@@ -12,6 +12,7 @@ interface CommentInputProps {
   showCancel?: boolean;
   onCancel?: () => void;
   size?: 'default' | 'small';
+  initialValue?: string;
 }
 
 export const CommentInput: React.FC<CommentInputProps> = ({
@@ -20,9 +21,10 @@ export const CommentInput: React.FC<CommentInputProps> = ({
   placeholder = "댓글을 입력하세요...",
   showCancel = false,
   onCancel,
-  size = 'default'
+  size = 'default',
+  initialValue = ''
 }) => {
-  const [text, setText] = useState('');
+  const [text, setText] = useState(initialValue);
   const { isAuthenticated, nickname, profile } = useAuthStore();
 
   const handleSubmit = () => {
