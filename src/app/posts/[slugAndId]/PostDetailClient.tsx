@@ -24,6 +24,8 @@ import { logger } from '@/utils/logger';
 import Image from 'next/image';
 import { User } from 'lucide-react';
 import { useIncrementViewCount } from '@/hooks/common/useIncrementViewCount';
+import { useToggleLike } from '@/hooks/posts/useToggleLike';
+import { useGetLikeStatus } from '@/hooks/posts/useGetLikeStatus';
 
 interface PostDetailClientProps {
     publicId: string;
@@ -34,7 +36,9 @@ const PostDetailClient: React.FC<PostDetailClientProps> = ({ publicId }) => {
     const { data: relatedPosts, isLoading: relatedLoading } = useGetRelatedPosts(publicId);
     const { data: navigationPosts, isLoading: navigationLoading } = useGetPostNavigation(publicId);
     const { mutate: incrementViewCount } = useIncrementViewCount();
-    const [isLiked, setIsLiked] = useState(false);
+    const { data: likeStatus } = useGetLikeStatus(publicId);
+    const { mutate: toggleLike, isPending: isLikeLoading } = useToggleLike();
+    const [localLikeCount, setLocalLikeCount] = useState(0);
     const [showRelated, setShowRelated] = useState(false);
     const { mutate: deletePost, mutateAsync: deletePostAsync, isPending, isError } = useDeletePost();
     const router = useRouter();
@@ -43,6 +47,7 @@ const PostDetailClient: React.FC<PostDetailClientProps> = ({ publicId }) => {
     useEffect(() => {
         if (post) {
             incrementViewCount({ contentType: 'posts', publicId });
+            setLocalLikeCount(post.likeCount || 0);
         }
     }, [post, publicId, incrementViewCount]);
 
@@ -64,6 +69,14 @@ const PostDetailClient: React.FC<PostDetailClientProps> = ({ publicId }) => {
                 alert('게시글 삭제에 실패했습니다.');
             }
         }
+    };
+
+    const handleLikeClick = () => {
+        toggleLike(publicId, {
+            onSuccess: (data) => {
+                setLocalLikeCount(data.likeCount);
+            }
+        });
     };
 
     if (postLoading) {
@@ -160,11 +173,14 @@ const PostDetailClient: React.FC<PostDetailClientProps> = ({ publicId }) => {
                                 <div className="mt-8 border-t border-gray-300 pt-4">
                                     <div className="flex justify-center mb-8">
                                         <button 
+                                            onClick={handleLikeClick}
+                                            disabled={isLikeLoading}
                                             className={`flex items-center gap-2 px-4 py-2 rounded-full transition-colors
-                                                ${isLiked ? 'bg-red-500 text-white' : 'bg-gray-100 hover:bg-gray-200'}`}
+                                                ${likeStatus?.isLiked ? 'bg-red-500 text-white' : 'bg-gray-100 hover:bg-gray-200'}
+                                                ${isLikeLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
                                         >
                                             <span className="text-lg">❤️</span>
-                                            <span>좋아요 {post.likeCount + (isLiked ? 1 : 0)}</span>
+                                            <span>좋아요 {localLikeCount}</span>
                                         </button>
                                     </div>
                                 </div>
