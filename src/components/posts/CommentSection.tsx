@@ -3,12 +3,14 @@
 import React, { useState } from 'react';
 import { useGetComments } from '@/hooks/posts/useGetComments';
 import { useCreateComment } from '@/hooks/posts/useCreateComment';
+import { useUpdateComment } from '@/hooks/posts/useUpdateComment';
 import { useDeleteComment } from '@/hooks/posts/useDeleteComment';
 import { useAuthStore } from '@/store/useAuthStore';
+import { useIsAuthor } from '@/hooks/auth/useIsAuthor';
 import { format } from 'date-fns';
 import { ko } from 'date-fns/locale';
 import Image from 'next/image';
-import { User, Trash2, MessageCircle } from 'lucide-react';
+import { User, Trash2, MessageCircle, Edit3 } from 'lucide-react';
 import { CommentInput } from './CommentInput';
 
 interface CommentSectionProps {
@@ -17,11 +19,13 @@ interface CommentSectionProps {
 
 export const CommentSection: React.FC<CommentSectionProps> = ({ publicId }) => {
   const [replyingTo, setReplyingTo] = useState<number | null>(null);
+  const [editingComment, setEditingComment] = useState<number | null>(null);
   const [page, setPage] = useState(1);
   
-  const { isAuthenticated, profile } = useAuthStore();
+  const { isAuthenticated } = useAuthStore();
   const { data: commentsData, isLoading } = useGetComments(publicId, page);
   const { mutate: createComment, isPending: isCreating } = useCreateComment(publicId);
+  const { mutate: updateComment, isPending: isUpdating } = useUpdateComment(publicId);
   const { mutate: deleteComment } = useDeleteComment(publicId);
 
   const handleSubmitComment = (content: string) => {
@@ -39,13 +43,27 @@ export const CommentSection: React.FC<CommentSectionProps> = ({ publicId }) => {
     );
   };
 
+  const handleUpdateComment = (content: string, commentId: number) => {
+    updateComment(
+      { commentId, content },
+      {
+        onSuccess: () => {
+          setEditingComment(null);
+        }
+      }
+    );
+  };
+
   const handleDeleteComment = (commentId: number) => {
     if (window.confirm('정말로 이 댓글을 삭제하시겠습니까?')) {
       deleteComment(commentId);
     }
   };
 
-  const CommentItem = ({ comment, isReply = false }: any) => (
+  const CommentItem = ({ comment, isReply = false }: any) => {
+    const isAuthor = useIsAuthor(comment.member.uuid);
+    
+    return (
     <div className={`${isReply ? 'ml-12' : ''} mb-4`}>
       <div className="flex gap-3">
         <div className="flex-shrink-0">
@@ -77,27 +95,52 @@ export const CommentSection: React.FC<CommentSectionProps> = ({ publicId }) => {
                 )}
               </div>
               
-              {isAuthenticated && comment.member.uuid === profile?.uuid && (
-                <button
-                  onClick={() => handleDeleteComment(comment.id)}
-                  className="text-gray-400 hover:text-red-500 transition-colors"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
+              {isAuthenticated && isAuthor && (
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={() => setEditingComment(comment.id)}
+                    className="text-gray-400 hover:text-blue-500 transition-colors"
+                    title="댓글 수정"
+                  >
+                    <Edit3 className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => handleDeleteComment(comment.id)}
+                    className="text-gray-400 hover:text-red-500 transition-colors"
+                    title="댓글 삭제"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
               )}
+              
             </div>
             
             <p className="text-sm text-gray-700 whitespace-pre-wrap">{comment.content}</p>
           </div>
           
-          {!isReply && isAuthenticated && (
-            <button
-              onClick={() => setReplyingTo(comment.id)}
-              className="mt-2 text-xs text-gray-500 hover:text-gray-700 flex items-center gap-1"
-            >
-              <MessageCircle className="w-3 h-3" />
-              답글 달기
-            </button>
+          {editingComment === comment.id ? (
+            <div className="mt-2">
+              <CommentInput
+                onSubmit={(content) => handleUpdateComment(content, comment.id)}
+                isLoading={isUpdating}
+                placeholder="댓글을 수정하세요..."
+                showCancel={true}
+                onCancel={() => setEditingComment(null)}
+                size="small"
+                initialValue={comment.content}
+              />
+            </div>
+          ) : (
+            !isReply && isAuthenticated && (
+              <button
+                onClick={() => setReplyingTo(comment.id)}
+                className="mt-2 text-xs text-gray-500 hover:text-gray-700 flex items-center gap-1"
+              >
+                <MessageCircle className="w-3 h-3" />
+                답글 달기
+              </button>
+            )
           )}
           
           {replyingTo === comment.id && (
@@ -123,7 +166,8 @@ export const CommentSection: React.FC<CommentSectionProps> = ({ publicId }) => {
         </div>
       </div>
     </div>
-  );
+    );
+  };
 
   return (
     <div className="mt-8">
