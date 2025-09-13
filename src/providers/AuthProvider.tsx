@@ -27,8 +27,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         // 초기 토큰 갱신 시도
         await handleTokenRefresh()
         
-        // 초기화 완료 표시 전에 약간의 지연을 줌
-        await new Promise(resolve => setTimeout(resolve, 100))
+        // 프로필 정보는 useProfile 훅에서 React Query로 관리하므로 여기서는 제거
         
         if (mounted) {
           // 인터셉터 초기화 완료 표시

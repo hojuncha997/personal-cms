@@ -22,6 +22,7 @@ import {
   isInterceptorInitialized
 } from './authInterceptor'
 import { logger } from '@/utils/logger'
+import { deduplicateRequest, createRequestKey } from './requestDeduplicator'
 
 export interface FetchOptions extends RequestInit {
   body?: any;
@@ -160,13 +161,20 @@ export async function fetchClient(url: string, options: FetchOptions = {skipAuth
     return response;
   };
 
-  // 인증 관련 요청은 queueRequest를 건너뛰고 바로 실행
+  // 요청 중복 제거를 위한 키 생성
+  const requestKey = createRequestKey(
+    url, 
+    options.method || 'GET', 
+    !options.skipAuth
+  );
+
+  // 인증 관련 요청은 queueRequest를 건너뛰고 바로 실행 (하지만 중복 제거는 적용)
   if (isAuthRequest) {
-    return executeRequest();
+    return deduplicateRequest(requestKey, executeRequest);
   }
 
-  // 그 외 요청은 queueRequest로 감싸서 실행
-  return queueRequest(executeRequest);
+  // 그 외 요청은 queueRequest와 중복 제거 모두 적용
+  return queueRequest(() => deduplicateRequest(requestKey, executeRequest));
 }
 
 
