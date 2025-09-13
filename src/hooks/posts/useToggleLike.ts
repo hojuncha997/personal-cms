@@ -2,6 +2,19 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { fetchClient } from '@/lib/fetchClient';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useRouter } from 'next/navigation';
+// import { useMemo } from 'react';
+
+// 디바운싱 유틸리티 함수 (필요시 활성화)
+// function debounce<T extends (...args: any[]) => any>(
+//   func: T,
+//   delay: number
+// ): (...args: Parameters<T>) => void {
+//   let timeoutId: NodeJS.Timeout;
+//   return (...args: Parameters<T>) => {
+//     clearTimeout(timeoutId);
+//     timeoutId = setTimeout(() => func(...args), delay);
+//   };
+// }
 
 interface ToggleLikeResponse {
   isLiked: boolean;
@@ -15,6 +28,7 @@ interface ToggleLikeResponse {
  * 1. mutationKey: 같은 키의 mutation이 실행 중이면 새 요청 무시
  * 2. isPending 상태: UI에서 버튼 disabled 처리
  * 3. React Query 내장 중복 방지: 동일한 요청 자동 중복 제거
+ * // 4. debouncing: 300ms 내 연속 클릭은 마지막 클릭만 처리 (주석처리됨)
  * 
  * 작동 방식:
  * - 사용자가 빠르게 3번 클릭 시
@@ -81,4 +95,18 @@ export const useToggleLike = () => {
       }
     },
   });
+
+  // 디바운싱 관련 코드 (필요시 활성화)
+  // const debouncedMutate = useMemo(
+  //   () => debounce((publicId: string) => {
+  //     mutation.mutate(publicId);
+  //   }, 300),
+  //   [mutation.mutate]
+  // );
+
+  // return {
+  //   ...mutation,
+  //   mutate: debouncedMutate,
+  //   mutateImmediate: mutation.mutate,
+  // };
 };
