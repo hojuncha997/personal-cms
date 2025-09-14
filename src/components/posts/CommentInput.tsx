@@ -3,16 +3,17 @@
 import React, { useState } from 'react';
 import { useAuthStore } from '@/store/useAuthStore';
 import Image from 'next/image';
-import { User, Send } from 'lucide-react';
+import { User, Send, Lock } from 'lucide-react';
 
 interface CommentInputProps {
-  onSubmit: (content: string) => void;
+  onSubmit: (content: string, isSecret?: boolean) => void;
   isLoading: boolean;
   placeholder?: string;
   showCancel?: boolean;
   onCancel?: () => void;
   size?: 'default' | 'small';
   initialValue?: string;
+  allowSecret?: boolean;
 }
 
 export const CommentInput: React.FC<CommentInputProps> = ({
@@ -22,15 +23,18 @@ export const CommentInput: React.FC<CommentInputProps> = ({
   showCancel = false,
   onCancel,
   size = 'default',
-  initialValue = ''
+  initialValue = '',
+  allowSecret = true
 }) => {
   const [text, setText] = useState(initialValue);
+  const [isSecret, setIsSecret] = useState(false);
   const { isAuthenticated, nickname, profile } = useAuthStore();
 
   const handleSubmit = () => {
     if (!text.trim()) return;
-    onSubmit(text);
+    onSubmit(text, isSecret);
     setText('');
+    setIsSecret(false);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -70,36 +74,61 @@ export const CommentInput: React.FC<CommentInputProps> = ({
         )}
       </div>
       
-      <div className="flex-1 flex gap-2">
-        <textarea
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          onKeyPress={handleKeyPress}
-          placeholder={placeholder}
-          className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 resize-none"
-          rows={size === 'small' ? 1 : 2}
-        />
-        <div className="flex flex-col gap-1">
-          <button
-            onClick={handleSubmit}
-            disabled={isLoading || !text.trim()}
-            className="px-3 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
-          >
-            <Send className="w-4 h-4" />
-            {size === 'default' && <span>등록</span>}
-          </button>
-          {showCancel && onCancel && (
+      <div className="flex-1">
+        <div className="flex gap-2 mb-2">
+          <textarea
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            onKeyPress={handleKeyPress}
+            placeholder={placeholder}
+            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 resize-none"
+            rows={size === 'small' ? 1 : 2}
+          />
+          <div className="flex flex-col gap-1">
             <button
-              onClick={() => {
-                onCancel();
-                setText('');
-              }}
-              className="px-3 py-1 text-gray-500 hover:text-gray-700 text-sm"
+              onClick={handleSubmit}
+              disabled={isLoading || !text.trim()}
+              className="px-3 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
             >
-              취소
+              <Send className="w-4 h-4" />
+              {size === 'default' && <span>등록</span>}
             </button>
-          )}
+            {showCancel && onCancel && (
+              <button
+                onClick={() => {
+                  onCancel();
+                  setText('');
+                  setIsSecret(false);
+                }}
+                className="px-3 py-1 text-gray-500 hover:text-gray-700 text-sm"
+              >
+                취소
+              </button>
+            )}
+          </div>
         </div>
+        
+        {/* 비밀 댓글 옵션 
+            - 최상위 댓글에서만 표시 (size === 'default')
+            - 답글에서는 비밀 댓글 옵션 제공하지 않음 (allowSecret prop으로 제어)
+        */}
+        {allowSecret && size === 'default' && (
+          <div className="flex items-center gap-2 text-sm">
+            <label className="flex items-center gap-1 cursor-pointer text-gray-600 hover:text-gray-800">
+              <input
+                type="checkbox"
+                checked={isSecret}
+                onChange={(e) => setIsSecret(e.target.checked)}
+                className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+              />
+              <Lock className="w-3 h-3" />
+              <span>비밀 댓글</span>
+            </label>
+            <span className="text-xs text-gray-400">
+              (작성자, 포스트 작성자, 관리자만 볼 수 있습니다)
+            </span>
+          </div>
+        )}
       </div>
     </div>
   );
