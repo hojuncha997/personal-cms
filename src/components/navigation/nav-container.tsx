@@ -13,6 +13,7 @@ import { NavMenuContent } from '@/constants/navigation'
 import { themeClasses } from '@/styles/theme-classes'
 import { theme } from '@/constants/styles/theme'
 import { Button } from '@/components/ui'
+import { NotificationBell } from '@/components/notifications/NotificationBell'
 
 interface NavContainerProps {
   onOpenDrawer: () => void;
@@ -43,10 +44,15 @@ export function NavContainer({
   const renderAuthButton = () => {
     if (isAuthenticated) {
       return (
-        <div className={`${theme.button.secondary.border} rounded-full flex items-center`}>
-          <div className="cursor-pointer">
-            {/* 프로필 메뉴 컴포넌트 */}
-            <NavProfile />
+        <div className="flex items-center gap-2">
+          {/* 알림 벨 - 로그인한 사용자에게만 표시 */}
+          <NotificationBell />
+          
+          {/* 프로필 메뉴 */}
+          <div className={`${theme.button.secondary.border} rounded-full flex items-center`}>
+            <div className="cursor-pointer">
+              <NavProfile />
+            </div>
           </div>
         </div>
       )
