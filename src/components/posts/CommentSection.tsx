@@ -10,7 +10,7 @@ import { useIsAuthor } from '@/hooks/auth/useIsAuthor';
 import { format } from 'date-fns';
 import { ko } from 'date-fns/locale';
 import Image from 'next/image';
-import { User, Trash2, MessageCircle, Edit3 } from 'lucide-react';
+import { User, Trash2, MessageCircle, Edit3, Lock } from 'lucide-react';
 import { CommentInput } from './CommentInput';
 
 interface CommentSectionProps {
@@ -23,18 +23,18 @@ export const CommentSection: React.FC<CommentSectionProps> = ({ publicId }) => {
   const [page, setPage] = useState(1);
   
   const { isAuthenticated } = useAuthStore();
-  const { data: commentsData, isLoading } = useGetComments(publicId, page);
+  const { data: commentsData, isLoading, isError } = useGetComments(publicId, page);
   const { mutate: createComment, isPending: isCreating } = useCreateComment(publicId);
   const { mutate: updateComment, isPending: isUpdating } = useUpdateComment(publicId);
   const { mutate: deleteComment } = useDeleteComment(publicId);
 
-  const handleSubmitComment = (content: string) => {
-    createComment({ content });
+  const handleSubmitComment = (content: string, isSecret?: boolean) => {
+    createComment({ content, isSecret });
   };
 
-  const handleSubmitReply = (content: string, parentCommentId: number) => {
+  const handleSubmitReply = (content: string, parentCommentId: number, isSecret?: boolean) => {
     createComment(
-      { content, parentCommentId },
+      { content, parentCommentId, isSecret },
       {
         onSuccess: () => {
           setReplyingTo(null);
@@ -63,6 +63,16 @@ export const CommentSection: React.FC<CommentSectionProps> = ({ publicId }) => {
   const CommentItem = ({ comment, isReply = false }: any) => {
     const isAuthor = useIsAuthor(comment.member.uuid);
     const isDeleted = comment.isDeleted || false;
+    const isSecret = comment.isSecret || false;
+    
+    // 서버에서 권한 검증 후 내용 숨김 처리:
+    // - 권한이 있으면: comment.content에 실제 내용이 들어있음
+    // - 권한이 없으면: comment.content가 null로 전송됨
+    // 
+    // shouldHideContent가 true인 경우:
+    // 1. 삭제된 댓글
+    // 2. 비밀 댓글인데 content가 null인 경우 (권한 없음)
+    const shouldHideContent = isDeleted || (isSecret && !comment.content);
     
     // 백엔드에서 이미 필터링되어 옴
     // 대댓글인 경우에만 추가 체크 (삭제된 대댓글도 표시해야 함)
@@ -71,7 +81,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({ publicId }) => {
     <div className={`${isReply ? 'ml-12' : ''} mb-4`}>
       <div className="flex gap-3">
         <div className="flex-shrink-0">
-          {!isDeleted && comment.member.profileImage ? (
+          {!shouldHideContent && comment.member.profileImage ? (
             <Image
               src={comment.member.profileImage}
               alt={comment.member.nickname}
@@ -90,10 +100,21 @@ export const CommentSection: React.FC<CommentSectionProps> = ({ publicId }) => {
           <div className="bg-gray-50 rounded-lg p-3">
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
-                <span className={`font-semibold text-sm ${isDeleted ? 'text-gray-400' : ''}`}>
-                  {isDeleted ? '삭제된 댓글' : comment.member.nickname}
+                {/* 작성자 이름 표시
+                    - 삭제된 댓글: "삭제된 댓글"
+                    - 비밀 댓글(권한 없음): "비밀 댓글"
+                    - 정상: 작성자 닉네임
+                */}
+                <span className={`font-semibold text-sm ${shouldHideContent ? 'text-gray-400' : ''}`}>
+                  {isDeleted ? '삭제된 댓글' : (isSecret && !comment.content) ? '비밀 댓글' : comment.member.nickname}
                 </span>
-                {!isDeleted && comment.createdAt && (
+                {/* 비밀 댓글 아이콘 (내용을 볼 수 있는 경우에만 표시) */}
+                {isSecret && comment.content && (
+                  <span title="비밀 댓글">
+                    <Lock className="w-3 h-3 text-gray-500" />
+                  </span>
+                )}
+                {!shouldHideContent && comment.createdAt && (
                   <>
                     <span className="text-xs text-gray-500">
                       {format(new Date(comment.createdAt), 'MM월 dd일 HH:mm', { locale: ko })}
@@ -105,7 +126,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({ publicId }) => {
                 )}
               </div>
               
-              {isAuthenticated && isAuthor && !isDeleted && (
+              {isAuthenticated && isAuthor && !shouldHideContent && (
                 <div className="flex items-center gap-1">
                   <button
                     onClick={() => setEditingComment(comment.id)}
@@ -126,8 +147,19 @@ export const CommentSection: React.FC<CommentSectionProps> = ({ publicId }) => {
               
             </div>
             
-            <p className={`text-sm whitespace-pre-wrap ${isDeleted ? 'text-gray-400 italic' : 'text-gray-700'}`}>
-              {isDeleted ? '삭제된 댓글입니다.' : (comment.content || '')}
+            {/* 댓글 내용 표시
+                - 삭제된 댓글: "삭제된 댓글입니다."
+                - 비밀 댓글(권한 없음): "비밀 댓글입니다. 권한이 없어 볼 수 없습니다."
+                - 정상: 실제 댓글 내용
+                
+                서버에서 권한 검증 후:
+                - 권한 있음: comment.content에 실제 내용 전송
+                - 권한 없음: comment.content가 null로 전송
+            */}
+            <p className={`text-sm whitespace-pre-wrap ${shouldHideContent ? 'text-gray-400 italic' : 'text-gray-700'}`}>
+              {isDeleted ? '삭제된 댓글입니다.' : 
+               (isSecret && !comment.content) ? '비밀 댓글입니다. 권한이 없어 볼 수 없습니다.' : 
+               (comment.content || '')}
             </p>
           </div>
           
@@ -144,7 +176,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({ publicId }) => {
               />
             </div>
           ) : (
-            !isReply && isAuthenticated && !isDeleted && (
+            !isReply && isAuthenticated && !shouldHideContent && (
               <button
                 onClick={() => setReplyingTo(comment.id)}
                 className="mt-2 text-xs text-gray-500 hover:text-gray-700 flex items-center gap-1"
@@ -158,12 +190,14 @@ export const CommentSection: React.FC<CommentSectionProps> = ({ publicId }) => {
           {replyingTo === comment.id && (
             <div className="mt-2">
               <CommentInput
-                onSubmit={(content) => handleSubmitReply(content, comment.id)}
+                onSubmit={(content, isSecret) => handleSubmitReply(content, comment.id, isSecret)}
                 isLoading={isCreating}
                 placeholder="답글을 입력하세요..."
                 showCancel={true}
                 onCancel={() => setReplyingTo(null)}
                 size="small"
+                allowSecret={true}
+                defaultSecret={comment.isSecret} // 부모 댓글이 비밀이면 답글도 기본적으로 비밀
               />
             </div>
           )}
@@ -184,7 +218,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({ publicId }) => {
   return (
     <div className="mt-8">
       <h3 className="text-lg font-bold mb-4">
-        댓글 {commentsData?.meta.total || 0}개
+        댓글 {isLoading ? '...' : (commentsData?.meta.total || 0)}개
       </h3>
       
       <div className="mb-6">
