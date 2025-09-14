@@ -100,11 +100,19 @@ export const CommentSection: React.FC<CommentSectionProps> = ({ publicId }) => {
           <div className="bg-gray-50 rounded-lg p-3">
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
+                {/* 작성자 이름 표시
+                    - 삭제된 댓글: "삭제된 댓글"
+                    - 비밀 댓글(권한 없음): "비밀 댓글"
+                    - 정상: 작성자 닉네임
+                */}
                 <span className={`font-semibold text-sm ${shouldHideContent ? 'text-gray-400' : ''}`}>
                   {isDeleted ? '삭제된 댓글' : (isSecret && !comment.content) ? '비밀 댓글' : comment.member.nickname}
                 </span>
+                {/* 비밀 댓글 아이콘 (내용을 볼 수 있는 경우에만 표시) */}
                 {isSecret && comment.content && (
-                  <Lock className="w-3 h-3 text-gray-500" />
+                  <span title="비밀 댓글">
+                    <Lock className="w-3 h-3 text-gray-500" />
+                  </span>
                 )}
                 {!shouldHideContent && comment.createdAt && (
                   <>
@@ -139,6 +147,15 @@ export const CommentSection: React.FC<CommentSectionProps> = ({ publicId }) => {
               
             </div>
             
+            {/* 댓글 내용 표시
+                - 삭제된 댓글: "삭제된 댓글입니다."
+                - 비밀 댓글(권한 없음): "비밀 댓글입니다. 권한이 없어 볼 수 없습니다."
+                - 정상: 실제 댓글 내용
+                
+                서버에서 권한 검증 후:
+                - 권한 있음: comment.content에 실제 내용 전송
+                - 권한 없음: comment.content가 null로 전송
+            */}
             <p className={`text-sm whitespace-pre-wrap ${shouldHideContent ? 'text-gray-400 italic' : 'text-gray-700'}`}>
               {isDeleted ? '삭제된 댓글입니다.' : 
                (isSecret && !comment.content) ? '비밀 댓글입니다. 권한이 없어 볼 수 없습니다.' : 
@@ -179,7 +196,8 @@ export const CommentSection: React.FC<CommentSectionProps> = ({ publicId }) => {
                 showCancel={true}
                 onCancel={() => setReplyingTo(null)}
                 size="small"
-                allowSecret={false}
+                allowSecret={true}
+                defaultSecret={comment.isSecret} // 부모 댓글이 비밀이면 답글도 기본적으로 비밀
               />
             </div>
           )}

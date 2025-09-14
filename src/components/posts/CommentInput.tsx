@@ -14,6 +14,7 @@ interface CommentInputProps {
   size?: 'default' | 'small';
   initialValue?: string;
   allowSecret?: boolean;
+  defaultSecret?: boolean; // 비밀 댓글 기본값 설정
 }
 
 export const CommentInput: React.FC<CommentInputProps> = ({
@@ -24,17 +25,18 @@ export const CommentInput: React.FC<CommentInputProps> = ({
   onCancel,
   size = 'default',
   initialValue = '',
-  allowSecret = true
+  allowSecret = true,
+  defaultSecret = false
 }) => {
   const [text, setText] = useState(initialValue);
-  const [isSecret, setIsSecret] = useState(false);
+  const [isSecret, setIsSecret] = useState(defaultSecret); // 기본값으로 설정
   const { isAuthenticated, nickname, profile } = useAuthStore();
 
   const handleSubmit = () => {
     if (!text.trim()) return;
     onSubmit(text, isSecret);
     setText('');
-    setIsSecret(false);
+    setIsSecret(defaultSecret); // 제출 후 기본값으로 복원
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -98,7 +100,7 @@ export const CommentInput: React.FC<CommentInputProps> = ({
                 onClick={() => {
                   onCancel();
                   setText('');
-                  setIsSecret(false);
+                  setIsSecret(defaultSecret); // 취소 시에도 기본값으로 복원
                 }}
                 className="px-3 py-1 text-gray-500 hover:text-gray-700 text-sm"
               >
@@ -109,24 +111,26 @@ export const CommentInput: React.FC<CommentInputProps> = ({
         </div>
         
         {/* 비밀 댓글 옵션 
-            - 최상위 댓글에서만 표시 (size === 'default')
-            - 답글에서는 비밀 댓글 옵션 제공하지 않음 (allowSecret prop으로 제어)
+            - 답글(size === 'small')에서도 표시 가능
+            - allowSecret prop으로 제어
         */}
-        {allowSecret && size === 'default' && (
-          <div className="flex items-center gap-2 text-sm">
+        {allowSecret && (
+          <div className={`flex items-center gap-2 ${size === 'small' ? 'text-xs' : 'text-sm'}`}>
             <label className="flex items-center gap-1 cursor-pointer text-gray-600 hover:text-gray-800">
               <input
                 type="checkbox"
                 checked={isSecret}
                 onChange={(e) => setIsSecret(e.target.checked)}
-                className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                className={`${size === 'small' ? 'w-3 h-3' : 'w-4 h-4'} text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500`}
               />
-              <Lock className="w-3 h-3" />
-              <span>비밀 댓글</span>
+              <Lock className={`${size === 'small' ? 'w-2.5 h-2.5' : 'w-3 h-3'}`} />
+              <span>{size === 'small' ? '비밀' : '비밀 댓글'}</span>
             </label>
-            <span className="text-xs text-gray-400">
-              (작성자, 포스트 작성자, 관리자만 볼 수 있습니다)
-            </span>
+            {size === 'default' && (
+              <span className="text-xs text-gray-400">
+                (작성자, 포스트 작성자, 관리자만 볼 수 있습니다)
+              </span>
+            )}
           </div>
         )}
       </div>
