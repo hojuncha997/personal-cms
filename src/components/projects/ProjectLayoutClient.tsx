@@ -11,6 +11,7 @@ import { useGetProjectCategories, ProjectCategory } from '@/hooks/projects/useGe
 import { useCategoryStore } from '@/store/useCategoryStore';
 import { useRouter } from 'next/navigation';
 import { CategorySkeleton } from '@/components/ui';
+import { theme } from '@/constants/styles/theme';
 
 
 // CategoryNav 컴포넌트 수정
@@ -118,13 +119,13 @@ export default function ProjectLayoutClient({
 
     // 초기 렌더링 시에는 아무것도 보여주지 않음
     if (!mounted) {
-        return <div className='min-h-screen bg-[#ffffff]'>{children}</div>;
+        return <div className={`min-h-screen ${theme.card.bg}`}>{children}</div>;
     }
 
     const showDrawer = isMobile || isTablet;
 
     return (
-        <div className='min-h-screen bg-[#ffffff] relative'>
+        <div className={`min-h-screen ${theme.card.bg} relative`}>
             {/* 모바일/태블릿에서만 보이는 햄버거 버튼 */}
             {showDrawer && (
                 <button

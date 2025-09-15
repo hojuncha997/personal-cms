@@ -24,6 +24,7 @@ import { useGetPostCategories, PostCategory } from '@/hooks/posts/useGetPostCate
 import { processCategories } from '@/utils/categoryUtils';
 import { Pagination } from '@/components/common/Pagination';
 import { Plus } from 'lucide-react';
+import { theme } from '@/constants/styles/theme';
 const PostContent = () => {
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -194,7 +195,7 @@ const PostContent = () => {
     }
 
     return (
-        <div className="w-full">
+        <div className={`w-full min-h-screen ${theme.card.bg}`}>
             {/* <h1 className="text-3xl font-bold mb-12 border-b border-black pb-4">포스팅</h1> */}
      
                     <div className="flex justify-between items-center mb-6">
@@ -225,7 +226,7 @@ const PostContent = () => {
 
             <div className="w-full">
                 <div>
-                    <div className='bg-white rounded-lg overflow-hidden'>
+                    <div className='bg-gray-100 rounded-lg overflow-hidden'>
                         {data.data.length === 0 ? (
                             <div className='text-center py-20 text-gray-500'>
                                 <p className='text-lg font-medium'>등록된 포스팅이 없습니다.</p>

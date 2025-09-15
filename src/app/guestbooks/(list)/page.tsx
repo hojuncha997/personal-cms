@@ -21,6 +21,7 @@ import Accordion from '@/components/common/Accordion';
 import FilterContent from '@/components/common/FilterContent';
 import { useGetGuestbookCategories, GuestbookCategory } from '@/hooks/guestbooks/useGetGuestbookCategories';
 import { processCategories } from '@/utils/categoryUtils';
+import { theme } from '@/constants/styles/theme';
 
 
 
@@ -190,7 +191,7 @@ const GuestbookListContent = () => {
     }
 
     return (
-        <div className="w-full">
+        <div className={`w-full min-h-screen ${theme.card.bg}`}>
             <div className="flex justify-between items-center mb-6">
                 <h1 className="text-2xl font-bold text-gray-700">방명록</h1>
                 <button
@@ -222,7 +223,7 @@ const GuestbookListContent = () => {
 
             <div className="w-full">
                 <div>
-                    <div className='bg-white rounded-lg overflow-hidden'>
+                    <div className={`${theme.card.bg} rounded-lg overflow-hidden`}>
                         {data.data.length === 0 ? (
                             <div className='text-center py-20 text-gray-500'>
                                 <p className='text-lg font-medium'>등록된 포스팅이 없습니다.</p>

@@ -21,6 +21,7 @@ import { User } from 'lucide-react';
 import { useIncrementViewCount } from '@/hooks/common/useIncrementViewCount';
 import GuestbookDetailSkeleton from '@/components/guestbooks/skeletons/GuestbookDetailSkeleton';
 import { useDeleteGuestbook } from '@/hooks/guestbooks/useDeleteGuestbook';
+import { theme } from '@/constants/styles/theme';
 interface GuestbookDetailClientProps {
     publicId: string;
 }
@@ -64,7 +65,7 @@ const GuestbookDetailClient: React.FC<GuestbookDetailClientProps> = ({ publicId 
             <Container className="px-0 sm:px-4">
                 <div className="max-w-4xl w-full mx-auto py-4 sm:py-8">
                     <div className="w-full space-y-6">
-                        <div className="bg-white rounded-lg sm:border-none">
+                        <div className={`${theme.card.bg} rounded-lg sm:border-none`}>
                             <div className="p-0 sm:p-6">
                                 {/* 헤더 */}
                                 <div className="border-b border-gray-300 pb-4">
