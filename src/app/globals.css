@@ -14,6 +14,7 @@
 
   body {
     @apply text-gray-700 bg-gray-100;
+    font-family: 'Gulim', '굴림', sans-serif;
   }
 
   .dark body {
