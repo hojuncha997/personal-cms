@@ -48,7 +48,7 @@ const CategoryNav = ({ pathname, onItemClick }: { pathname: string, onItemClick?
                         // 하위 카테고리가 있는 경우: 펼치기/접기 버튼
                         <button
                             onClick={() => toggleCategory(category.id)}
-                            className={`flex-1 block p-2 rounded-md transition-colors text-left
+                            className={`flex-1 block p-2  transition-colors text-left
                                 ${currentCategory === category.slug ? 'bg-gray-700 text-white' : 'hover:bg-gray-100'}
                             `}
                         >
@@ -66,7 +66,7 @@ const CategoryNav = ({ pathname, onItemClick }: { pathname: string, onItemClick?
                         // 하위 카테고리가 없는 경우: 링크로 처리
                         <Link
                             href={`/guestbooks?categorySlug=${category.slug}`}
-                            className={`flex-1 block p-2 rounded-md transition-colors
+                            className={`flex-1 block p-2  transition-colors
                                 ${currentCategory === category.slug ? 'bg-gray-700 text-white' : 'hover:bg-gray-100'}
                             `}
                             onClick={onItemClick}
@@ -90,7 +90,7 @@ const CategoryNav = ({ pathname, onItemClick }: { pathname: string, onItemClick?
                 <li onClick={onItemClick}>
                     <Link
                         href="/guestbooks"
-                        className={`block p-2 rounded-md transition-colors
+                        className={`block p-2  transition-colors
                             ${!currentCategory ? 'bg-gray-700 text-white' : 'hover:bg-gray-100'}
                         `}
                     >

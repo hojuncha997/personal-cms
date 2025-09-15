@@ -227,7 +227,7 @@ const ProjectListContent = () => {
 
             <div className="w-full">
                 <div>
-                    <div className={`${theme.card.bg} rounded-lg overflow-hidden`}>
+                    <div className={`${theme.card.bg} overflow-hidden`}>
                         {data.data.length === 0 ? (
                             <div className='text-center py-20 text-gray-500'>
                                 <p className='text-lg font-medium'>등록된 포스팅이 없습니다.</p>
@@ -289,7 +289,7 @@ const ProjectListContent = () => {
                                         <div className='w-40 ml-4'>
                                             {/* 썸네일 영역 */}
                                             {/* <div className={`w-full h-24 rounded-lg overflow-hidden ${!project.thumbnail ? 'bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center p-2' : ''}`}> */}
-                                            <div className={`w-full h-24 rounded-lg overflow-hidden ${!project.thumbnail ? 'bg-gradient-to-r from-gray-400 to-gray-700 flex items-center justify-center p-2' : ''}`}>
+                                            <div className={`w-full h-24 overflow-hidden ${!project.thumbnail ? 'bg-gradient-to-r from-gray-400 to-gray-700 flex items-center justify-center p-2' : ''}`}>
     
                                                 {project.thumbnail ? (
                                                     <Image 

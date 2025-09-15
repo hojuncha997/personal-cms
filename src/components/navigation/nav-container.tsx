@@ -43,7 +43,7 @@ export function NavContainer({
   const renderAuthButton = () => {
     if (isAuthenticated) {
       return (
-        <div className={`${theme.button.secondary.border} rounded-full flex items-center`}>
+        <div className={`${theme.button.secondary.border} flex items-center`}>
           <div className="cursor-pointer">
             {/* 프로필 메뉴 컴포넌트 */}
             <NavProfile />

@@ -161,7 +161,7 @@ export const theme = {
     /** 카드 그림자 */
     shadow: 'shadow-md',
     /** 카드 라운드 코너 */
-    rounded: 'rounded-lg',
+    rounded: '',
   },
   
   // 이미지 스타일

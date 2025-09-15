@@ -49,7 +49,7 @@ export default function Home() {
       <Container className="">
         <div className="py-6">
           {/* 메인 섹션 */}
-          <section className={`mb-12 ${theme.card.border} rounded-lg p-0 overflow-hidden`}>
+          <section className={`mb-12 ${theme.card.border}  p-0 overflow-hidden`}>
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-0">
               {/* 메인 뉴스 영역 */}
               {featuredPost && (
@@ -70,7 +70,7 @@ export default function Home() {
                         </div>
                         {featuredPost.thumbnail ? (
                           <div className="col-span-6">
-                            <div className={`aspect-[4/3] bg-${theme.colors.gray[100]} rounded-sm overflow-hidden ${theme.card.border}`}>
+                            <div className={`aspect-[4/3] bg-${theme.colors.gray[100]}  overflow-hidden ${theme.card.border}`}>
                               {featuredPost.thumbnail ? (
                                 <Image 
                                   src={featuredPost.thumbnail} 
@@ -80,7 +80,7 @@ export default function Home() {
                                   className={themeClasses.image}
                                 />
                               ) : (
-                                <div className={`aspect-[4/3] relative bg-gradient-to-r from-gray-400 to-gray-700 rounded-sm ${theme.card.border}`}>
+                                <div className={`aspect-[4/3] relative bg-gradient-to-r from-gray-400 to-gray-700  ${theme.card.border}`}>
                                   <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center z-10 p-4">
                                     <p className="text-white text-center font-medium">{featuredPost.title}</p>
                                   </div>
@@ -90,7 +90,7 @@ export default function Home() {
                           </div>
                         ) : (
                           <div className="col-span-6">
-                            <div className={`aspect-[4/3] relative bg-gradient-to-r from-gray-400 to-gray-700 rounded-sm ${theme.card.border}`}>
+                            <div className={`aspect-[4/3] relative bg-gradient-to-r from-gray-400 to-gray-700  ${theme.card.border}`}>
                               <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center z-10 p-4">
                                 <p className="text-white text-center font-medium">{featuredPost.title}</p>
                               </div>
@@ -125,7 +125,7 @@ export default function Home() {
                               <span className={`text-xs text-${theme.colors.gray[500]}`}>{post.current_author_name}</span>
                             </div>
                             {post.thumbnail ? (
-                              <div className={`w-20 h-20 flex-shrink-0 bg-${theme.colors.gray[100]} rounded-sm overflow-hidden ${theme.card.border}`}>
+                              <div className={`w-20 h-20 flex-shrink-0 bg-${theme.colors.gray[100]}  overflow-hidden ${theme.card.border}`}>
                                 <Image 
                                   src={post.thumbnail} 
                                   alt={post.title}
@@ -135,7 +135,7 @@ export default function Home() {
                                 />
                               </div>
                             ) : (
-                              <div className={`w-20 h-20 flex-shrink-0 relative bg-gradient-to-r from-gray-400 to-gray-700 rounded-sm ${theme.card.border}`}>
+                              <div className={`w-20 h-20 flex-shrink-0 relative bg-gradient-to-r from-gray-400 to-gray-700  ${theme.card.border}`}>
                                 <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center z-10 p-1">
                                   <p className="text-white text-xs text-center">{post.title.substring(0, 20)}{post.title.length > 20 ? '...' : ''}</p>
                                 </div>
@@ -152,7 +152,7 @@ export default function Home() {
           </section>
 
           {/* 프로젝트 섹션 */}
-          <section className={`${theme.card.border} rounded-lg p-0 overflow-hidden`}>
+          <section className={`${theme.card.border}  p-0 overflow-hidden`}>
             <div className={`${theme.button.primary.bg} ${theme.button.primary.text} p-1 lg:p-1 `}>
               <Heading level={2} className={`m-0 ${theme.button.primary.text}`}>프로젝트</Heading>
             </div>
@@ -163,7 +163,7 @@ export default function Home() {
                     <Card className={`cursor-pointer shadow-none ${theme.card.hover} border-0`}>
                       <CardContent className="p-0">
                         {project.thumbnail ? (
-                          <div className={`aspect-[16/10] bg-${theme.colors.gray[100]} rounded-sm overflow-hidden mb-3 ${theme.card.border}`}>
+                          <div className={`aspect-[16/10] bg-${theme.colors.gray[100]}  overflow-hidden mb-3 ${theme.card.border}`}>
                             <Image 
                               src={project.thumbnail} 
                               alt={project.title}
@@ -173,7 +173,7 @@ export default function Home() {
                             />
                           </div>
                         ) : (
-                          <div className={`aspect-[16/10] relative bg-gradient-to-r from-gray-400 to-gray-700 rounded-sm mb-3 ${theme.card.border}`}>
+                          <div className={`aspect-[16/10] relative bg-gradient-to-r from-gray-400 to-gray-700  mb-3 ${theme.card.border}`}>
                             <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center z-10 p-4">
                               <p className="text-white text-center font-medium">{project.title}</p>
                             </div>

@@ -62,7 +62,7 @@ const ProjectDetailClient: React.FC<ProjectDetailClientProps> = ({ publicId }) =
             <Container className="px-0 sm:px-4">
                 <div className="max-w-4xl w-full mx-auto py-4 sm:py-8">
                     <div className="w-full space-y-6">
-                        <div className={`${theme.card.bg} rounded-lg sm:border-none`}>
+                        <div className={`${theme.card.bg} sm:border-none`}>
                             <div className="p-0 sm:p-6">
                                 {/* 헤더 */}
                                 <div className="border-b border-gray-300 pb-4">
