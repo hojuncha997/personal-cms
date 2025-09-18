@@ -66,7 +66,7 @@ export const themeColors: ThemeColorPalette = {
   primary: '#374151',    // gray-700
   secondary: '#ffffff',  // white
   background: {
-    light: '#ffffff',    // white
+    light: '#f3f4f6',    // gray-100
     dark: '#374151',     // gray-700
   },
   text: {
@@ -117,10 +117,10 @@ export const theme = {
       disabled: 'bg-gray-300 cursor-not-allowed',
     },
     
-    // 보조 버튼 (흰색 배경, 회색 테두리와 텍스트)
+    // 보조 버튼 (회색 배경, 회색 테두리와 텍스트)
     secondary: {
       /** 보조 버튼 배경색 */
-      bg: 'bg-white',
+      bg: 'bg-[#CBCBCB]',
       /** 보조 버튼 텍스트 색상 */
       text: 'text-primary',
       /** 보조 버튼 호버 상태 */
@@ -137,7 +137,7 @@ export const theme = {
   // 입력 필드 스타일
   input: {
     /** 입력 필드 배경색 */
-    bg: 'bg-white',
+    bg: 'bg-[#CBCBCB]',
     /** 입력 필드 텍스트 색상 */
     text: 'text-primary',
     /** 입력 필드 테두리 색상 */
@@ -153,7 +153,7 @@ export const theme = {
   // 카드 스타일
   card: {
     /** 카드 배경색 */
-    bg: 'bg-white',
+    bg: 'bg-[#CBCBCB]',
     /** 카드 테두리 */
     border: 'border border-primary',
     /** 카드 호버 상태 */
@@ -161,7 +161,7 @@ export const theme = {
     /** 카드 그림자 */
     shadow: 'shadow-md',
     /** 카드 라운드 코너 */
-    rounded: 'rounded-lg',
+    rounded: '',
   },
   
   // 이미지 스타일

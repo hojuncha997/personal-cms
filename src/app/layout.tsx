@@ -32,7 +32,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="scrollbar-gutter-stable" style={{ scrollBehavior:'auto' }}> 
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <body className="antialiased" style={{ fontFamily: 'Gulim, 굴림, sans-serif' }}>
         <ClientRootLayout>
           {children}
         </ClientRootLayout>

@@ -27,6 +27,7 @@ import { useIncrementViewCount } from '@/hooks/common/useIncrementViewCount';
 import { useToggleLike } from '@/hooks/posts/useToggleLike';
 import { useGetLikeStatus } from '@/hooks/posts/useGetLikeStatus';
 import { CommentSection } from '@/components/posts/CommentSection';
+import { theme } from '@/constants/styles/theme';
 
 interface PostDetailClientProps {
     publicId: string;
@@ -94,7 +95,7 @@ const PostDetailClient: React.FC<PostDetailClientProps> = ({ publicId }) => {
                 <div className="max-w-4xl w-full mx-auto py-4 sm:py-8">
                     <div className="w-full space-y-6">
                         {/* 본문 컨테이너 */}
-                        <div className="bg-white rounded-lg sm:border-none">
+                        <div className={`${theme.card.bg} sm:border-none`}>
                             <div className="p-0 sm:p-6">
                                 {/* 헤더 */}
                                 <div className="border-b border-gray-300 pb-4">
@@ -186,7 +187,7 @@ const PostDetailClient: React.FC<PostDetailClientProps> = ({ publicId }) => {
                                     </div>
                                 </div>
 
-                                <div className="p-4 sm:p-6 border border-gray-300 rounded-lg">
+                                <div className="p-4 sm:p-6 border border-gray-300">
                                     <CommentSection publicId={publicId} />
                                 </div>
                             </div>
@@ -195,13 +196,13 @@ const PostDetailClient: React.FC<PostDetailClientProps> = ({ publicId }) => {
                         {/* 관련 포스트와 네비게이션 섹션 */}
                         {showRelated && (
                             <>
-                                <div className="bg-white border border-gray-300 rounded-lg">
+                                <div className="bg-white border border-gray-300">
                                     <div className="p-4 sm:p-6">
                                         <RelatedPosts publicId={publicId} />
                                     </div>
                                 </div>
 
-                                <div className="bg-white border border-gray-300 rounded-lg">
+                                <div className="bg-white border border-gray-300">
                                     <div className="p-4 sm:p-6">
                                         <PostNavigation publicId={publicId} />
                                     </div>

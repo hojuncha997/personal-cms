@@ -13,7 +13,9 @@
   }
 
   body {
-    @apply text-gray-700 bg-white;
+    @apply text-gray-700;
+    background-color: #CBCBCB;
+    font-family: 'Gulim', '굴림', sans-serif;
   }
 
   .dark body {

@@ -13,6 +13,7 @@ import { useGetGuestbookCategories, GuestbookCategory } from '@/hooks/guestbooks
 import { useCategoryStore } from '@/store/useCategoryStore';
 import { useRouter } from 'next/navigation';
 import { CategorySkeleton } from '@/components/ui';
+import { theme } from '@/constants/styles/theme';
 
 // CategoryNav 컴포넌트 수정
 const CategoryNav = ({ pathname, onItemClick }: { pathname: string, onItemClick?: () => void }) => {
@@ -47,7 +48,7 @@ const CategoryNav = ({ pathname, onItemClick }: { pathname: string, onItemClick?
                         // 하위 카테고리가 있는 경우: 펼치기/접기 버튼
                         <button
                             onClick={() => toggleCategory(category.id)}
-                            className={`flex-1 block p-2 rounded-md transition-colors text-left
+                            className={`flex-1 block p-2  transition-colors text-left
                                 ${currentCategory === category.slug ? 'bg-gray-700 text-white' : 'hover:bg-gray-100'}
                             `}
                         >
@@ -65,7 +66,7 @@ const CategoryNav = ({ pathname, onItemClick }: { pathname: string, onItemClick?
                         // 하위 카테고리가 없는 경우: 링크로 처리
                         <Link
                             href={`/guestbooks?categorySlug=${category.slug}`}
-                            className={`flex-1 block p-2 rounded-md transition-colors
+                            className={`flex-1 block p-2  transition-colors
                                 ${currentCategory === category.slug ? 'bg-gray-700 text-white' : 'hover:bg-gray-100'}
                             `}
                             onClick={onItemClick}
@@ -89,7 +90,7 @@ const CategoryNav = ({ pathname, onItemClick }: { pathname: string, onItemClick?
                 <li onClick={onItemClick}>
                     <Link
                         href="/guestbooks"
-                        className={`block p-2 rounded-md transition-colors
+                        className={`block p-2  transition-colors
                             ${!currentCategory ? 'bg-gray-700 text-white' : 'hover:bg-gray-100'}
                         `}
                     >
@@ -118,17 +119,17 @@ export default function GuestbookLayoutClient({
 
     // 초기 렌더링 시에는 아무것도 보여주지 않음
     if (!mounted) {
-        return <div className='min-h-screen bg-[#ffffff]'>{children}</div>;
+        return <div className={`min-h-screen ${theme.card.bg}`}>{children}</div>;
     }
 
     const showDrawer = isMobile || isTablet;
 
     return (
-        <div className='min-h-screen bg-[#ffffff] relative'>
+        <div className={`min-h-screen ${theme.card.bg} relative`}>
             {/* 모바일/태블릿에서만 보이는 햄버거 버튼 */}
             {showDrawer && (
                 <button
-                    className="fixed bottom-20 left-0 z-50 p-3 bg-gradient-to-r from-blue-600 to-purple-600 rounded-r-2xl shadow-[0_4px_20px_rgba(0,0,0,0.15)] transition-all duration-300 hover:shadow-[0_4px_25px_rgba(59,130,246,0.3)]"
+                    className="fixed bottom-20 left-0 z-50 p-3 bg-gray-700 shadow-[0_4px_20px_rgba(0,0,0,0.15)] transition-all duration-300 hover:shadow-[0_4px_25px_rgba(59,130,246,0.3)]"
                     onClick={() => setIsDrawerOpen(!isDrawerOpen)}
                 >
                     <Menu 
