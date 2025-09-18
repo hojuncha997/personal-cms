@@ -1,0 +1,8 @@
+# Exclude admin app from deployment
+personal-workspace/apps/admin
+
+# Exclude blog app if not needed in main deployment
+personal-workspace/apps/blog
+
+# Exclude node_modules in workspace apps
+personal-workspace/apps/*/node_modules
