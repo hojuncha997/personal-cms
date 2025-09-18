@@ -120,7 +120,7 @@ export const theme = {
     // 보조 버튼 (회색 배경, 회색 테두리와 텍스트)
     secondary: {
       /** 보조 버튼 배경색 */
-      bg: 'bg-gray-100',
+      bg: 'bg-[#CBCBCB]',
       /** 보조 버튼 텍스트 색상 */
       text: 'text-primary',
       /** 보조 버튼 호버 상태 */
@@ -137,7 +137,7 @@ export const theme = {
   // 입력 필드 스타일
   input: {
     /** 입력 필드 배경색 */
-    bg: 'bg-gray-100',
+    bg: 'bg-[#CBCBCB]',
     /** 입력 필드 텍스트 색상 */
     text: 'text-primary',
     /** 입력 필드 테두리 색상 */
@@ -153,7 +153,7 @@ export const theme = {
   // 카드 스타일
   card: {
     /** 카드 배경색 */
-    bg: 'bg-gray-100',
+    bg: 'bg-[#CBCBCB]',
     /** 카드 테두리 */
     border: 'border border-primary',
     /** 카드 호버 상태 */

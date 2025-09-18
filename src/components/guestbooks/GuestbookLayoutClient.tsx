@@ -129,7 +129,7 @@ export default function GuestbookLayoutClient({
             {/* 모바일/태블릿에서만 보이는 햄버거 버튼 */}
             {showDrawer && (
                 <button
-                    className="fixed bottom-20 left-0 z-50 p-3 bg-gradient-to-r from-blue-600 to-purple-600 rounded-r-2xl shadow-[0_4px_20px_rgba(0,0,0,0.15)] transition-all duration-300 hover:shadow-[0_4px_25px_rgba(59,130,246,0.3)]"
+                    className="fixed bottom-20 left-0 z-50 p-3 bg-gray-700 shadow-[0_4px_20px_rgba(0,0,0,0.15)] transition-all duration-300 hover:shadow-[0_4px_25px_rgba(59,130,246,0.3)]"
                     onClick={() => setIsDrawerOpen(!isDrawerOpen)}
                 >
                     <Menu 

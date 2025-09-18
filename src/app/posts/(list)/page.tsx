@@ -185,7 +185,7 @@ const PostContent = () => {
         if (!loading) {
             return (
                 <AdminGuard>
-                    <Link href="/posts/write" className='flex items-center gap-2 px-4 py-2 bg-gray-700 text-white rounded-md hover:bg-gray-800 transition-colors'>
+                    <Link href="/posts/write" className='flex items-center gap-2 px-4 py-2 bg-gray-700 text-white hover:bg-gray-800 transition-colors'>
                         <Plus className="w-4 h-4" />
                         <span>포스팅 작성</span>
                     </Link>
@@ -226,7 +226,7 @@ const PostContent = () => {
 
             <div className="w-full">
                 <div>
-                    <div className='bg-gray-100 overflow-hidden'>
+                    <div className={`${theme.card.bg} overflow-hidden`}>
                         {data.data.length === 0 ? (
                             <div className='text-center py-20 text-gray-500'>
                                 <p className='text-lg font-medium'>등록된 포스팅이 없습니다.</p>
@@ -253,7 +253,7 @@ const PostContent = () => {
                                                 </div>
                                             )}
                                             <div className='text-sm text-gray-500 flex flex-wrap gap-4'>
-                                                <span className='px-2 py-1 bg-gray-100 text-sm rounded-md'>{post.categorySlug || 'no category'}</span>
+                                                <span className='px-2 py-1 ${theme.card.bg} text-sm'>{post.categorySlug || 'no category'}</span>
                                                 <div className="flex items-center gap-2">
                                                     {/* {post.author_profile_image ? (
                                                         <Image
@@ -277,7 +277,7 @@ const PostContent = () => {
                                         </div>
                                         <div className='w-40 ml-4'>
                                             {/* 썸네일 영역 */}
-                                            <div className={`w-full h-24 overflow-hidden ${!post.thumbnail ? 'bg-gradient-to-r from-gray-400 to-gray-700 flex items-center justify-center p-2' : ''}`}>
+                                            <div className={`w-full h-24 overflow-hidden ${!post.thumbnail ? 'bg-gray-600 flex items-center justify-center p-2' : ''}`}>
                                                 {post.thumbnail ? (
                                                     <Image 
                                                         src={post.thumbnail} 

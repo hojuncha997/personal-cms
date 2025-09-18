@@ -196,7 +196,7 @@ const GuestbookListContent = () => {
                 <h1 className="text-2xl font-bold text-gray-700">방명록</h1>
                 <button
                     onClick={handleWriteClick}
-                    className="flex items-center gap-2 px-4 py-2 bg-gray-700 text-white rounded-md hover:bg-gray-800 transition-colors"
+                    className="flex items-center gap-2 px-4 py-2 bg-gray-700 text-white  hover:bg-gray-800 transition-colors"
                 >
                     <Plus className="w-4 h-4" />
                     <span>방명록 작성</span>
@@ -251,7 +251,7 @@ const GuestbookListContent = () => {
                                             )}
                                             <div className='text-sm text-gray-500 flex flex-wrap gap-4'>
                                                 <span 
-                                                    className='px-2 py-1 bg-gray-100 text-sm rounded-md cursor-pointer hover:bg-gray-200'
+                                                    className='px-2 py-1 ${theme.card.bg} text-sm  cursor-pointer hover:bg-gray-200'
                                                     onClick={(e) => {
                                                         e.preventDefault();
                                                         handleCategoryChange(guestbook.categorySlug || '');
@@ -283,7 +283,7 @@ const GuestbookListContent = () => {
                                         </div>
                                         <div className='w-40 ml-4'>
                                             {/* 썸네일 영역 */}
-                                            <div className={`w-full h-24 overflow-hidden ${!guestbook.thumbnail ? 'bg-gradient-to-r from-gray-400 to-gray-700 flex items-center justify-center p-2' : ''}`}>
+                                            <div className={`w-full h-24 overflow-hidden ${!guestbook.thumbnail ? 'bg-gray-600 flex items-center justify-center p-2' : ''}`}>
                                                 {guestbook.thumbnail ? (
                                                     <Image 
                                                         src={guestbook.thumbnail} 
@@ -312,10 +312,10 @@ const GuestbookListContent = () => {
                                 <button
                                     key={page}
                                     onClick={() => handlePageChange(page)}
-                                    className={`px-4 py-2 rounded-md ${
+                                    className={`px-4 py-2  ${
                                         searchState.page === page 
                                             ? 'bg-gray-700 text-white' 
-                                            : 'bg-gray-100 hover:bg-gray-200'
+                                            : '${theme.card.bg} hover:bg-gray-200'
                                     }`}
                                 >
                                     {page}

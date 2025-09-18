@@ -80,7 +80,7 @@ export default function Home() {
                                   className={themeClasses.image}
                                 />
                               ) : (
-                                <div className={`aspect-[4/3] relative bg-gradient-to-r from-gray-400 to-gray-700  ${theme.card.border}`}>
+                                <div className={`aspect-[4/3] relative bg-gray-600  ${theme.card.border}`}>
                                   <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center z-10 p-4">
                                     <p className="text-white text-center font-medium">{featuredPost.title}</p>
                                   </div>
@@ -90,7 +90,7 @@ export default function Home() {
                           </div>
                         ) : (
                           <div className="col-span-6">
-                            <div className={`aspect-[4/3] relative bg-gradient-to-r from-gray-400 to-gray-700  ${theme.card.border}`}>
+                            <div className={`aspect-[4/3] relative bg-gray-600  ${theme.card.border}`}>
                               <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center z-10 p-4">
                                 <p className="text-white text-center font-medium">{featuredPost.title}</p>
                               </div>
@@ -135,7 +135,7 @@ export default function Home() {
                                 />
                               </div>
                             ) : (
-                              <div className={`w-20 h-20 flex-shrink-0 relative bg-gradient-to-r from-gray-400 to-gray-700  ${theme.card.border}`}>
+                              <div className={`w-20 h-20 flex-shrink-0 relative bg-gray-600  ${theme.card.border}`}>
                                 <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center z-10 p-1">
                                   <p className="text-white text-xs text-center">{post.title.substring(0, 20)}{post.title.length > 20 ? '...' : ''}</p>
                                 </div>
@@ -173,7 +173,7 @@ export default function Home() {
                             />
                           </div>
                         ) : (
-                          <div className={`aspect-[16/10] relative bg-gradient-to-r from-gray-400 to-gray-700  mb-3 ${theme.card.border}`}>
+                          <div className={`aspect-[16/10] relative bg-gray-600  mb-3 ${theme.card.border}`}>
                             <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center z-10 p-4">
                               <p className="text-white text-center font-medium">{project.title}</p>
                             </div>
